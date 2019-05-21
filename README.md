@@ -32,8 +32,8 @@ Peer review ( 리더십, 토론 능력, 책임감, 전공능력 )
 ---
 ## Environments
 ### Development Environment
-OS : Linux
-Editor : Text Editor, vim, ..
+OS : Linux  
+Editor : Text Editor, vim, ..  
 
 ### Execution Environment
 OS : Rasbian
