@@ -1,4 +1,3 @@
-#EMSO/Term
 
 # Smart Farm System
 ### DeadLine
@@ -26,10 +25,10 @@ Peer review ( 리더십, 토론 능력, 책임감, 전공능력 )
 * 
 ---
 ## Member
-> 201311276 박형민
-> 201311287 엄현식
-> 2013 이진호
-> 2013 한예훈
+> 201311276 박형민   
+> 201311287 엄현식  
+> 2013 이진호   
+> 2013 한예훈   
 ---
 ## Environments
 ### Development Environment
@@ -47,7 +46,7 @@ OS : Rasbian
 	3. 빛 감지 센서
 	4. LED
 	5. 적외선 센서
-	6. 거리 감지 센
+	6. 거리 감지 센서
 3. Device
 	1. 모터
 	2. 부저
@@ -56,7 +55,6 @@ OS : Rasbian
 ---
 ## Development Tool
 1. Remote Repository
- [GitHub Link]( )
 2. Project management
 3. 
 
@@ -85,29 +83,29 @@ Smart Farm System
  │   │	  └──DEVICE/
  │   │	       └──DEVICE_LIB.c
  │   └──App/
- │		   ├──daemon.c 					/* Background */
- │       └──SF_SUBCTR.c 				/* sub Controller */
+ │       ├──daemon.c 			/* Background */
+ │       └──SF_SUBCTR.c 		/* sub Controller */
  │
  ├──R2/
  │   ├──Kernel/
- │   │    └──SF_NET/
- │   │         └──NETWORK.c
+ │   │   └──SF_NET/
+ │   │        └──NETWORK.c
  │   ├──lib/
- │   │	└──SF_NET/
- │   │	     └──NETWORK_LIB.c 
+ │   │	 └──SF_NET/
+ │   │	      └──NETWORK_LIB.c 
  │   └──App/
- │		    ├──daemon.c 				/* Background */
- │        ├──SF_CTR.c 				/* Controller */
- │        └──SF_UIF.c 				/* User Interface */
+ │	 ├──daemon.c	 		/* Background */
+ │       ├──SF_CTR.c 			/* Controller */
+ │       └──SF_UIF.c 			/* User Interface */
  │
  └──R3/
- 	   ├──Kernel/
+     ├──Kernel/
      │   └──SF_NET/
      │        └──NETWORK.c
-  	   ├──lib/
+     ├──lib/
      │   └──SF_NET/
-     │	    └──NETWORK_LIB.c 
+     │	      └──NETWORK_LIB.c 
      └──App/
-     	   ├──daemon.c 					/* Background */
-         └──SF_STORAGE.c 				/* Storage */
+     	 ├──daemon.c 			/* Background */
+         └──SF_STORAGE.c 		/* Storage */
 ```
