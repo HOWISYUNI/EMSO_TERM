@@ -27,8 +27,8 @@ Peer review ( 리더십, 토론 능력, 책임감, 전공능력 )
 ## Member
 > 201311276 박형민   
 > 201311287 엄현식  
-> 2013 이진호   
-> 2013 한예훈   
+> 201311306 이진호   
+> 201311320 한예훈   
 ---
 ## Environments
 ### Development Environment
