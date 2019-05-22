@@ -51,6 +51,38 @@ OS : Rasbian
 	1. 모터
 	2. 부저
 	3. 카메라
+### Coding Style
+가이드라인 : [kernel_code_style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html)
+
+#### 1. 들여쓰기 : __space 4__
+
+#### 2. 함수 정의
+```
+/* 함수 이름 : 함수 기능
+ * 인자값 설명
+ * 반환값 설명
+ * * /
+function() {
+}
+```
+
+#### 3. 한 줄짜리
+```if() break;```
+
+
+#### 4. 주석
+```/*  */```
+
+#### 5. Naming
+
+__변수명__ : ```val_name;```
+
+__함수명__ : ```func_name_like_that() ```
+
+__구조체명__ :```typedef struct_t {} name;```
+
+__매크로__ : ```DEFINE_SOMETHING```
+
 
 ---
 ## Development Tool
