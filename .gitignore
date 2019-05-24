@@ -9,5 +9,8 @@
 *.swp
 
 /* tmp */
-src/ku_pir/.tmp_versions/
+**/.tmp_versions/
 
+
+/* binary */
+R1/daemon
