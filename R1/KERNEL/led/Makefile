@@ -2,7 +2,7 @@ KDIR := ~/linux-rpi
 ARM := ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
 PWD := $(shell pwd)
 
-obj-m := ku_pir.o
+obj-m := led.o
 
 default:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
