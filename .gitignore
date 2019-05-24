@@ -1,0 +1,13 @@
+/* Cache */
+*.ko
+*.mod.c
+*.mod.o
+*.symvers
+*.order
+*.cmd
+*.o
+*.swp
+
+/* tmp */
+src/ku_pir/.tmp_versions/
+
