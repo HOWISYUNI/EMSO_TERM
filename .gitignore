@@ -10,8 +10,14 @@
 
 /* tmp */
 **/.tmp_versions/
+<<<<<<< HEAD
 **/.DS_Store
 
 /* binary */
 R1/daemon
+=======
+>>>>>>> 041b76194aa973221951c0a5c4bcc0dc10710a29
 
+
+/* binary */
+R1/daemon
