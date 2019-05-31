@@ -104,17 +104,17 @@ Smart Farm System
  │   │	   │    ├──SENSOR_2.c
  │   │	   │    ├──SENSOR_3.c
  │   │	   │    └──SENSOR_4.c
- │   │	   └──DEVICE/
- │   │            ├──DEVICE_1.c
- │   │            ├──DEVICE_2.c
- │   │            └──DEVICE_3.c
+ │   │	   └──ACTUATOR/
+ │   │            ├──ACTUATOR_1.c
+ │   │            ├──ACTUATOR_2.c
+ │   │            └──ACTUATOR_3.c
  │   ├──lib/							
  │   │	  ├──SF_NET/
  │   │	  │    └──NETWORK_LIB.c 
  │   │	  ├──SENSOR/
  │   │	  │    └──SENSOR_LIB.c
- │   │	  └──DEVICE/
- │   │	       └──DEVICE_LIB.c
+ │   │	  └──ACTUATOR/
+ │   │	       └──ACTUATOR_LIB.c
  │   └──App/
  │       ├──daemon.c 			/* Background */
  │       └──SF_SUBCTR.c 		/* sub Controller */
