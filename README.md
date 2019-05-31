@@ -47,7 +47,7 @@ OS : Rasbian
 	4. LED
 	5. PIR 센서
 	6. 거리 감지 센서
-3. Device
+3. Actuator
 	1. 모터
 	2. 부저
     3. 카메라
