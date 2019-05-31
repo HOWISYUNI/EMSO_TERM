@@ -6,16 +6,12 @@
  *
  * */
 
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/gpio.h>
-#include <linux/delay.h>
+#include "dht11.h"
 
 MODULE_LICENSE("GPL");
 
-#define MAX_TIMING 85
-#define DHT11 21
+static dev_t dev_num;
+static struct cdev *cd_cdev;
 
 static int dht11_data[5] = {0,};
 
@@ -64,15 +60,35 @@ static void dht11_read(void){
 	
 }
 
-static int __init dht11_init(void){
+static dht11_open(struct inode *inode, struct file *file){
 	int i=0;
-
-	gpio_request(DHT11, "DHT11");
 
 	for(i=0;i<20;i++){
 		dht11_read();
 		mdelay(200);
 	}
+
+	return 0;
+}
+
+static dht11_release(struct inode *inode, struct file *file){
+	
+	return 0;
+}
+
+struct file_operations dht11_fops = {
+	.open = dht11_open,
+	.release = dht11_release
+};
+
+static int __init dht11_init(void){
+
+	gpio_request(DHT11, "DHT11");
+
+	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+	cd_cdev = cdev_alloc();
+	cdev_init(cd_cdev, &dht11_fops);
+	cdev_add(cd_cdev, dev_num, 1);
 	
 	return 0;
 }
