@@ -43,3 +43,20 @@ int read_light_sensor(){
 
 	return light_value;
 }
+
+/*
+	motor turn on
+	counter-clockwise 180 -> clockwise 360 -> counter-clockwise 360
+*/
+int turn_on_motor(){
+	int ret;
+	ret = open("/dev/motor_dev", O_RDWR);
+	return ret;
+}
+
+/*turn off motor*/
+int turn_off_motor(int fd){
+	int ret;
+	ret = close(fd);
+	return ret;
+}

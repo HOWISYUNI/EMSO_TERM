@@ -2,6 +2,9 @@
 
 MODULE_LICENSE("GPL");
 
+static dev_t dev_num;
+static struct cdev *cd_cdev;
+
 int steps[STEPS][4] = {
 	{1,0,0,0},
 	{1,1,0,0},
@@ -49,12 +52,18 @@ void moveDegree(int degree, int delay, int direction){
 
 }
 
-struct int motor_open(struct inode *inode, struct file *file){
+static int motor_open(struct inode *inode, struct file *file){
+
+	moveDegree(180, 1000, 1);
+	while(1){
+		moveDegree(360, 1000, 0);
+		moveDegree(360, 1000, 1);
+	}
 	
 	return 0;
 }
 
-struct int motor_release(struct inode *inode, struct file *file){
+static int motor_release(struct inode *inode, struct file *file){
 	
 	return 0;
 }

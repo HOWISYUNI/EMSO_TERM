@@ -7,6 +7,8 @@
 #include <linux/delay.h>
 #include <linux/cdev.h>
 
+#define DEV_NAME "motor"
+
 #define PIN1 6
 #define PIN2 13
 #define PIN3 19
