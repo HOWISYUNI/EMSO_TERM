@@ -54,7 +54,6 @@ void moveDegree(int degree, int delay, int direction){
 
 static int motor_open(struct inode *inode, struct file *file){
 
-	moveDegree(180, 1000, 1);
 	while(1){
 		moveDegree(360, 1000, 0);
 		moveDegree(360, 1000, 1);
