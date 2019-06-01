@@ -22,9 +22,24 @@ int turn_on_pir(){
 	return ret;	/* success : 0 */
 }
 
-int turn_off_led(int fd){
+int turn_off_pir(int fd){
 	int ret;
 	ret = close(fd);
 
 	return ret;	/* success : 0 */
+}
+
+/* read value from light sensor*/
+int read_light_sensor(){
+	int dev;
+	int ret;
+	int light_value=0;
+
+	dev = open("/dev/light_sensor_dev",O_RDWR);
+	
+	ret=read(dev,&light_value,sizeof(int));
+	
+	ret = close(dev);
+
+	return light_value;
 }

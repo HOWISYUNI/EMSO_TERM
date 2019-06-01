@@ -6,3 +6,5 @@ int turn_off_led(int fd);
 
 int turn_on_pir();
 int turn_off_pir(int fd);
+
+int read_light_sensor();
