@@ -1,4 +1,4 @@
-#include "device_lib.h"
+#include "actuator_lib.h"
 /* LED device path : /dev/LED */
 
 /* turn on led */
@@ -15,18 +15,16 @@ int turn_off_led(int fd){
     return ret;
 }
 
-int turn_on_pir(){
+int turn_on_buzzer(){
 	int ret;
-	ret = open("/dev/pir", O_RDWR);
-	
-	return ret;	/* success : 0 */
+	ret = open("/dev/buzzer", O_RDWR);
+	return ret;
 }
 
-int turn_off_pir(int fd){
+int turn_off_buzzer(int fd){
 	int ret;
 	ret = close(fd);
-
-	return ret;	/* success : 0 */
+	return ret;
 }
 
 /* read value from light sensor*/
