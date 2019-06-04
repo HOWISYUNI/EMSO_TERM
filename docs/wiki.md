@@ -21,10 +21,10 @@
 
 ## Device name
 ```
-#define DEV_NAME "led"
-#define DEV_NAME "dht11"
-#define DEV_NAME "light_sensor_dev"
-#define DEV_NAME "pir_sensor_dev"
+#define DEV_LED "led"
+#define DEV_DHT "dht11"
+#define DEV_LIGHT "light"
+#define DEV_PIR "pir"
 ```
 
 ---
