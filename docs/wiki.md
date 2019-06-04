@@ -6,17 +6,17 @@
 ## Device GPIO num 
 
 ```
-#define LED 4       /*  led  */
-#define PIN1 6      /* motor */
-#define CE0 8       /* light */
-#define MISO 9      /* light */
-#define MOSI 10     /* light */
-#define SCLK 11     /* light */
-#define PIN2 13     /* motor */
-#define SENSOR 17   /*  pir  */
-#define PIN3 19     /* motor */
-#define DHT11 21    /* dht11 */
-#define PIN4 26     /* motor */
+#define LED 4          /*  led  */
+#define MOTOR_A 6      /* motor */
+#define CE0 8          /* light */
+#define MISO 9         /* light */
+#define MOSI 10        /* light */
+#define SCLK 11        /* light */
+#define MOTOR_B 13     /* motor */
+#define SENSOR 17      /*  pir  */
+#define MOTOR_C 19     /* motor */
+#define DHT 21         /* dht11 */
+#define MOTOR_D 26     /* motor */
 ```
 
 ## Device name
