@@ -9,10 +9,10 @@
 
 #define DEV_NAME "motor"
 
-#define PIN1 6
-#define PIN2 13
-#define PIN3 19
-#define PIN4 26
+#define MOTOR_A 6
+#define MOTOR_B 13
+#define MOTOR_C 19
+#define MOTOR_D 26
 
 #define STEPS 8
 

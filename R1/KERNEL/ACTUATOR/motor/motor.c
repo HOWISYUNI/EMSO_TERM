@@ -73,10 +73,10 @@ struct file_operations motor_fops = {
 };
 
 static int __init simple_motor_init(void){
-	gpio_request_one(PIN1, GPIOF_OUT_INIT_LOW, "p1");
-	gpio_request_one(PIN2, GPIOF_OUT_INIT_LOW, "p2");
-	gpio_request_one(PIN3, GPIOF_OUT_INIT_LOW, "p3");
-	gpio_request_one(PIN4, GPIOF_OUT_INIT_LOW, "p4");
+	gpio_request_one(MOTOR_A, GPIOF_OUT_INIT_LOW, "MOTOR_A");
+	gpio_request_one(MOTOR_B, GPIOF_OUT_INIT_LOW, "MOTOR_B");
+	gpio_request_one(MOTOR_C, GPIOF_OUT_INIT_LOW, "MOTOR_C");
+	gpio_request_one(MOTOR_D, GPIOF_OUT_INIT_LOW, "MOTOR_D");
 
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
 	cd_cdev = cdev_alloc();
@@ -87,10 +87,10 @@ static int __init simple_motor_init(void){
 }
 
 static void __exit simple_motor_exit(void){
-	gpio_free(PIN1);
-	gpio_free(PIN2);
-	gpio_free(PIN3);
-	gpio_free(PIN4);
+	gpio_free(MOTOR_A);
+	gpio_free(MOTOR_B);
+	gpio_free(MOTOR_C);
+	gpio_free(MOTOR_D);
 }
 
 module_init(simple_motor_init);
