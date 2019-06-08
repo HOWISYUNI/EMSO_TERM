@@ -1,3 +1,0 @@
-/* ku smart farm system network api */
-
-
