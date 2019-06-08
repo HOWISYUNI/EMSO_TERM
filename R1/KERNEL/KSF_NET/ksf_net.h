@@ -19,51 +19,12 @@
 #include <linux/ip.h>
 #include <linux/in.h>
 
-
 #define KSF_NET "ksf_net"
 
 #define DEFAULT_PORT 2325   /* Src */
 #define CONNECT_PORT 23     /* Dest */
 //#define INADDR_SEND ((unsigned long int)0x7f000001) /* 127.0.0.1 */
 #define INADDR_SEND INADDR_LOOPBACK
-
-/*
- * @GET | type           | data      | cmd           
- * 'l'  : light value    | time      | 'a' : average
- * 's'  : soil value     |           | 's' : sum
- * @PUT |
- * 'a'  : alert led      | time      | '1' : on
- * 'b'  : buzzer         |           | '0' : off
- * 'c'  : camera         |           |
- * 'l'  : led            |           |
- * 'm'  : motor          |           |
- * 'p'  : water pump     |           |
- * 's'  : sprinkler      |           |
- * @POST|
- * 'l'  : light value    | DATA      | NULL
- * 's'  : soil value     |           |
- * 'a'  : alert info     |           |
- */
-
-struct request{
-    char method;
-    char type;
-    char cmd;
-    size_t len;
-    void *data;
-};
-
-/*
- *  type            | data
- *  's' : Success   | GET  : data
- *  'f' : Failure   | PUT  : result
- *  't' : Timeout   | POST : result
- */
-struct response{
-    char type;
-    size_t len;
-    void *data;
-};
 
 static dev_t dev_num;
 static struct cdev *cd_cdev;
