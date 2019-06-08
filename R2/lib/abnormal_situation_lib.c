@@ -19,9 +19,17 @@ int request_connection_to_r3(){
 }
 
 /*비정상 상황 r3에 전송*/
-int send_abnormal_situation_to_r3(){
+void send_abnormal_situation_to_r3(socket){
 	
-	return 0;
+	struct response rcv;
+
+	rcv = request_post(socket, type, data);
+
+	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
+	if(rcv.data){
+
+	}
+
 }
 
 /*비정상 상황시 알람 메시지*/

@@ -23,9 +23,16 @@ int request_connection_to_r3(){
 }
 
 /*r3에 미확인 물체 데이터 전송*/
-int send_unidentified_object_to_r3(){
+void send_unidentified_object_to_r3(int socket){
+	struct response rcv;
 
-	return 0;
+	rcv = request_post(socket, type, data);
+
+	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
+	if(rcv.data){
+
+	}
+
 }
 
 
