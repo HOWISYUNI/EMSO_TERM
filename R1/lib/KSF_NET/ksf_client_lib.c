@@ -8,38 +8,32 @@
  * */
 
 
-int client_init(src_ip, dest_ip, port, type){
-    struct client_info c_info;
-    struct server_info s_info;
-    int socket, ret;
-    socket = open("/dev/ksf_net_client", O_RDWR);
-
-    /* client init */
-    c_info.ip = src_ip;
-    c_info.port = port;
-    c_info.type = type; /* @GET @POST @PUT */
-
-    /* set dest server */
-    s_info.ip = dest_ip;
-    s_info.port = port;
-
-    /* socket init */
-    ret = ioctl(socket, INIT_CLIENT, c_info);
-    if(ret < 0){
-        /* fail init */
+int client_init(char *dest_ip, int port){
+    int sock, ret;
+    struct sockaddr_in server_addr;
+    
+    sock = socket(PF_INET, SOCK_STREAM, 0);
+    if(sock < 0){
+        printf("failed init\n");
         return -1;
     }
-    /* ask alive server */
-    ret = ioctl(socket, INIT_CONNCT, s_info);
+    
+    /* hdr set */
+    memset(&server_addr, 0, sizeof(struct sockaddr_in));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+    server_addr.sin_addr.s_addr = inet_addr(dest_ip);
+    
+    ret = connect(sock, (struct *sockaddr)&server_addr, sizeof(struct sockaddr_in));
     if(ret < 0){
-        /* cannot connect to server */
-        return -2;
+        printf("failed connect\n");
+        return -1;
     }
-
-    return socket;
+    
+    return sock;
 }
 
-struct response request_get(socket, type, data, cmd){
+struct response request_get(int sock, char type, char *data, char cmd){
     struct request req;
     struct response rsp;
     int ret;
