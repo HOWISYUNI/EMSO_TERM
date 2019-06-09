@@ -1,10 +1,12 @@
+#include "ksf_net.h"
 
 /* INIT
  * */
-int server_init(ip, port);
+int server_open(int port);
+int server_close(int sock);
 /* LISTEN
  * */
-struct request wait_request(socket);
+int wait_request(int sock, struct request *req);
 /* RESPONSE
  * */
-int response(socket, type, data);
+int response(int c_sock, char type, unsigned long len, char *data);

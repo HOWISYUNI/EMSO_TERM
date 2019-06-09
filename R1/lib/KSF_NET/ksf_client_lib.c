@@ -1,3 +1,5 @@
+#include "ksf_client_lib.h"
+
 /* Client REST API */
 /* 20190603 aeomhs "rest api - client #interface"
  * Client request to server
@@ -8,9 +10,9 @@
  * */
 
 
-int client_init(char *dest_ip, int port){
+int client_open(char *dest_ip, int port){
     int sock, ret;
-    struct sockaddr_in server_addr;
+    struct sockaddr_in s_addr;
     
     sock = socket(PF_INET, SOCK_STREAM, 0);
     if(sock < 0){
@@ -19,12 +21,12 @@ int client_init(char *dest_ip, int port){
     }
     
     /* hdr set */
-    memset(&server_addr, 0, sizeof(struct sockaddr_in));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-    server_addr.sin_addr.s_addr = inet_addr(dest_ip);
+    memset(&s_addr, 0, sizeof(s_addr));
+    s_addr.sin_family = AF_INET;
+    s_addr.sin_port = htons(4000);
+    s_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     
-    ret = connect(sock, (struct *sockaddr)&server_addr, sizeof(struct sockaddr_in));
+    ret = connect(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
     if(ret < 0){
         printf("failed connect\n");
         return -1;
@@ -33,78 +35,47 @@ int client_init(char *dest_ip, int port){
     return sock;
 }
 
-struct response request_get(int sock, char type, char *data, char cmd){
-    struct request req;
+struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data){
+    struct request *req;
     struct response rsp;
     int ret;
 
+    req = (struct request*)malloc(len+sizeof(struct request));
+    memset(req, 0, sizeof(req));
+    
     /* request init */
-    req.type = type; /* @light @soil */
-    req.data = data; /* @60 == 현재로부터 1시간 전부터 계산 */
-    req.cmd = cmd;   /* @avg @sum ... */
-    req.method = GET;
+    req->method = method;
+    req->type = type; /* @light @soil */
+    req->cmd = cmd;   /* @avg @sum ... */
+    req->len = len;
+    req->data = data; /* @60 == 현재로부터 1시간 전부터 계산 */
 
     /* send request */
-    ret = write(socket, req, sizeof(struct request));
+    ret = write(sock, req, len);
     if(ret < 0){
         /* fail request */
+        rsp.type = 'F';
+        rsp.len = 0;
+        strcpy(rsp.data, "\n");
+        return rsp;
     }
-
+    
     /* maybe wait until receive response */
-    ret = read(socket, rsp, sizeof(struct response));
+    ret = read(sock, &rsp, sizeof(struct response));
     if(ret < 0){
         /* fail request */
+        rsp.type = 'f';
+        rsp.len = 0;
+        strcpy(rsp.data, "\n");
+        return rsp;
     }
 
     return rsp;
 }
 
-struct response request_post(socket, type, data){
-    struct request req;
-    struct response rsp;
+int client_close(int sock){
     int ret;
-    /* request init */
-    req.type = type; /* @light @soil @alert */
-    req.data = data; /* @data : ...? */
-    req.cmd = NULL;
-    req.method = POST;
-
-    /* send reqeust */
-    ret = write(socket, req, sizeof(struct requset));
-    if(ret < 0){
-        /* fail request */
-    }
-
-    /* wait response */
-    ret = read(socket, rsp, sizeof(struct response));
-    if(ret < 0){
-        /* fail request */
-    }
-
-    return rsp;
-}
-
-struct response request_put(socket, type, data, cmd){
-    struct request req;
-    struct response rsp;
-    int ret;
-    /* request init */
-    req.type = type; /* @led @motor @pump @buzzer @camera @led */
-    req.data = data; /* @60 : 60min */
-    req.cmd = cmd;   /* @on @off */
-    req.method = PUT;
-
-    /* send reqeust */
-    ret = write(socket, req, sizeof(struct request));
-    if(ret < 0){
-        /* fail request */
-    }
-
-    /* wait response */
-    ret = read(socket, rsp, sizeof(struct response));
-    if(ret < 0){
-        /* fail request */
-    }
-
-    return rsp;
+    ret = close(sock);
+    
+    return ret;
 }

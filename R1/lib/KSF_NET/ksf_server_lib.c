@@ -1,3 +1,5 @@
+#include "ksf_server_lib.h"
+
 /* Server REST API */
 /* 20190602 aeomhs "rest api - server #interface"
  * Server is always on.
@@ -7,56 +9,80 @@
  * @POST: request save information : create new data
  * */
 
-int server_init(ip, port){
-    struct server_info s_info;
-    int socket, ret;
-
-    /* server init */
-    s_info.ip = ip;
-    s_info.port = port;
-    socket = open("/dev/ksf_net", O_RDWR);
-    if(socket < 0){
-        /* fail init */
+int server_open(int port){
+    int sock, ret;
+    struct sockaddr_in s_addr;  /* server address */
+    
+    sock = socket(PF_INET, SOCK_STREAM, 0);
+    if(sock < 0){
+        printf("failed init\n");
         return -1;
     }
-
-    /* socket init */
-    ret = ioctl(socket, INIT_SERVER, s_info);
+    
+    memset(&s_addr, 0, sizeof(s_addr));
+    s_addr.sin_family = AF_INET;
+    s_addr.sin_port = htons(4000);
+    s_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    
+    ret = bind(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
+    
     if(ret < 0){
-        /* fail init */
+        printf("failed bind\n");
         return -1;
     }
 
-    return socket;
+    return sock;
+}
+
+int server_close(int sock){
+    int ret;
+    
+    ret = close(sock);
+
+    return ret;
 }
 
 /* Server should be run alyways */
-struct request wait_request(socket){
-    struct request req;
+int wait_request(int sock, struct request *req){
+    int ret;
+    int c_sock; /* client socket */
+    int c_addr_size;
+    struct sockaddr_in c_addr; /* client address */
+    
+    ret = listen(sock, 5);
+    if(ret < 0){
+        printf("failed listen\n");
+        return -1;
+    }
+    
+    c_addr_size = sizeof(struct sockaddr_in);
+    c_sock = accept(sock, (struct sockaddr*)&c_addr, &c_addr_size);
+    
+    if(c_sock < 0){
+        printf("failed connect to client\n");
+        return -1;
+    }
+    
+    read(c_sock, req, sizeof(struct response));
+    printf("received\n");
 
-
-    /* Wait request */
-    req = read(socket, request);
-
-    return req;
-
+    return c_sock;
 }
 
 /* Send response */
-int response(socket, type, data){
+int response(int c_sock, char type, unsigned long len, char *data){
     struct response rsp;
     int ret;
 
     /* response init */
     rsp.type = type;
-    rsp.data = data;
+    rsp.len = len;
+    memset(rsp.data, 0, BUFF_SIZE);
+    strcpy(rsp.data, data);
+    
+    write(c_sock, &rsp, sizeof(struct response));
+    close(c_sock);
 
-    /* send response */
-    ret = write(socket, rsp, sizeof(struct response));
-    if(ret < 0){
-        /* fail response */
-    }
-
-    return ret;
+    return 0;
 }
 
