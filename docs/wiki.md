@@ -85,7 +85,7 @@ struct request{
 >           , camera('c'), motor('m'), water_pump('p'), sprinkler('s'),    
 > cmd    : turn_on('1'), turn_off('0')  
 > len    : data length  
-> data   :   
+> data   : timer(positive), infinit(zero), error(negative)
 ```
 ## Response struct
 ```C
