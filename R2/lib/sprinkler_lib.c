@@ -24,13 +24,13 @@ int recieve_humidity_data_from_r3(){
 }
 
 /*스프링클러 작동여부 판단*/
-bool check_sprinkler(int data){
+bool check_sprinkler(struct response res){
 	bool operation = false;
+
 	/*습도 데이터가 일정 수준 이하이면 스프링클러를 작동신호를 출력*/
-	if(data < 20){
+	if( (res.type == 's') && (res.data < 20) ){
 		operation = true;
-	}
-	
+	}	
 
 	return operation;
 }
@@ -42,14 +42,10 @@ int reqeust_connection_to_r1(){
 }
 
 /*스프링클러 제어 신호 전송*/
-void send_sprinkler_signal(bool sig){
-	
-	int socket;
-
-	socket = client_init(src_ip, dest_ip, port, type);
+void send_sprinkler_signal(int socket, bool sig){
 
 	if(sig == true){
-		request_put(socket, type, data, cmd);
+		request(socket, 'U', 's', '1', len, data);
 	}else{
 		/*보낼필요없음*/
 	}
