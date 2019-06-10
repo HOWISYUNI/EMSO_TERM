@@ -1,13 +1,5 @@
-#include <stdio.h>
+#include <stdio.h>터
 #include <stdlib.h>
-
-/**/
-#include "../lib/lib/abnormal_situation_lib.h"
-#include "" 
-#include ""
-#include ""
-
-/*네트워크 라이브러리*/
 #include "../lib/SF_NET/ksf_server_lib.h"
 #include "../lib/SF_NET/ksf_client-lib.h"
 
@@ -15,32 +7,35 @@
 int main(void){
 
 	struct request rcv;
-	int socket;
 
-	/*서버 초기화*/
-	socket = server_init(ip, port);
+	/*소켓 초기화*/
+	socket_r1 = server_open(port);
+	socket_r3 = client_open(dest_ip, port)
+
 
 	/*요청 대기*/
 	while(1){
-		rcv = wait_request(socket);
+		rcv = wait_request(socket_r1);
 
-		if(rcv.type == ""){	/*토양 온습도 데이터*/
+		if(rcv.type == ""){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/
-			send_humidity_data_to_r3(socket);
+			send_humidity_data_to_r3(socket_r3);
 		}else if(rcv.type == ""){	/*조도 데이터*/
 			/*r3에게 데이터 전송*/
-			send_light_data_to_r3(socket);
+			send_light_data_to_r3(socket_r3);
 		}else if(){	/*비정상 상황 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			send_abnormal_situation_to_r3(socket);
+			send_abnormal_situation_to_r3(socket_r3);
 		}else if(){	/*미확인 물체 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			send_unidentified_object_to_r3(socket);
+			send_unidentified_object_to_r3(socket_r3);
 		}else{	/**/
 
 		}
 	
 	}
+
+	server_close(socket_r1);
 
 	return 0;
 }
