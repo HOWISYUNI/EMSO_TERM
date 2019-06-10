@@ -5,7 +5,7 @@
 
 ## Device GPIO num 
 
-```
+```C
 #define LED 4          /*  led  */
 #define MOTOR_A 6      /* motor */
 #define CE0 8          /* light */
@@ -20,13 +20,86 @@
 ```
 
 ## Device name
-```
+```C
 #define DEV_LED "led"
 #define DEV_DHT "dht11"
 #define DEV_LIGHT "light"
 #define DEV_PIR "pir"
 ```
 
+---
+
+# Network (Data Communictation)
+> RESTful Library  
+> Client request to server  
+> Server response to client  
+## Server function lib
+```C
+int server_open(int port);                                           /* socket open & bind */
+int server_close(int sock);                                          /* socket close */
+int wait_request(int sock, struct request *req);                     /* connect(listen,accpet) & read */
+int response(int c_sock, char type, unsigned long len, char *data);  /* write */
+```
+## Client function lib
+```C
+int client_open(char *dest_ip, int port);                                                          /* socket open & connect */
+struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);/* write & read */
+int client_close(int sock);                                                                        /* socket close */
+```
+
+## Request struct
+```C
+struct request{
+    char method;          /* Request Method */
+    char type;            /* Data Type */
+    char cmd;             /* Command */
+    unsigned long len;    /* Real Data length */
+    char data[BUFF_SIZE]; /* BUFF_SIZE = 1024 */
+};
+```
+
+### @GET
+```
+> Usage  : R2.cmd_ctl.client->R3.refine_ctl.server
+> method : 'G' (should be fixed)
+> type   : light('l'), soil('s'), alert_log('a')  
+> cmd    : value('v'), average('a'), sum('s')  
+> len    : data length  
+> data   :   
+```
+### @POST
+```
+> Usage  : R1.sensor_ctl.client->R2.data_ctl.server  
+>        : R2.data_ctl.client->R3.storage_ctl.server  
+> method : 'O' (should be fixed)  
+> type   : light('l'), soil('s'), alert_log('a')  
+> cmd    : save('s')  
+> len    : data length   
+> data   :   
+```
+### @PUT
+```
+> Usage  : R2.cmd_ctl.client->R1.act_ctl.server  
+> method : 'U' (should be fixed)  
+> type   : led_light('l'), led_alert('a'), buzzer('b')  
+>           , camera('c'), motor('m'), water_pump('p'), sprinkler('s'),    
+> cmd    : turn_on('1'), turn_off('0')  
+> len    : data length  
+> data   :   
+```
+## Response struct
+```C
+struct response{
+    char type;            /* Request Result */
+    unsigned long len;    /* Real Data length */
+    char data[BUFF_SIZE]; /* BUFF_SIZE = 1024 */
+};
+```
+```
+> Usage  : Successful('s'), Failure('f'), Timeout('t')  
+> len    : data length  
+> data   :   
+```
 ---
 
 # Dictionary
