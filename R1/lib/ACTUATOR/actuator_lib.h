@@ -15,6 +15,8 @@
 
 int turn_on_led();
 int turn_off_led(int fd);
+int turn_on_led_alert();
+int turn_off_led_alert(int fd);
 
 int turn_on_buzzer_me();
 int turn_on_buzzer_do();

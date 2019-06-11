@@ -16,6 +16,17 @@ int turn_off_led(int fd){
     return ret;
 }
 
+int turn_on_led_alert(){
+    int ret;
+    ret = open("/dev/led_alert", O_RDWR);
+    return ret;
+}
+int turn_off_led_alert(int fd){
+    int ret;
+    ret = close(fd);
+    return ret;
+}
+
 /* turn on  buzzer*/
 int turn_on_buzzer(){
     int ret;
