@@ -17,6 +17,8 @@
 #define MOTOR_C 19     /* motor */
 #define DHT 21         /* dht11 */
 #define MOTOR_D 26     /* motor */
+#define WATERPUMP_A    /*이거 */
+#define WATERPUMP_B
 ```
 
 ## Device name
