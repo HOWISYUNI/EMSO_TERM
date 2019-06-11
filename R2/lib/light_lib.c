@@ -21,11 +21,12 @@ int request_connection_to_r3(){
 void send_light_data_to_r3(int socket){
 	struct response rcv;
 
-	rcv = request_post(socket, type, data);
+	rcv = request(socket, 'O', 'l', 's', len, data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
 
 	}
 
+	return 0;
 }
