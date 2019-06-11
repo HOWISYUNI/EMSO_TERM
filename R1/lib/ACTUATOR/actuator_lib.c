@@ -81,3 +81,25 @@ int turn_off_motor(int fd){
 	ret = close(fd);
 	return ret;
 }
+
+
+/* camera snapshot */
+int snapshot(void){
+    pid_t pid;
+    pid = fork();
+    
+    if(pid < 0){
+        /* fail to fork */
+        printf("fail to fork\n");
+        return -1;
+    }
+    else if(pid == 0){
+        /* child process */
+        exec
+    }
+    else{
+        /* parents process */
+        printf("return pid(%d)\n", pid);
+        return pid;
+    }
+}
