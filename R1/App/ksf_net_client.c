@@ -9,12 +9,14 @@ int main(void){
     int sock, ret;
     struct response rsp;
     
-    sock = client_open("127.0.0.1", 1010);
+    sock = client_open(LOCAL_HOST, LOCAL_PORT);
     printf("client open\n");
     
     rsp = request(sock, 'G', 'T', 'C', 100, "hi everyone\n");
     
-    printf("rsp : %c %ld %s\n", rsp.type, rsp.len, rsp.data);
+    printf("rsp.type : %c\n", rsp.type);
+    printf("rsp.len : %ld\n", rsp.len);
+    printf("rsp.data : %s\n", rsp.data);
     client_close(sock);    
 
     return 0;

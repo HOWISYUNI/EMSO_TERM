@@ -10,13 +10,15 @@
 #define R3_ADDR "10.10.10.15"
 #define R3_STG_PORT 3010  /* Server */
 #define R3_REF_PORT 3020  /* Server */
+#define LOCAL_HOST "127.0.0.1"
+#define LOCAL_PORT 4000
 
 struct request{
     char method;
     char type;
     char cmd;
     unsigned long len;
-    void *data;
+    char data[BUFF_SIZE];
 };
 
 struct response{

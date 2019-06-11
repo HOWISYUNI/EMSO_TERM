@@ -21,7 +21,7 @@ int server_open(int port){
     
     memset(&s_addr, 0, sizeof(s_addr));
     s_addr.sin_family = AF_INET;
-    s_addr.sin_port = htons(4000);
+    s_addr.sin_port = htons(port);
     s_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     
     ret = bind(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
@@ -63,9 +63,9 @@ int wait_request(int sock, struct request *req){
         return -1;
     }
     
-    read(c_sock, req, sizeof(struct response));
+    read(c_sock, req, sizeof(struct request));
     printf("received\n");
-
+    
     return c_sock;
 }
 

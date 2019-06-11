@@ -11,17 +11,24 @@ int main(void){
     int sock, c_sock, ret;
     struct request *req;
     
-    sock = server_open(1010);
+    sock = server_open(LOCAL_PORT);
     if(sock < 0){
         printf("fail init socket\n");
         return -1;
     }
+    
     c_sock = wait_request(sock, req);
+    printf("req.method : %c\n", req->method);
+    printf("req.type : %c\n", req->type);
+    printf("req.cmd : %c\n", req->cmd);
+    printf("req.len : %ld\n", req->len);
+    printf("req.data : %s\n", req->data);
+    
     if(c_sock < 0){
         printf("fail get request\n");
         return -1;
     }
-    ret = response(c_sock, 't', 100, "hello\n");
+    ret = response(c_sock, 's', 100, "hello\n");
     if(ret < 0){
         printf("fail response\n");
         return -1;

@@ -23,8 +23,8 @@ int client_open(char *dest_ip, int port){
     /* hdr set */
     memset(&s_addr, 0, sizeof(s_addr));
     s_addr.sin_family = AF_INET;
-    s_addr.sin_port = htons(4000);
-    s_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    s_addr.sin_port = htons(port);
+    s_addr.sin_addr.s_addr = inet_addr(dest_ip);
     
     ret = connect(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
     if(ret < 0){
@@ -36,27 +36,27 @@ int client_open(char *dest_ip, int port){
 }
 
 struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data){
-    struct request *req;
+    struct request req;
     struct response rsp;
     int ret;
 
-    req = (struct request*)malloc(len+sizeof(struct request));
-    memset(req, 0, sizeof(req));
+    //memset(&req, 0, sizeof(req));
+    //memset(&rsp, 0, sizeof(rsp));
     
     /* request init */
-    req->method = method;
-    req->type = type; /* @light @soil */
-    req->cmd = cmd;   /* @avg @sum ... */
-    req->len = len;
-    req->data = data; /* @60 == 현재로부터 1시간 전부터 계산 */
+    req.method = method;
+    req.type = type; 
+    req.cmd = cmd;   
+    req.len = len;
+    strcpy(req.data, data);
 
     /* send request */
-    ret = write(sock, req, len);
+    ret = write(sock, &req, sizeof(struct request));
     if(ret < 0){
         /* fail request */
-        rsp.type = 'F';
+        rsp.type = 'f';
         rsp.len = 0;
-        strcpy(rsp.data, "\n");
+        strcpy(rsp.data, "send request fail\n");
         return rsp;
     }
     
@@ -66,7 +66,7 @@ struct response request(int sock, char method, char type, char cmd, unsigned lon
         /* fail request */
         rsp.type = 'f';
         rsp.len = 0;
-        strcpy(rsp.data, "\n");
+        strcpy(rsp.data, "receive response fail\n");
         return rsp;
     }
 
