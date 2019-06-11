@@ -1,7 +1,4 @@
-#include <stdio.h>터
-#include <stdlib.h>
-#include "../lib/SF_NET/ksf_server_lib.h"
-#include "../lib/SF_NET/ksf_client-lib.h"
+#include "./data_controller.h"
 
 /*R1으로부터 받는 데이터를 처리*/
 int main(void){

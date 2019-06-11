@@ -13,7 +13,7 @@
 }*/
 
 /*led 작동여부 판단*/
-bool check_led(int data){
+int check_led(int data){
 	int operation = false;
 	/*light sensor값이 일정 수준 이하이면 led를 작동하는 것으로 판단*/
 	if(data < 10){
@@ -30,13 +30,10 @@ bool check_led(int data){
 }*/
 
 /*led 작동여부 전송*/
-void send_led_signal(bool sig){
-	int socket;
-
-	socket = client_init(src_ip, dest_ip, port, type);
-
+void send_led_signal(int socket, int sig){
+	
 	if(sig == true){
-		request_put(socket, type, data, cmd);
+		request(socket, 'U', 'l', '1', len, data);
 	}else{
 		/*보낼필요없음*/
 	}

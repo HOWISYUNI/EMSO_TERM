@@ -1,4 +1,4 @@
-
+#include "./abnormal_situation_lib.h"
 
 /*r1으로부터 비정상 상황 통신 대기*/
 /*int wait_abnormal_situation_from_r1(){
@@ -19,7 +19,7 @@
 }*/
 
 /*비정상 상황 r3에 전송*/
-int send_abnormal_situation_to_r3(){
+int send_abnormal_situation_to_r3(int socket){
 
 	struct response rcv;
 
