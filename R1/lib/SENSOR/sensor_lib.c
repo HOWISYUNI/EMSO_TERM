@@ -31,21 +31,22 @@ int read_light_sensor()
 
 Description : 토양 온습도 값을 읽어오는 함수 (알아서 오픈하고 읽어서 닫고 읽은 값 리턴해줌)
 Parameter : void
-Return : void light_value
+Return : int light_value
 
 */
-void read_soil_sensor()
+int read_soil_sensor()
 {
 	int dev;
 	int ret;
-//	int light_value=0;
+	int soil_value=0;
 
 	dev = open("/dev/soil_sensor_dev",O_RDWR);
 	
-//	ret=read(dev,&light_value,sizeof(int));
+	ret=read(dev,&soil_value,sizeof(int));
 	
 	ret = close(dev);
 
+	return soil_value;
 }
 
 
@@ -132,7 +133,7 @@ int open_ultrasonic_sensor()
 
 /*	close_ultrasonic_senser()
 
-Description : 거리를 측정하는 센서를 끄는 함
+Description : 거리를 측정하는 센서를 끄는 함수
 Parameter : int dev  (file description)
 Return : void
 

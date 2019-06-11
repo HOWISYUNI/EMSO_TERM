@@ -75,12 +75,7 @@ static int dht11_read(struct file *file, char *buf, size_t len, loff_t *lof){
 }
 
 static dht11_open(struct inode *inode, struct file *file){
-	int i=0;
 
-	for(i=0;i<20;i++){
-		
-		mdelay(200);
-	}
 
 	return 0;
 }
