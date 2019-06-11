@@ -13,9 +13,14 @@ int recieve_light_data_from_r3(){
 }
 
 /*led 작동여부 판단*/
-int check_led(){
+bool check_led(int data){
+	int operation = false;
 	/*light sensor값이 일정 수준 이하이면 led를 작동하는 것으로 판단*/
-	return 0;
+	if(data < 10){
+		operation = true;
+	}
+
+	return operation;
 }
 
 /*r1에 연결 요청*/
@@ -25,7 +30,16 @@ int requset_connection_to_r1(){
 }
 
 /*led 작동여부 전송*/
-int send_led_signal(){
+void send_led_signal(bool sig){
+	int socket;
+
+	socket = client_init(src_ip, dest_ip, port, type);
+
+	if(sig == true){
+		request_put(socket, type, data, cmd);
+	}else{
+		/*보낼필요없음*/
+	}
 
 	return 0;
 }

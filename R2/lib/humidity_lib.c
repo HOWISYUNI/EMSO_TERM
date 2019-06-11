@@ -1,4 +1,4 @@
-
+/*토양 온습도임 헷갈리면 차후 수정하겠음*/
 /*r1 통신 대기*/
 int wait_humidity_data_from_r1(){
 
@@ -18,7 +18,16 @@ int request_connection_to_r3(){
 }
 
 /*r3에 온습도데이터 전달*/
-int send_humidity_data_to_r3(){
+void send_humidity_data_to_r3(int socket){
 
-	return 0;
+	struct response rcv;
+
+	rcv = request_post(socket, type, data);
+
+	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
+	if(rcv.data){
+
+	}
+
+
 }

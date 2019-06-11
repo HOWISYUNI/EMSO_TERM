@@ -11,9 +11,11 @@
 int main(){
 
 	struct response rcv;
+	bool sig;	/*actuator 작동여부*/
+	int socket;
 
 	/*클라이언트 초기화*/
-	client_init(src_ip, dest_ip, port, type);
+	socket = client_init(src_ip, dest_ip, port, type);
 
 	/*r3에 일정주기마다 데이터 요청*/
 	while(1){
@@ -21,16 +23,14 @@ int main(){
 		delay(1000);
 		/*r3에 온습도 데이터를 요청함.*/
 		rcv = request_get(socket, type, data, cmd);
-		sig = check_sprinkler();	/*rcv값에 따라서 스프링클러 작동여부 구하는 함수*/
-		if(sig){
-			send_sprinkler_siganl();	/*작동하기로 했으면 시그널을 보냄*/
-		}
+		sig = check_sprinkler(rcv.data);	/*rcv값에 따라서 스프링클러 작동여부 구하는 함수*/		
+		send_sprinkler_siganl(sig);	/*작동하기로 했으면 시그널을 보냄*/
+
 		/*r3에 조도 데이터를 요청함*/
-		rcv = request_get();
-		sig = check_led();	/*rcv값에 따라서 led 작동여부 구하는 함수*/
-		if(sig){
-			send_led_signal();	/*작동하기로 했으면 시그널을 보냄*/
-		}
+		rcv = request_get(socket, type, data, cmd);
+		sig = check_led(rcv.data);	/*rcv값에 따라서 led 작동여부 구하는 함수*/
+		send_led_signal(sig);	/*작동하기로 했으면 시그널을 보냄*/
+		
 	
 	}
 

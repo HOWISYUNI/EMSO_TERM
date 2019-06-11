@@ -5,14 +5,21 @@ MODULE_LICENSE("GPL");
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 
-void pump_on(void){
+/*delay 시간만큼 워터펌프 온*/
+void pump_on(int delay){
 	printk("pump on");
 	/*이게 지금 작동은하는데 물이 어떻게 들어가는지는 잘 모르겠음*/
 	gpio_set_value(WATERPUMP_A, 1);
     gpio_set_value(WATERPUMP_B, 0);
+	/*작동상태 ing*/
+	mdelay(delay);
+	/*펌프 오프*/
+	gpio_set_value(WATERPUMP_A, 0);
+	gpio_set_value(WATERPUMP_B, 0);
 
 }
 
+/*펌프 오프 근데 아마 안쓰일거 같음*/
 void pump_off(void){
 	printk("pump off");
 
