@@ -1,3 +1,5 @@
+#include "pir.h"
+
 MODULE_LICENSE("GPL");
 
 static int irq_num;

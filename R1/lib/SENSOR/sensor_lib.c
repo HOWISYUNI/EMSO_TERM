@@ -1,8 +1,5 @@
 /* sensor library */
-
 #include "sensor_lib.h"
-
-
 
 /*	read_light_senser()
 
@@ -75,8 +72,6 @@ void read_dht11_sensor(int dht11_data[])
 	pir이나 ultrasonic 센서의 경우 시나리오상 한번씩 실행 되는 것이 아니라 계속 켜저서 값이 어느정도 이하 일 때, Interrupt가 	발생함.
 */
 
-
-
 /*	open_pir_senser()
 
 Description : 모션을 감지하는 센서를 켜는 함수
@@ -143,5 +138,4 @@ void close_ultrasonic_sensor(int dev)
 	int ret;
 
 	ret = close(dev);
-
 }
