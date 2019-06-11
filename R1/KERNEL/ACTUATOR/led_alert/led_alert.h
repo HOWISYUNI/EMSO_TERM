@@ -5,19 +5,19 @@
 #include <linux/gpio.h>
 #include <linux/cdev.h>
 
-#define DEV_LED "led"
-#define LED 4
+#define DEV_LED_ALERT "led_alert"
+#define LED_ALERT 5
 
 /* 
- * function : LED on
+ * function : LED ALERT on
  * parameter : file path, mode
  * return : file descriptor
  * */
-static int led_open(struct inode *inode, struct file *file);
+static int led_alert_open(struct inode *inode, struct file *file);
 /*
- * function : LED off
+ * function : LED ALERT off
  * parameter : file path, mode
  * return : file descriptor
  * */
-static int led_release(struct inode *inode, struct file *file);
+static int led_alert_release(struct inode *inode, struct file *file);
 
