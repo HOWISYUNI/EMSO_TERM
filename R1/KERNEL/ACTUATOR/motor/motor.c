@@ -2,6 +2,9 @@
 
 MODULE_LICENSE("GPL");
 
+static dev_t dev_num;
+static struct cdev *cd_cdev;
+
 int steps[STEPS][4] = {
 	{1,0,0,0},
 	{1,1,0,0},
@@ -49,12 +52,17 @@ void moveDegree(int degree, int delay, int direction){
 
 }
 
-struct int motor_open(struct inode *inode, struct file *file){
+static int motor_open(struct inode *inode, struct file *file){
+
+	while(1){
+		moveDegree(360, 1000, 0);
+		moveDegree(360, 1000, 1);
+	}
 	
 	return 0;
 }
 
-struct int motor_release(struct inode *inode, struct file *file){
+static int motor_release(struct inode *inode, struct file *file){
 	
 	return 0;
 }
@@ -65,10 +73,10 @@ struct file_operations motor_fops = {
 };
 
 static int __init simple_motor_init(void){
-	gpio_request_one(PIN1, GPIOF_OUT_INIT_LOW, "p1");
-	gpio_request_one(PIN2, GPIOF_OUT_INIT_LOW, "p2");
-	gpio_request_one(PIN3, GPIOF_OUT_INIT_LOW, "p3");
-	gpio_request_one(PIN4, GPIOF_OUT_INIT_LOW, "p4");
+	gpio_request_one(MOTOR_A, GPIOF_OUT_INIT_LOW, "MOTOR_A");
+	gpio_request_one(MOTOR_B, GPIOF_OUT_INIT_LOW, "MOTOR_B");
+	gpio_request_one(MOTOR_C, GPIOF_OUT_INIT_LOW, "MOTOR_C");
+	gpio_request_one(MOTOR_D, GPIOF_OUT_INIT_LOW, "MOTOR_D");
 
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
 	cd_cdev = cdev_alloc();
@@ -79,10 +87,10 @@ static int __init simple_motor_init(void){
 }
 
 static void __exit simple_motor_exit(void){
-	gpio_free(PIN1);
-	gpio_free(PIN2);
-	gpio_free(PIN3);
-	gpio_free(PIN4);
+	gpio_free(MOTOR_A);
+	gpio_free(MOTOR_B);
+	gpio_free(MOTOR_C);
+	gpio_free(MOTOR_D);
 }
 
 module_init(simple_motor_init);
