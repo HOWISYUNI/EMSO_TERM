@@ -95,7 +95,7 @@ int snapshot(void){
     }
     else if(pid == 0){
         /* child process */
-        exec
+        execl("
     }
     else{
         /* parents process */
