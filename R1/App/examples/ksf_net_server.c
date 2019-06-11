@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ksf_net.h"
 
 int server_open(int port);
 int server_close(int sock);
