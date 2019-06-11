@@ -19,11 +19,11 @@
 }*/
 
 /*r3에 토양 온습도데이터 전달*/
-void send_humidity_data_to_r3(int socket){
+void send_humidity_data_to_r3(int socket, struct response data_r1){
 
 	struct response rcv;
 
-	rcv = request(socket, 'O', 's', 's', len, data);
+	rcv = request(socket, 'O', 's', 's', data_r1.len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){

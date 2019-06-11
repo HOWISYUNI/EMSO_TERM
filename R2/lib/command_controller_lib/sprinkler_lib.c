@@ -46,7 +46,7 @@ int check_sprinkler(int data){
 void send_sprinkler_signal(int socket, int sig){
 
 	if(sig == true){
-		request(socket, 'U', 's', '1', len, data);
+		request(socket, 'U', 's', '1', 0, "true");
 	}else{
 		/*보낼필요없음*/
 	}

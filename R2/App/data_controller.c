@@ -16,16 +16,16 @@ int main(void){
 
 		if(rcv.type == 's'){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/
-			send_humidity_data_to_r3(socket_r3);
+			send_humidity_data_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'l'){	/*조도 데이터*/
 			/*r3에게 데이터 전송*/
-			send_light_data_to_r3(socket_r3);
+			send_light_data_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'a'){	/*비정상 상황 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			send_abnormal_situation_to_r3(socket_r3);
+			send_abnormal_situation_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'a'){	/*미확인 물체 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			send_unidentified_object_to_r3(socket_r3);
+			send_unidentified_object_to_r3(socket_r3, rcv);
 		}else{	/**/
 
 		}

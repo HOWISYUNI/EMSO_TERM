@@ -1,5 +1,4 @@
-#include "./led_check_lib.h"
-#include "./led_send_lib.h"
+#include "./led_lib.h"
 
 /*r3에서 led 작동여부를 위한 빛감지 센서 데이터를 위한 연결 요청*/
 /*int reqeust_connection_to_r3(){
