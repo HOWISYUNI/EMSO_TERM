@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "ksf_net.h"
 
 int server_open(int port);
@@ -16,6 +18,8 @@ int main(void){
         printf("fail init socket\n");
         return -1;
     }
+    req = (struct request*)malloc(sizeof(struct request));
+    memset(req, 0, sizeof(struct request));
     
     c_sock = wait_request(sock, req);
     printf("req.method : %c\n", req->method);
@@ -34,6 +38,7 @@ int main(void){
         return -1;
     }
     
+    free(req);
     server_close(sock);
     return 0;
 }
