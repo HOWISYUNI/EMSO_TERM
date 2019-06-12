@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 
 int read_light_sensor();
+
 void read_soil_sensor();
 void read_dht11_sensor(int dht11_data[]);
 
