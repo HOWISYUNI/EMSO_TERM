@@ -17,30 +17,135 @@
 /* response
 > Usage  : Successful('s'), Failure('f'), Timeout('t')  
 */
-int send_response(char type);
+void send_response(char type);
 
 
 int main(void){
 	int socket_r2;
-	int fd;
 	struct request rcv;
+	int time;
 
    	socket_r2 = server_open(R2_DATA_PORT);
+
 
 	/*요청 대기*/
 	while(1){
 		rcv = wait_request(socket_r1);
 
-		if(rcv.type == "l"){	/*빛 데이터*/
-			
+		if(rcv.type == "l"){	/*광합성용 LED */
+			if(rcv.cmd == '1'){
+				time=atoi(rcv.data);
+				if(time>0){
+					if(turn_on_led_timer(time)<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
+				}
+				else if(time==0){
+					if(turn_on_led()<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
+				}
+				else{
+					/*Error*/
+					send_response('f');
+				}
+			}
+			else if(rcv.cmd == '0'){
+				if(turn_off_led()<0){
+					/*Error*/
+					send_response('f');						
+				}
+				send_response('s');
+			}
+			else{
+				/*Error*/
+				send_response('f');
+			}
 		}else if(rcv.type == "a"){	/*비상시 불빛 신호*/
-			
+			if(rcv.cmd == '1'){
+				time=atoi(rcv.data);
+				if(time>0){
+					if(turn_on_led_alert_timer(time)<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
+				}
+				else if(time==0){
+					if(turn_on_led_alert()<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
+				}
+				else{
+					/*Error*/
+					send_response('f');
+				}
+			}
+			else if(rcv.cmd == '0'){
+				if(turn_off_led()_alert<0){
+					/*Error*/
+					send_response('f');						
+				}
+				send_response('s');
+			}
+			else{
+				/*Error*/
+				send_response('f');
+			}
 		}else if(rcv.type == "b"){	/*비정상 버저 신호*/
-			
+			if(rcv.cmd == '1'){
+				time=atoi(rcv.data);
+				if(time>0){
+					
+				}
+				else if(time==0){
+					
+				}
+				else{
+					/*Error*/
+				}
+			}
+			else if(rcv.cmd == '0'){
+				
+			}
+			else{
+				/*Error*/
+			}
 		}else if(rcv.type == "c"){	/*카메라 신호*/
-			
+			if(rcv.cmd == '1'){
+				
+			}
+			else if(rcv.cmd == '0'){
+				
+			}
+			else{
+				/*Error*/
+			}
 		}else if(rcv.type == "s"){	/*스프링 쿨러 신호*/
-			
+			if(rcv.cmd == '1'){
+				time=atoi(rcv.data);
+				if(time>0){
+					
+				}
+				else if(time==0){
+					
+				}
+				else{
+					/*Error*/
+				}
+			}
+			else if(rcv.cmd == '0'){
+				
+			}
+			else{
+				/*Error*/
+			}
 		}else{	/**/
 
 		}
@@ -50,16 +155,18 @@ int main(void){
 	server_close(socket_r2);
 }
 
-int send_response(char type){
+void send_response(char type){
 	struct response rsp;
 	rsp.type = type;
 	rsp.len = 0;
 	strcpy(rsp.data, '\n');
 
 	if(response(socket_r2, rsp.type, rsp.len, rsp.data)<0){
-		return -1;
+		/*Error*/
 	}
 	
-	return 0;
+	
 }
+
+
 

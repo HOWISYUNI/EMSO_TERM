@@ -160,6 +160,7 @@ int wait_for_pir(){
 }
 
 
+/*거리 재는 함수*/
 int get_ultrasonic(){
 	int dist;
 	dist = open_ultrasonic_sensor();
@@ -168,6 +169,7 @@ int get_ultrasonic(){
 }
 
 
+/*r2에게 Alert 신호 보내고 거리 보내는 함수*/
 int send_alert_distance_data_to_r2(int socket, int value){
 	struct response rcv;
 	char data[1024];
