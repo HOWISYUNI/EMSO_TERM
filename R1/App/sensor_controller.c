@@ -3,24 +3,17 @@
 
 #include "app.h"
 
-/*빛 센서/토양 온도 센서 주기를 10초로 설정*/
-#define PERIOD 10000
-/*온도 체크 주기를 5초로 설정*/
-#define TEMPERATURE_PERIOD 5000
-/*알람을 뱔생 시킬 온도를 50도(C`)로 설정*/
-#define ALERT_TEMPERATURE 50
-/*알람을 발생 시킬 거리를 10cm로 설정*/
-#define ALERT_DISTANCE 10
+
 
 int send_light_data_to_r2(int socket);
 int send_soil_data_to_r2(int socket);
 int send_alert_temperature_data_to_r2(int socket);
+int wait_for_pir();
 
 int main(void){
 
 	struct request rcv;
 	pid_t pid;
-	int ret;
 	int socket_r2;
 
 	/*소켓 초기화*/
@@ -33,8 +26,14 @@ int main(void){
 	}
 	else if(pid==0){
 			while(1){
-				ret=send_light_data_to_r2(socket_r2);
-				ret=send_soil_data_to_r2(socket_r2);
+				if(send_light_data_to_r2(socket_r2)<0){
+					/*send 실패*/
+					
+				}
+				if(send_soil_data_to_r2(socket_r2)<0){
+					/*send 실패*/
+					
+				}
 				sleep(PERIOD);
 			}
 	}
@@ -46,11 +45,20 @@ int main(void){
 		else if(pid==0){
 			while(1){
 				/*PIR 예훈이가 짜야 짠다*/
+				if(wait_for_pir()==0){
+					
+				}
+				else{
+					
+				}
 			}					
 		}
 		else{
 			while(1){
-				ret=send_alert_temperature_data_to_r2(socket_r2);
+				if(send_alert_temperature_data_to_r2(socket_r2)<0){
+					/*send 실패*/
+					
+				}
 				sleep(TEMPERATURE_PERIOD);
 			}			
 
@@ -76,8 +84,11 @@ int send_light_data_to_r2(int socket){
 	rcv = request(socket, 'O', 'l', 's', len, data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.data){
-
+	if(rcv.type=='f'){
+		return -1;
+	}
+	else if(rcv.type=='t'){
+		return -2;
 	}
 
 	return 0;
@@ -94,8 +105,11 @@ int send_soil_data_to_r2(int socket){
 	rcv = request(socket, 'O', 's', 's', len, data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.data){
-
+	if(rcv.type=='f'){
+		return -1;
+	}
+	else if(rcv.type=='t'){
+		return -2;
 	}
 
 	return 0;
@@ -112,6 +126,12 @@ int send_alert_temperature_data_to_r2(int socket){
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
 	if(&data>ALERT_TEMPERATURE){
 		rcv = request(socket, 'O', 't', 's', len, data);
+		if(rcv.type=='f'){
+			return -1;
+		}
+		else if(rcv.type=='t'){
+			return -2;
+		}
 
 	}
 	
@@ -119,3 +139,20 @@ int send_alert_temperature_data_to_r2(int socket){
 	return 0;
 }
 
+
+int wait_for_pir(){
+	
+	if(pir_wait()==0){
+		return 0;
+	}
+	else{
+		return -1;
+	}
+}
+
+
+int get_ultrasonic(){
+	int dist;
+	dist = open_ultrasonic_sensor();
+	
+}
