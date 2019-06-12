@@ -21,6 +21,8 @@
 #define LOCAL_HOST "127.0.0.1"
 #define LOCAL_PORT 4000
 
+#ifndef _STRUCT_H_
+#define _STRUCT_H_
 struct request{
     char method;
     char type;
@@ -34,6 +36,7 @@ struct response{
     unsigned long len;
     char data[BUFF_SIZE];
 };
+#endif
 
 /* Client Function */
 int client_open(char *dest_ip, int port);
@@ -44,3 +47,4 @@ int server_open(int port);
 int server_close(int sock);
 int wait_request(int sock, struct request *req);
 int response(int c_sock, char type, unsigned long len, char *data);
+
