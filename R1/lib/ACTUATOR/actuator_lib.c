@@ -85,44 +85,46 @@ int turn_on_led_alert_timer(unsigned long sec){
     return 0;
 }
 
-/* turn on  buzzer*/
+/* turn on buzzer */
 int turn_on_buzzer(){
-    int ret;
-    ret = open("/dev/buzzer", O_RDWR);
-    return ret;
+    int fd, ret;
+    fd = open("/dev/buzzer", O_RDWR);
+    ret = ioctl(fd, BUZZER_ON, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
-
-/* turn off buzzer*/
-int turn_off_buzzer(int fd){
-    int ret;
-    ret = close(fd);
-    return ret;
-
-/* buzzer on '미' */
-int turn_on_buzzer_me(){
-	int ret;
-	dev = open("/dev/buzzer", O_RDWR);
-	ret = ioctl(dev, BUZZER_ME, NULL);
-
-	return ret;	/* success = 0 */
+/* turn off buzzer */
+int turn_off_buzzer(){
+    int fd, ret;
+    fd = open("/dev/buzzer", O_RDWR);
+    ret = ioctl(fd, BUZZER_OFF, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
-
-/* buzzer on '도' */
-int turn_on_buzzer_do(){
-	int ret;
-	dev = open("/dev/buzzer", O_RDWR);
-	ret = ioctl(dev, BUZZER_DO, NULL);
-
-	return ret;	/* success = 0 */
+/* turn on buzzer while n sec*/
+int turn_on_buzzer_timer(unsigned long sec){
+    int fd, ret;
+    fd = open("/dev/buzzer", O_RDWR);
+    ret = ioctl(fd, BUZZER_TIME, sec);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
-
-/* buzzer off */
-int turn_off_buzzer(int fd){
-	int ret;
-	ret = close(fd);
-	return ret;
-}
-
+ 
 /*
 	motor turn on
 	counter-clockwise 180 -> clockwise 360 -> counter-clockwise 360
