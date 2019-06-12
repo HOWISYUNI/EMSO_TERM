@@ -30,3 +30,21 @@ int main(){
 
 	return 0;
 }
+
+void send_sprinkler_signal(int socket, int sig){
+	if(sig == true){
+		request(socket, 'U', 's', '1', 0, "true");
+	}else{
+		/*보낼필요없음*/
+	}
+
+}
+
+void send_led_signal(int socket, int sig){
+	if(sig == true){
+		request(socket, 'U', 'l', '1', 0, "true");
+	}else{
+		/*보낼필요없음*/
+	}
+
+}
