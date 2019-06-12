@@ -12,3 +12,7 @@
 
 #define true 1
 #define false 0
+
+void send_sprinkler_signal(int socket, int sig);
+
+void send_led_signal(int socket, int sig);
