@@ -7,8 +7,8 @@
 
 int read_light_sensor();
 
-void read_soil_sensor();
-void read_dht11_sensor(int dht11_data[]);
+int read_soil_sensor();
+int read_dht11_sensor();
 
 int open_pir_sensor();
 void close_pir_sensor(int dev);
