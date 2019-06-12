@@ -14,26 +14,37 @@ static int echo_flag = 0;
 //static ktime_t stop;
 
 static int ultrasonic_open(struct inode *inode, struct file *file) {
-	enable_irq(irq_num);
+	
+	return 0;
+}
 
+static int ultrasonic_release(struct inode *inode, struct file* file){
+	disable_irq(irq_num);
+
+	return 0;
+}
+
+static int ultrasonic_read(struct file *file, char *buf, size_t len, loff_t *lof){
+	int ret;
+	enable_irq(irq_num);
+ 
 	count = 0;
 	gpio_set_value(TRIG, 1);
 	udelay(10);
 	gpio_set_value(TRIG, 0);
 	echo_flag = 0;
-
+  
 	while(echo_flag == 0){
 		count++;
 		udelay(1);
 	}
-	
+ 
 	dist = (34000 * count) / 2000000;
 
-	return dist;
-}
-
-static int ultrasonic_release(struct inode *inode, struct file* file){
-	disable_irq(irq_num);
+	ret = copy_to_user(buf, &dist, sizeof(int));
+	if(ret < 0){
+		return -1;
+	}
 
 	return 0;
 }
@@ -57,6 +68,7 @@ static irqreturn_t ultrasonic_isr(int irq, void* dev_id){
 struct file_operations ultrasonic_fops = {
 	.open = ultrasonic_open,
 	.release = ultrasonic_release,
+	.read = ultrasonic_read,
 };
 
 static int __init ultrasonic_init(void){
