@@ -13,15 +13,4 @@
 **/.DS_Store
 
 /* binary */
-*.daemon
-*.actuator_ctl
-*.sensor_ctl
-*.command_ctl
-*.data_ctl
-*.ui_ctl
-*.refine_ctl
-*.storage_ctl
-
-/* server & client test binary */
-*.server
-*.client
+bin/

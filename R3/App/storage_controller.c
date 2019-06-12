@@ -9,7 +9,7 @@ int main(){
 	char *suc = "success";
 	
 	while(1){
-		sock = server_open(LOCAL_HOST);
+		sock = server_open(3010);
 		c_sock = wait_request(sock, &req);		/* 데이터 수신 대기 */
 		
 		/* cmd is save('s') */
