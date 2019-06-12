@@ -20,15 +20,15 @@ static void timer_func(unsigned long data){
 
 static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
         switch( cmd ){
-        case TURN_ON_LED:
+        case TURN_ON_LEDA:
                 printk("turn on led alert\n");
                 gpio_set_value(LED_ALERT, 1);
                 break;
-        case TURN_OFF_LED:
+        case TURN_OFF_LEDA:
                 printk("turn off led alert\n");
                 gpio_set_value(LED_ALERT, 0);
                 break;
-        case TIME_LED:
+        case TIME_LEDA:
                 printk("turn on led alert until expire timer : %ld\n", arg);
                 del_timer(&timer);
                 timer.function = timer_func;
