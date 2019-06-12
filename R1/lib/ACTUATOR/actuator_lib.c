@@ -4,27 +4,85 @@
 
 /* turn on led */
 int turn_on_led(){
-    int ret;
-    ret = open("/dev/led", O_RDWR);
-    return ret;
+    int fd, ret;
+    fd = open("/dev/led", O_RDWR);
+    ret = ioctl(fd, TURN_ON_LED, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
 /* turn off led */
-int turn_off_led(int fd){
-    int ret;
-    ret = close(fd);
-    return ret;
+int turn_off_led(){
+    int fd, ret;
+    fd = open("/dev/led", O_RDWR);
+    ret = ioctl(fd, TURN_OFF_LED, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
-int turn_on_led_alert(){
-    int ret;
-    ret = open("/dev/led_alert", O_RDWR);
-    return ret;
+/* turn on while n sec */
+int turn_on_led_timer(unsigned long sec){
+    int fd, ret;
+    fd = open("/dev/led", O_RDWR);
+    ret = ioctl(fd, TIME_LED, sec);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
-int turn_off_led_alert(int fd){
-    int ret;
-    ret = close(fd);
-    return ret;
+/* turn on led alert */
+int turn_on_led_alert(){
+    int fd, ret;
+    fd = open("/dev/led_alert", O_RDWR);
+    ret = ioctl(fd, TURN_ON_LED, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+/* turn off led */
+int turn_off_led_alert(){
+    int fd, ret;
+    fd = open("/dev/led_alert", O_RDWR);
+    ret = ioctl(fd, TURN_OFF_LED, NULL);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+/* turn on while n sec */
+int turn_on_led_alert_timer(unsigned long sec){
+    int fd, ret;
+    fd = open("/dev/led_alert", O_RDWR);
+    ret = ioctl(fd, TIME_LED, sec);
+    if(ret < 0){
+        pritnf("failed\n");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
 /* turn on  buzzer*/
