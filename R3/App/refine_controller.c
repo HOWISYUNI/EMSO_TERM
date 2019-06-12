@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../lib/controllers.h"
 
 int main(void){
 	int srv, clt;
@@ -8,7 +9,7 @@ int main(void){
 	struct response rsp;
 	struct request req;
 	unsigned long data_len;
-	int data = 0;
+	//int data = 0;
 	char *data = "";
 
 	srv = server_open(R3_REF_PORT);
@@ -16,11 +17,11 @@ int main(void){
 
 	while(1){
 		srv = server_open(R3_REF_PORT);
-		c_sock = wait_request(srv, req);
+		c_sock = wait_request(srv, &req);
 
 		if(req.method == 'G'){
 			data = refine_data(req.type, req.cmd);
-			data_len = strlen(abc);
+			data_len = strlen(data);
 
 			response(c_sock, 's', data_len, data);
 		}
