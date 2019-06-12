@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../lib/ksf_server_lib.h"
+#include "../lib/KSF_NET/ksf_net_lib.h"
 
 int main(void){
 	int srv, clt;
@@ -9,6 +9,7 @@ int main(void){
 	struct request req;
 	unsigned long data_len;
 	int data = 0;
+	char *data = "";
 
 	srv = server_open(R3_REF_PORT);
 	//clt = client_open("127.0.0.1", 3020);
@@ -19,7 +20,7 @@ int main(void){
 
 		if(req.method == 'G'){
 			data = refine_data(req.type, req.cmd);
-			data_len = strlen(data);
+			data_len = strlen(abc);
 
 			response(c_sock, 's', data_len, data);
 		}
@@ -28,6 +29,5 @@ int main(void){
 		}
 		server_close(srv);
 	}
-
 	return 0;
 }

@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define _CRT_SECURE_NO_WARNINGS
 
+/*
 #define START_NUM 0x80
 #define IOCTL_NUM1 START_NUM+1
 #define IOCTL_NUM2 START_NUM+2
@@ -17,6 +20,7 @@
 #define LIGHT_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM3, unsigned long *)	
 #define ULSN_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM4, unsigned long *)	
 #define TEMP_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM5, unsigned long *)
+*/
 
-int save_data(int type, int data);
-int refine_data(int type, int data);
+int save_data(char type, char* data);
+char* refine_data(char type, char cmd);
