@@ -21,24 +21,25 @@
 #define TURN_OFF_LEDA _IOWR(LED_ALERT_IOCTL_NUM, LED_ALERT_IOCTL_NUM2, unsigned long *)
 #define TIME_LEDA _IOWR(LED_ALERT_IOCTL_NUM, LED_ALERT_IOCTL_NUM3, unsigned long *)
 /* Buzzer */
-#define IOCTL_START_NUM 0x80
-#define IOCTL_NUM1 IOCTL_START_NUM+1
-#define IOCTL_NUM2 IOCTL_START_NUM+2
-#define IOCTL_NUM 'z'
-#define BUZZER_DO(IOCTL_NUM, IOCTL_NUM1, unsigned long *)
-#define BUZZER_ME(IOCTL_NUM, IOCTL_NUM2, unsigned long *)
-
+#define BUZZER_NUM 0x30
+#define BUZZER_IOCTL_NUM1 BUZZER_NUM+1
+#define BUZZER_IOCTL_NUM2 BUZZER_NUM+2
+#define BUZZER_IOCTL_NUM3 BUZZER_NUM+3
+#define BUZZER_IOCTL_NUM 'c'
+#define BUZZER_ON _IOWR(BUZZER_IOCTL_NUM, BUZZER_IOCTL_NUM1, unsigned long *)
+#define BUZZER_OFF _IOWR(BUZZER_IOCTL_NUM, BUZZER_IOCTL_NUM2, unsigned long *)
+#define BUZZER_TIME _IOWR(BUZZER_IOCTL_NUM, BUZZER_IOCTL_NUM3, unsigned long *)
+/* LED & LED for ALERT */
 int turn_on_led();
 int turn_on_led_timer(unsigned long sec);
 int turn_off_led();
 int turn_on_led_alert();
 int turn_on_led_alert_timer(unsigned long sec);
 int turn_off_led_alert();
-
-int turn_on_buzzer_me();
-int turn_on_buzzer_do();
-
-int turn_off_buzzer(int fd);
+/* Buzzer */
+int turn_on_buzzer()
+int turn_off_buzzer()
+int turn_on_buzzer_timer(unsigned long sec)
 
 int read_light_sensor();
 
