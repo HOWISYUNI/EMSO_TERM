@@ -9,26 +9,50 @@
 
 MODULE_LICENSE("GPL");
 
+static struct timer_list timer;
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 
-static int led_alert_open(struct inode *inode, struct file *file){
-    gpio_set_value(LED_ALERT, 1);
-    return 0;
+static void timer_func(unsigned long data){
+    printk("led alert down\n");
+	gpio_set_value(LED_ALERT, 0);
 }
 
+static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
+        switch( cmd ){
+        case TURN_ON_LED:
+                printk("turn on led alert\n");
+                gpio_set_value(LED_ALERT, 1);
+                break;
+        case TURN_OFF_LED:
+                printk("turn off led alert\n");
+                gpio_set_value(LED_ALERT, 0);
+                break;
+        case TIME_LED:
+                printk("turn on led alert until expire timer : %ld\n", arg);
+                del_timer(&timer);
+                timer.function = timer_func;
+	            timer.data = 1L;
+	            timer.expires = jiffies + (arg*HZ);
+	            gpio_set_value(LED_ALERT, 1);
+	            add_timer(&timer);
+                break;
+        default:
+                return -1;
+        }
 
-static int led_alert_release(struct inode *inode, struct file *file){
-    gpio_set_value(LED_ALERT, 0);
-    return 0;
+        return 0;
 }
+
 
 struct file_operations led_alert_fops = {
-    .open = led_alert_open,
-    .release = led_alert_release
+	.unlocked_ioctl = led_alert_ioctl,
 };
 
 static int __init led_alert_init(void){
+    /* timer init */
+    init_timer(&timer);
+    
     /* gpio init */
     gpio_request_one(LED_ALERT, GPIOF_OUT_INIT_LOW, "LED");
 
@@ -42,6 +66,8 @@ static int __init led_alert_init(void){
 }
 
 static void __exit led_alert_exit(void){
+    /* timer bye */
+   	del_timer(&timer);
     /* cdev free */
     cdev_del(cd_cdev);
     unregister_chrdev_region(dev_num, 1);
