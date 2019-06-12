@@ -102,31 +102,43 @@ int main(void){
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
-					
+					if(turn_on_buzzer_timer(time)<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
 				}
 				else if(time==0){
-					
+					if(turn_on_buzzer()<0){
+						/*Error*/
+						send_response('f');						
+					}
+					send_response('s');
 				}
 				else{
 					/*Error*/
+					send_response('f');
 				}
 			}
 			else if(rcv.cmd == '0'){
-				
+				if(turn_off_buzzer<0){
+					/*Error*/
+					send_response('f');						
+				}
+				send_response('s');
 			}
 			else{
 				/*Error*/
+				send_response('f');
 			}
 		}else if(rcv.type == "c"){	/*카메라 신호*/
-			if(rcv.cmd == '1'){
-				
+			if(snapshot<0){
+				/*Error*/	
+				send_response('f');
 			}
-			else if(rcv.cmd == '0'){
-				
-			}
-			else{
-				/*Error*/
-			}
+			send_response('s');
+/*****************이거 FTP 방식 고려할 생각 있는지 한번 고민해보셈******************/
+			
 		}else if(rcv.type == "s"){	/*스프링 쿨러 신호*/
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);

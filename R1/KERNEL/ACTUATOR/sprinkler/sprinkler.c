@@ -1,4 +1,4 @@
-#include "sprinkler.h"
+#include "motor.h"
 
 MODULE_LICENSE("GPL");
 
@@ -6,16 +6,12 @@ static dev_t dev_num;
 static struct cdev *cd_cdev;
 
 /*delay 시간만큼 워터펌프 온*/
-void pump_on(int delay){
+void pump_on(){
 	printk("pump on");
 	/*이게 지금 작동은하는데 물이 어떻게 들어가는지는 잘 모르겠음*/
 	gpio_set_value(WATERPUMP_A, 1);
-    gpio_set_value(WATERPUMP_B, 0);
-	/*작동상태 ing*/
-	mdelay(delay);
-	/*펌프 오프*/
-	gpio_set_value(WATERPUMP_A, 0);
 	gpio_set_value(WATERPUMP_B, 0);
+	
 
 }
 
@@ -25,6 +21,54 @@ void pump_off(void){
 
 	gpio_set_value(WATERPUMP_A, 0);
 	gpio_set_value(WATERPUMP_B, 0);
+
+}
+
+
+int steps[STEPS][4] = {
+	{1,0,0,0},
+	{1,1,0,0},
+	{0,1,0,0},
+	{0,1,1,0},
+	{0,0,1,0},
+	{0,0,1,1},
+	{0,0,0,1},
+	{1,0,0,1}
+};
+
+void setStep(int step){
+	gpio_set_value(PIN1, steps[step][0]);
+    gpio_set_value(PIN2, steps[step][1]);
+    gpio_set_value(PIN3, steps[step][2]);
+    gpio_set_value(PIN4, steps[step][3]);
+}
+
+void forward(int round, int delay){
+	int i=0;
+	int j=0;
+	for(i=1;i<=64*round;i++){
+		for(j=1;j<=64;j++){//5.625도
+			setStep(j%8);
+			udelay(delay);
+		}
+	}
+
+}
+
+void moveDegree(int degree, int delay, int direction){
+	int i=0;
+	if(direction == 0){
+		for(i=1;i<=(64*64*degree)/360;i++){//360도
+			setStep(i%8);
+			udelay(delay);
+		}
+
+	}else{
+		for(i=1;i<=(64*64*degree)/360;i++){
+			setStep(STEPS-i%8);
+			udelay(delay);
+		}	
+	}
 
 }
 
@@ -41,7 +85,7 @@ static int sprinkler_release(struct inode *inode, struct file *file){
 static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 		
 	switch(cmd){
-		case BUZZER_ON:
+		case SPRINKLER_ON:
 		    del_timer(&timer);
 	    	timer.function = buzzer_me;
         	timer.expires = jiffies + (HZ);
@@ -49,12 +93,12 @@ static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 			gpio_set_value(BUZZER, 1);
 			break;
 
-		case BUZZER_OFF:
+		case sprinkler_OFF:
 		    del_timer(&timer);
 			gpio_set_value(BUZZER, 0);
 			break;
 			
-		case BUZZER_TIME:
+		case sprinkler_TIME:
 		    del_timer(&timer);
 		    timer.function = buzzer_me;
         	timer.expires = jiffies + (HZ);
@@ -80,40 +124,30 @@ struct file_operations sprinkler_fops = {
 	.unlocked_ioctl = sprinkler
 };
 
+
 static int __init sprinkler_init(void){
+	gpio_request_one(MOTOR_A, GPIOF_OUT_INIT_LOW, "MOTOR_A");
+	gpio_request_one(MOTOR_B, GPIOF_OUT_INIT_LOW, "MOTOR_B");
+	gpio_request_one(MOTOR_C, GPIOF_OUT_INIT_LOW, "MOTOR_C");
+	gpio_request_one(MOTOR_D, GPIOF_OUT_INIT_LOW, "MOTOR_D");
+	gpio_request_one(WATERPUMP_A, GPIOF_OUT_INIT_LOW, "PUMP_A");
+	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_LOW, "PUMP_B");
 
-	gpio_request_one(WATERPUMP_A, GPIOF_OUT_INIT_LOW, "WATERPUMP_A");
-	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_LOW, "WATERPUMP_B");
 
-	printk("init waterpump");
 
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
 	cd_cdev = cdev_alloc();
 	cdev_init(cd_cdev, &sprinkler_fops);
 	cdev_add(cd_cdev, dev_num, 1);
-
-	///*test 바로 지우셈
-	gpio_set_value(WATERPUMP_A, 1);
-    gpio_set_value(WATERPUMP_B, 0);
-    mdelay(3000);
-    gpio_set_value(WATERPUMP_A, 0);
-    gpio_set_value(WATERPUMP_B, 0);
-    mdelay(3000);
-    gpio_set_value(WATERPUMP_A, 0);
-    gpio_set_value(WATERPUMP_B, 1);
-    mdelay(3000);
-    gpio_set_value(WATERPUMP_A, 0);
-    gpio_set_value(WATERPUMP_B, 0);
-	//*/
-
+	
 	return 0;
 }
 
 static void __exit sprinkler_exit(void){
-
-	cdev_del(cd_cdev);
-	unregister_chrdev_region(dev_num, 1);
-
+	gpio_free(MOTOR_A);
+	gpio_free(MOTOR_B);
+	gpio_free(MOTOR_C);
+	gpio_free(MOTOR_D);
 	gpio_set_value(WATERPUMP_A, 0);
 	gpio_set_value(WATERPUMP_B, 0);
 
