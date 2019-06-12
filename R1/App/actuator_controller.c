@@ -3,7 +3,7 @@
 
 #include "app.h"
 
-/*
+/* request <PUT>
 > Usage  : R2.cmd_ctl.client->R1.act_ctl.server  
 > method : 'U' (should be fixed)  
 > type   : led_light('l'), led_alert('a'), buzzer('b')  
@@ -12,6 +12,13 @@
 > len    : data length  
 > data   : timer(positive), infinit(zero), error(negative)
 */
+
+
+/* response
+> Usage  : Successful('s'), Failure('f'), Timeout('t')  
+*/
+int send_response(char type);
+
 
 int main(void){
 	int socket_r2;
@@ -24,15 +31,15 @@ int main(void){
 	while(1){
 		rcv = wait_request(socket_r1);
 
-		if(rcv.type == "l"){	/*온습도 데이터*/
+		if(rcv.type == "l"){	/*빛 데이터*/
 			
-		}else if(rcv.type == "a"){	/*조도 데이터*/
+		}else if(rcv.type == "a"){	/*비상시 불빛 신호*/
 			
-		}else if(rcv.type == "b"){	/*비정상 상황 신호*/
+		}else if(rcv.type == "b"){	/*비정상 버저 신호*/
 			
-		}else if(rcv.type == "c"){	/*미확인 물체 신호*/
+		}else if(rcv.type == "c"){	/*카메라 신호*/
 			
-		}else if(rcv.type == "s"){	/*미확인 물체 신호*/
+		}else if(rcv.type == "s"){	/*스프링 쿨러 신호*/
 			
 		}else{	/**/
 
@@ -42,3 +49,17 @@ int main(void){
 
 	server_close(socket_r2);
 }
+
+int send_response(char type){
+	struct response rsp;
+	rsp.type = type;
+	rsp.len = 0;
+	strcpy(rsp.data, '\n');
+
+	if(response(socket_r2, rsp.type, rsp.len, rsp.data)<0){
+		return -1;
+	}
+	
+	return 0;
+}
+
