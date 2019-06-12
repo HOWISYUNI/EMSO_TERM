@@ -6,15 +6,15 @@
 #include <linux/cdev.h>
 #include <linux/timer.h>
 
-#define IOCTL_START_NUM 0x80
-#define IOCTL_NUM1 IOCTL_START_NUM+1
-#define IOCTL_NUM2 IOCTL_START_NUM+2
-#define IOCTL_NUM3 IOCTL_START_NUM+3
+#define LED_IOCTL 0x10
+#define LED_IOCTL_NUM1 LED_IOCTL+1
+#define LED_IOCTL_NUM2 LED_IOCTL+2
+#define LED_IOCTL_NUM3 LED_IOCTL+3
 
-#define LED_IOCTL_NUM 'z'
-#define TURN_ON_LED _IOWR(LED_IOCTL_NUM, IOCTL_NUM1, unsigned long *)
-#define TURN_OFF_LED _IOWR(LED_IOCTL_NUM, IOCTL_NUM2, unsigned long *)
-#define TIME_LED _IOWR(LED_IOCTL_NUM, IOCTL_NUM3, unsigned long *)
+#define LED_IOCTL_NUM 'a'
+#define TURN_ON_LED _IOWR(LED_IOCTL_NUM, LED_IOCTL_NUM1, unsigned long *)
+#define TURN_OFF_LED _IOWR(LED_IOCTL_NUM, LED_IOCTL_NUM2, unsigned long *)
+#define TIME_LED _IOWR(LED_IOCTL_NUM, LED_IOCTL_NUM3, unsigned long *)
 
 #define DEV_LED "led"
 #define LED 4
