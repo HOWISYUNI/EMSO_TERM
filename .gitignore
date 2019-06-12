@@ -14,13 +14,13 @@
 
 /* binary */
 *.daemon
-*.actuator_controller
-*.sensor_controller
-*.command_controller
-*.data_controller
-*.user_interface
-*.refine_controller
-*.storage_controller
+*.actuator_ctl
+*.sensor_ctl
+*.command_ctl
+*.data_ctl
+*.ui_ctl
+*.refine_ctl
+*.storage_ctl
 
 /* server & client test binary */
 *.server

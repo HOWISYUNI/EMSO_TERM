@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../lib/controllers.h"
 
 int main(void){
 	int srv, clt;
@@ -11,11 +12,11 @@ int main(void){
 	int data = 0;
 	char *data = "";
 
-	srv = server_open(R3_REF_PORT);
+	//srv = server_open(R3_REF_PORT);
 	//clt = client_open("127.0.0.1", 3020);
 
 	while(1){
-		srv = server_open(R3_REF_PORT);
+		srv = server_open(LOCAL_HOST);
 		c_sock = wait_request(srv, req);
 
 		if(req.method == 'G'){
