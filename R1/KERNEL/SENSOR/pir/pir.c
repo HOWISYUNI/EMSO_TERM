@@ -2,30 +2,35 @@
 
 MODULE_LICENSE("GPL");
 
+static int a = 0;
 static int irq_num;
+wait_queue_head_t wq;
 
-static int pir_open(struct inode *inode, struct file* file){
-	printk("interrupt enable\n");
+static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	enable_irq(irq_num);
 
-	return 0;
-}
+	if(cmd == (0x80+1)){
+		wait_event(wq, a != 0);
 
-static int pir_release(struct inode *inode, struct file* file){
-	printk("interrupt disable\n");
-	disable_irq(irq_num);
+		a = 0;
+		disable_irq(irq_num);
 
-	return 0;
+		return 0;
+	}
+
+	return -1;
 }
 
 struct file_operations pir_fops =
 {
 	.open = pir_open,
 	.release = pir_release,
+	.unlocked_ioctl = pir_ioctl,
 };
 
 static irqreturn_t pir_isr(int irq, void* dev_id){
-	printk("Alert!!!\n");
+	a = 1;
+	wake_up(&wq);
 
 	return IRQ_HANDLED;
 }
@@ -55,6 +60,8 @@ static int __init pir_init(void){
 	/* success */
 	else
 	   	disable_irq(irq_num);
+
+	init_waitqueue_head(&wq);
 
 	return 0;
 }
