@@ -80,15 +80,22 @@ Parameter : void
 Return : int dev (file description)
 
 */
-int open_pir_sensor()
+int pir_wait()
 {
 	int dev;
 	int ret;
 
 	dev = open("/dev/pir_sensor_dev",O_RDWR);
+	ret = ioctl(dev, _IOWR('z', (0x80+1), unsigned long *), NULL);
 	
-	return dev
+	close(dev);
 
+	if(ret == 0){
+		return 0;	
+	}
+	else{
+		return -1;
+	}
 }
 
 /*	close_pir_senser()
@@ -99,13 +106,14 @@ Return : void
 
 */
 
+/*
 void close_pir_sensor(int dev)
 {
 	int ret;
 
 	ret = close(dev);
-
 }
+*/
 
 
 /*	open_ultrasonic_senser()
@@ -119,11 +127,14 @@ int open_ultrasonic_sensor()
 {
 	int dev;
 	int ret;
+	int ulsn_value = 0;
 
 	dev = open("/dev/ultrasonic_sensor_dev",O_RDWR);
+	ret = read(dev, &ulsn_value, sizeof(int));
 	
-	return dev
-
+	close(dev);
+	
+	return ulsn_value;
 }
 
 /*	close_ultrasonic_senser()

@@ -17,7 +17,7 @@
  * return : distance */
 static int ultrasonic_open(struct inode *inode, struct file *file);
 static int ultrasonic_release(struct inode *inode, struct file *file);
-
+static int ultrasonic_read(struct file *file, char *buf, size_t len, loff_t *lof);
 /* function : When ultrasonic_open function open, it measure distance
  * parameter : irq, dev_id
  * return : IRQ_HANDLED */
