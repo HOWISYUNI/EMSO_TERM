@@ -1,21 +1,23 @@
 #include <stdio.h>
 
-#include "../lib/SF_NET/ksf_server_lib.h"
+#include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../lib/controllers.h"
 
 int main(){
-	struct response rcv;
 	struct request req;
-	int sock, c_sock;
+	int sock, c_sock, ret;
+	char *suc = "success";
 	
 	while(1){
 		sock = server_open(R3_STG_PORT);
-
-		c_sock = wait_request(sock, req);		/* 데이터 수신 대기 */
+		c_sock = wait_request(sock, &req);		/* 데이터 수신 대기 */
 		
 		/* cmd is save('s') */
 		if(req.cmd == 's'){		//method??
-			save_data(req.type, req.data);
-
+			ret = save_data(req.type, req.data);
+			if(ret < 0){
+				ret = response(c_sock, 'f', 0 , "Failed not save_data func");
+			}
 			/*
 			if(req.type == 'l'){
 				save_light(req.len, req.data);
@@ -27,7 +29,7 @@ int main(){
 				save_data
 			}
 			*/
-			ret = response(c_sock, 's', 0, '\n');
+			ret = response(c_sock, 's', 0, suc);
 		}
 		else{
 			ret = response(c_sock, 'f', 0 , "Failed not save");

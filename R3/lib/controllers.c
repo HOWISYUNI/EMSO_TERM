@@ -1,29 +1,67 @@
 #include "controllers.h"
 
 int save_data(char type, char *data){
-
-	char *enter = "\n";
-	strcat(data, enter);
+	FILE *fp;
+	int size;
 
 	switch(type){
 
-		case l:
-			FILE *fp = fopen("light.txt", "a");
-			fputs(data, fp);
+		case 'l':
+			fp = fopen("light.txt", "a+");
+			if(fp < 0){
+				printf("File open Fail!!\n");
+				return -1;
+			}
+			fseek(fp, 0L, SEEK_END);
+			size = ftell(fp);
+
+			if (size == 0)
+				fprintf(fp, "%s", data);
+			else
+				fprintf(fp, "\n%s", data);
+			//fwrite(data1, 1, sizeof(data1), fp);
+			//fputs(data1, fp);
+
 			fclose(fp);
 
 			return 0;
-			
-		case s:
-			FILE *fp = fopen("soil.txt", "a");
-			fputs(data, fp);
+	
+		case 's':
+			fp = fopen("soil.txt", "a+");
+			if(fp < 0){
+				printf("File open Fail!!\n");
+				return -1;
+			}
+			fseek(fp, 0L, SEEK_END);
+			size = ftell(fp);
+
+			if (size == 0)
+				fprintf(fp, "%s", data);
+			else
+				fprintf(fp, "\n%s", data);
+			//fwrite(data1, 1, sizeof(data1), fp);
+			//fputs(data1, fp);
+
 			fclose(fp);
 
 			return 0;
 
-		case a:
-			FILE *fp = fopen("alert_log.txt", "a");
-			fputs(data, fp);
+		case 'a':
+			fp = fopen("alert_log.txt", "a+");
+			if(fp < 0){
+				printf("File open Fail!!\n");
+				return -1;
+			}
+			fseek(fp, 0L, SEEK_END);
+			size = ftell(fp);
+
+			if (size == 0)
+				fprintf(fp, "%s", data);
+			else
+				fprintf(fp, "\n%s", data);
+			//fwrite(data1, 1, sizeof(data1), fp);
+			//fputs(data1, fp);
+
 			fclose(fp);
 
 			return 0;
@@ -43,18 +81,43 @@ int save_data(char type, char *data){
 }
 
 char* refine_data(char type, char cmd){
-	char *buffer = malloc(sizeof(char) * 20);
+	//char *buffer = malloc(sizeof(char) * 20);
 	//char *dArr[10] = { NULL, };
 	FILE *fp;
+	int temp = 0;
+	int lines = 0;
+	char s[81];
+	static char s1[10];
 
 	if(type == 'l'){
 		fp = fopen("light.txt", "r");
 
 		if(cmd == 'v'){
-			fgets(buffer, sizeof(buffer), fp);
-			
-			return buffer;
+
+			/* Count num of Lines */
+			fseek(fp, 0L, SEEK_SET);
+			while(!feof(fp)){
+				fgets(s, 80, fp);
+				lines++;
+			}
+			printf("Lines : %d\n", lines);
+
+			/* Extract Data  */
+			fseek(fp, 0L, SEEK_SET);
+			while(!feof(fp)){
+				fgets(s, 80, fp);
+				lines--;
+				if(lines < 10) {
+					printf("s : %s\n", s);
+					temp += atoi(s);
+				}
+			}
+			sprintf(s1, "%d", temp);
+			printf("abc : %s\n", s1);
+
+			return s1;
 		}
+
 		else if(cmd == 'a'){
 
 		}
