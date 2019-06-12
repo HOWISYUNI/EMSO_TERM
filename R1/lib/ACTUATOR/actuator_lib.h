@@ -1,5 +1,9 @@
-#include <sys/fcntl.h>		
-#include <unistd.h>		/* close */
+#include <unistd.h>		
+#include <sys/types.h>
+#include <sys/fcntl.h>
+#include <sys/ioctl.h>
+
+/* close */
 
 #define IOCTL_START_NUM 0x80
 #define IOCTL_NUM1 IOCTL_START_NUM+1
@@ -11,9 +15,15 @@
 
 int turn_on_led();
 int turn_off_led(int fd);
+int turn_on_led_alert();
+int turn_off_led_alert(int fd);
 
 int turn_on_buzzer_me();
 int turn_on_buzzer_do();
+
 int turn_off_buzzer(int fd);
 
 int read_light_sensor();
+
+int turn_on_motor();
+int turn_off_motor(int fd);

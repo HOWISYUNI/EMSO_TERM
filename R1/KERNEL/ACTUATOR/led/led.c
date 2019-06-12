@@ -33,7 +33,7 @@ static int __init led_init(void){
     gpio_request_one(LED, GPIOF_OUT_INIT_LOW, "LED");
 
     /* cdev init */
-    alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+    alloc_chrdev_region(&dev_num, 0, 1, DEV_LED);
     cd_cdev = cdev_alloc();
     cdev_init(cd_cdev, &led_fops);
     cdev_add(cd_cdev, dev_num, 1);

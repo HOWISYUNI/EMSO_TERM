@@ -16,6 +16,30 @@ int turn_off_led(int fd){
     return ret;
 }
 
+int turn_on_led_alert(){
+    int ret;
+    ret = open("/dev/led_alert", O_RDWR);
+    return ret;
+}
+int turn_off_led_alert(int fd){
+    int ret;
+    ret = close(fd);
+    return ret;
+}
+
+/* turn on  buzzer*/
+int turn_on_buzzer(){
+    int ret;
+    ret = open("/dev/buzzer", O_RDWR);
+    return ret;
+}
+
+/* turn off buzzer*/
+int turn_off_buzzer(int fd){
+    int ret;
+    ret = close(fd);
+    return ret;
+
 /* buzzer on '미' */
 int turn_on_buzzer_me(){
 	int ret;
@@ -24,6 +48,7 @@ int turn_on_buzzer_me(){
 
 	return ret;	/* success = 0 */
 }
+
 /* buzzer on '도' */
 int turn_on_buzzer_do(){
 	int ret;
@@ -40,17 +65,41 @@ int turn_off_buzzer(int fd){
 	return ret;
 }
 
-/* read value from light sensor*/
-int read_light_sensor(){
-	int dev;
+/*
+	motor turn on
+	counter-clockwise 180 -> clockwise 360 -> counter-clockwise 360
+*/
+int turn_on_motor(){
 	int ret;
-	int light_value=0;
+	ret = open("/dev/motor_dev", O_RDWR);
+	return ret;
+}
 
-	dev = open("/dev/light_sensor_dev",O_RDWR);
-	
-	ret=read(dev,&light_value,sizeof(int));
-	
-	ret = close(dev);
+/*turn off motor*/
+int turn_off_motor(int fd){
+	int ret;
+	ret = close(fd);
+	return ret;
+}
 
-	return light_value;
+
+/* camera snapshot */
+int snapshot(void){
+    pid_t pid;
+    pid = fork();
+    
+    if(pid < 0){
+        /* fail to fork */
+        printf("fail to fork\n");
+        return -1;
+    }
+    else if(pid == 0){
+        /* child process */
+        execl("snapshot.sh", "10230", NULL);
+    }
+    else{
+        /* parents process */
+        printf("return pid(%d)\n", pid);
+        return pid;
+    }
 }
