@@ -15,6 +15,10 @@ int main(void){
 	/*요청 대기*/
 	while(1){
 		wait_request(socket_r1, &rcv);
+		if(response(socket_r1, 's', 0, "") < 0 ){
+			/*ERROR*/
+			printf("response error");
+		}
 
 		if(rcv.type == 's'){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/

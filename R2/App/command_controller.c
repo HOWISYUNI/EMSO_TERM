@@ -13,7 +13,7 @@ int main(){
 	/*r3에 일정주기마다 데이터 요청*/
 	while(1){
 		/*일정주기마다 요청하기위해 delay를 줌*/
-		sleep(1000);
+		sleep(1);
 
 		/*r3에 토양 온습도 데이터를 요청함.*/
 		rcv = request(socket_r3, 'G', 's', 'v', 0, "");
