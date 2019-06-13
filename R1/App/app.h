@@ -14,7 +14,7 @@
 /*알람을 발생 시킬 거리를 10cm로 설정*/
 #define ALERT_DISTANCE 10
 /*PIR신호가 왔을 때 거리를 재는 시간을 10초로 설정*/
-#define DIST_SECONDS 10000
+#define DIST_SECONDS 10
 
 /*====================================================*/
 
