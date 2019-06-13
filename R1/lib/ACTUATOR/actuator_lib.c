@@ -1,4 +1,5 @@
 #include "actuator_lib.h"
+#include <stdio.h>
 /* LED device path : /dev/LED
    BUZZER device path : /dev/buzzer */
 
@@ -8,7 +9,7 @@ int turn_on_led(){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -22,7 +23,7 @@ int turn_off_led(){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -36,7 +37,7 @@ int turn_on_led_timer(unsigned long sec){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TIME_LED, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -49,7 +50,7 @@ int turn_on_led_alert(){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -63,7 +64,7 @@ int turn_off_led_alert(){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -77,7 +78,7 @@ int turn_on_led_alert_timer(unsigned long sec){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TIME_LED, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -91,7 +92,7 @@ int turn_on_buzzer(){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_ON, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -104,7 +105,7 @@ int turn_off_buzzer(){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_OFF, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -117,7 +118,7 @@ int turn_on_buzzer_timer(unsigned long sec){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_TIME, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
