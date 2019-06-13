@@ -1,9 +1,11 @@
 #include "controllers.h"
 
 int save_data(char type, char *data){
-	FILE *fp;
+	FILE *fp = NULL;
 	int size;
 
+	printf("Here!!!!\n");
+	printf("Here!!!!\n");
 	switch(type){
 
 		case 'l':
@@ -80,15 +82,17 @@ int save_data(char type, char *data){
 	}
 }
 
+//void refine_data(char type, char cmd){
 char* refine_data(char type, char cmd){
 	//char *buffer = malloc(sizeof(char) * 20);
 	//char *dArr[10] = { NULL, };
-	FILE *fp;
+	FILE *fp = NULL;
 	int temp = 0;
 	int lines = 0;
-	char s[81];
+	char s[10] = {0, }; /* temporary for reading text file */
 	static char s1[10];
 
+	printf("Hello!?\n");
 	if(type == 'l'){
 		fp = fopen("light.txt", "r");
 
@@ -97,7 +101,7 @@ char* refine_data(char type, char cmd){
 			/* Count num of Lines */
 			fseek(fp, 0L, SEEK_SET);
 			while(!feof(fp)){
-				fgets(s, 80, fp);
+				fgets(s, 9, fp);	//4 = sizeof s[5] - 1
 				lines++;
 			}
 			printf("Lines : %d\n", lines);
@@ -105,7 +109,7 @@ char* refine_data(char type, char cmd){
 			/* Extract Data  */
 			fseek(fp, 0L, SEEK_SET);
 			while(!feof(fp)){
-				fgets(s, 80, fp);
+				fgets(s, 9, fp);
 				lines--;
 				if(lines < 10) {
 					printf("s : %s\n", s);
@@ -113,6 +117,7 @@ char* refine_data(char type, char cmd){
 				}
 			}
 			sprintf(s1, "%d", temp);
+			//itoa(temp, buf, 10);
 			printf("abc : %s\n", s1);
 
 			return s1;
