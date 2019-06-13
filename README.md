@@ -45,12 +45,13 @@ OS : Rasbian
 	2. 온습도 센서
 	3. 빛 감지 센서
 	4. LED
-	5. 적외선 센서
+	5. PIR 센서
 	6. 거리 감지 센서
-3. Device
+3. Actuator
 	1. 모터
 	2. 부저
-	3. 카메라
+    3. 카메라
+	4. 워터 펌프
 ### Coding Style
 가이드라인 : [kernel_code_style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html)
 
@@ -86,9 +87,9 @@ __매크로__ : ```DEFINE_SOMETHING```
 
 ---
 ## Development Tool
-1. Remote Repository
-2. Project management
-3. 
+1. Remote Repository : github
+2. Project management : None
+3. Communitcation : Slack
 
 ---
 ## Development Directory Structure
@@ -103,17 +104,17 @@ Smart Farm System
  │   │	   │    ├──SENSOR_2.c
  │   │	   │    ├──SENSOR_3.c
  │   │	   │    └──SENSOR_4.c
- │   │	   └──DEVICE/
- │   │            ├──DEVICE_1.c
- │   │            ├──DEVICE_2.c
- │   │            └──DEVICE_3.c
+ │   │	   └──ACTUATOR/
+ │   │            ├──ACTUATOR_1.c
+ │   │            ├──ACTUATOR_2.c
+ │   │            └──ACTUATOR_3.c
  │   ├──lib/							
  │   │	  ├──SF_NET/
  │   │	  │    └──NETWORK_LIB.c 
  │   │	  ├──SENSOR/
  │   │	  │    └──SENSOR_LIB.c
- │   │	  └──DEVICE/
- │   │	       └──DEVICE_LIB.c
+ │   │	  └──ACTUATOR/
+ │   │	       └──ACTUATOR_LIB.c
  │   └──App/
  │       ├──daemon.c 			/* Background */
  │       └──SF_SUBCTR.c 		/* sub Controller */

@@ -1,0 +1,3027 @@
+diff --git a/.gitignore b/.gitignore
+index 6e1d34e..2881d6d 100755
+--- a/.gitignore
++++ b/.gitignore
+@@ -13,5 +13,8 @@
+ **/.DS_Store
+ 
+ /* binary */
+-R1/daemon
++*.daemon
+ 
++/* server & client test binary */
++*.server
++*.client
+diff --git a/R1/App/actuator_controller.c b/R1/App/actuator_controller.c
+new file mode 100644
+index 0000000..6e70343
+--- /dev/null
++++ b/R1/App/actuator_controller.c
+@@ -0,0 +1,13 @@
++#include <stdio.h>
++#include <unistd.h>
++
++#include "app.h"
++
++int main(void){
++    printf("led on\n");
++    led_controller(1);
++    sleep(5);
++    printf("led off\n");
++    led_controller(0);
++    return 0;
++}
+diff --git a/R1/App/app.h b/R1/App/app.h
+index 4a5b2c4..db45107 100644
+--- a/R1/App/app.h
++++ b/R1/App/app.h
+@@ -1,6 +1,4 @@
++#include "../lib/SENSOR/sensor_lib.h"
+ #include "../lib/ACTUATOR/actuator_lib.h"
+ 
+ int led_controller(int flag);
+-int buzzer_controller(int count, int flag);
+-int ultrasonic_controller(int flag);
+-int pir_controller(int flag);
+diff --git a/R1/App/examples/app.h b/R1/App/examples/app.h
+new file mode 100644
+index 0000000..596330c
+--- /dev/null
++++ b/R1/App/examples/app.h
+@@ -0,0 +1,6 @@
++#include "../../lib/ACTUATOR/actuator_lib.h"
++
++int led_controller(int flag);
++int buzzer_controller(int count, int flag);
++int ultrasonic_controller(int flag);
++int pir_controller(int flag);
+diff --git a/R1/App/daemon.c b/R1/App/examples/daemon.c
+similarity index 100%
+rename from R1/App/daemon.c
+rename to R1/App/examples/daemon.c
+diff --git a/R1/App/examples/ksf_net_client.c b/R1/App/examples/ksf_net_client.c
+new file mode 100644
+index 0000000..1f32325
+--- /dev/null
++++ b/R1/App/examples/ksf_net_client.c
+@@ -0,0 +1,22 @@
++#include <stdio.h>
++
++int client_open(char *dest_ip, int port);
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);
++int client_close(int sock);
++
++int main(void){
++    int sock, ret;
++    struct response rsp;
++    
++    sock = client_open(LOCAL_HOST, LOCAL_PORT);
++    printf("client open\n");
++    
++    rsp = request(sock, 'G', 'T', 'C', 100, "hi everyone\n");
++    
++    printf("rsp.type : %c\n", rsp.type);
++    printf("rsp.len : %ld\n", rsp.len);
++    printf("rsp.data : %s\n", rsp.data);
++    client_close(sock);    
++
++    return 0;
++}
+diff --git a/R1/App/examples/ksf_net_server.c b/R1/App/examples/ksf_net_server.c
+new file mode 100644
+index 0000000..ba265ef
+--- /dev/null
++++ b/R1/App/examples/ksf_net_server.c
+@@ -0,0 +1,43 @@
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++
++int server_open(int port);
++int server_close(int sock);
++int wait_request(int sock, struct request *req);
++int response(int c_sock, char type, unsigned long len, char *data);
++
++
++int main(void){
++    int sock, c_sock, ret;
++    struct request *req;
++    
++    sock = server_open(LOCAL_PORT);
++    if(sock < 0){
++        printf("fail init socket\n");
++        return -1;
++    }
++    req = (struct request*)malloc(sizeof(struct request));
++    memset(req, 0, sizeof(struct request));
++    
++    c_sock = wait_request(sock, req);
++    printf("req.method : %c\n", req->method);
++    printf("req.type : %c\n", req->type);
++    printf("req.cmd : %c\n", req->cmd);
++    printf("req.len : %ld\n", req->len);
++    printf("req.data : %s\n", req->data);
++    
++    if(c_sock < 0){
++        printf("fail get request\n");
++        return -1;
++    }
++    ret = response(c_sock, 's', 100, "hello\n");
++    if(ret < 0){
++        printf("fail response\n");
++        return -1;
++    }
++    
++    free(req);
++    server_close(sock);
++    return 0;
++}
+diff --git a/R1/App/sf_subctr.c b/R1/App/examples/sf_subctr.c
+similarity index 100%
+rename from R1/App/sf_subctr.c
+rename to R1/App/examples/sf_subctr.c
+diff --git a/R1/App/sensor_controller.c b/R1/App/sensor_controller.c
+new file mode 100644
+index 0000000..e136de8
+--- /dev/null
++++ b/R1/App/sensor_controller.c
+@@ -0,0 +1,9 @@
++#include <stdio.h>
++#include <unistd.h>
++
++#include "app.h"
++
++int main(void){
++   
++    return 0;
++}
+diff --git a/R1/App/snapshot.sh b/R1/App/snapshot.sh
+new file mode 100644
+index 0000000..f64fe19
+--- /dev/null
++++ b/R1/App/snapshot.sh
+@@ -0,0 +1,8 @@
++#!/bin/bash
++filename=$1
++param=$#
++
++if [ ${param} -eq 1 ]; then
++    raspistill -o camera/${filename}.jpg
++    echo snapshot saved ${filename}
++fi
+diff --git a/R1/KERNEL/ACTUATOR/led/led.c b/R1/KERNEL/ACTUATOR/led/led.c
+index 39efef4..47f25c4 100755
+--- a/R1/KERNEL/ACTUATOR/led/led.c
++++ b/R1/KERNEL/ACTUATOR/led/led.c
+@@ -33,7 +33,7 @@ static int __init led_init(void){
+     gpio_request_one(LED, GPIOF_OUT_INIT_LOW, "LED");
+ 
+     /* cdev init */
+-    alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
++    alloc_chrdev_region(&dev_num, 0, 1, DEV_LED);
+     cd_cdev = cdev_alloc();
+     cdev_init(cd_cdev, &led_fops);
+     cdev_add(cd_cdev, dev_num, 1);
+diff --git a/R1/KERNEL/ACTUATOR/led/led.h b/R1/KERNEL/ACTUATOR/led/led.h
+index 415e3b9..d730179 100644
+--- a/R1/KERNEL/ACTUATOR/led/led.h
++++ b/R1/KERNEL/ACTUATOR/led/led.h
+@@ -5,7 +5,7 @@
+ #include <linux/gpio.h>
+ #include <linux/cdev.h>
+ 
+-#define DEV_NAME "led"
++#define DEV_LED "led"
+ #define LED 4
+ 
+ /* 
+diff --git a/R1/KERNEL/ACTUATOR/led_alert/Makefile b/R1/KERNEL/ACTUATOR/led_alert/Makefile
+new file mode 100644
+index 0000000..ea5bb6a
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/led_alert/Makefile
+@@ -0,0 +1,14 @@
++KDIR := ~/linux-rpi
++ARM := ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
++PWD := $(shell pwd)
++
++obj-m := led_alert.o
++
++default:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
++
++copy:
++	scp led.ko mknod.sh pi@10.10.10.13:~/emso/TP/led_alert
++
++clean:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
+diff --git a/R1/KERNEL/ACTUATOR/led_alert/led_alert.c b/R1/KERNEL/ACTUATOR/led_alert/led_alert.c
+new file mode 100755
+index 0000000..94ad2e2
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/led_alert/led_alert.c
+@@ -0,0 +1,53 @@
++/*
++ * 20190524 aeomhs
++ * led_alert.c
++ * open : LED_ALERT on
++ * close : LED_ALERt off
++ * */
++
++#include "led_alert.h"
++
++MODULE_LICENSE("GPL");
++
++static dev_t dev_num;
++static struct cdev *cd_cdev;
++
++static int led_alert_open(struct inode *inode, struct file *file){
++    gpio_set_value(LED_ALERT, 1);
++    return 0;
++}
++
++
++static int led_alert_release(struct inode *inode, struct file *file){
++    gpio_set_value(LED_ALERT, 0);
++    return 0;
++}
++
++struct file_operations led_alert_fops = {
++    .open = led_alert_open,
++    .release = led_alert_release
++};
++
++static int __init led_alert_init(void){
++    /* gpio init */
++    gpio_request_one(LED_ALERT, GPIOF_OUT_INIT_LOW, "LED");
++
++    /* cdev init */
++    alloc_chrdev_region(&dev_num, 0, 1, DEV_LED_ALERT);
++    cd_cdev = cdev_alloc();
++    cdev_init(cd_cdev, &led_alert_fops);
++    cdev_add(cd_cdev, dev_num, 1);
++	
++    return 0;
++}
++
++static void __exit led_alert_exit(void){
++    /* cdev free */
++    cdev_del(cd_cdev);
++    unregister_chrdev_region(dev_num, 1);
++    /* gpio free */
++    gpio_free(LED_ALERT);
++}
++
++module_init(led_alert_init);
++module_exit(led_alert_exit);
+diff --git a/R1/KERNEL/ACTUATOR/led_alert/led_alert.h b/R1/KERNEL/ACTUATOR/led_alert/led_alert.h
+new file mode 100644
+index 0000000..b3037d4
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/led_alert/led_alert.h
+@@ -0,0 +1,23 @@
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/gpio.h>
++#include <linux/cdev.h>
++
++#define DEV_LED_ALERT "led_alert"
++#define LED_ALERT 5
++
++/* 
++ * function : LED ALERT on
++ * parameter : file path, mode
++ * return : file descriptor
++ * */
++static int led_alert_open(struct inode *inode, struct file *file);
++/*
++ * function : LED ALERT off
++ * parameter : file path, mode
++ * return : file descriptor
++ * */
++static int led_alert_release(struct inode *inode, struct file *file);
++
+diff --git a/R1/KERNEL/ACTUATOR/led_alert/mknod.sh b/R1/KERNEL/ACTUATOR/led_alert/mknod.sh
+new file mode 100644
+index 0000000..5f2f6b7
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/led_alert/mknod.sh
+@@ -0,0 +1,4 @@
++MODULE="led_alert"
++MAJOR=$(awk "\$2==\"$MODULE\" {print \$1}" /proc/devices)
++
++mknod /dev/$MODULE c $MAJOR 0
+diff --git a/R1/KERNEL/ACTUATOR/motor/motor.c b/R1/KERNEL/ACTUATOR/motor/motor.c
+index 3d25a80..0795415 100644
+--- a/R1/KERNEL/ACTUATOR/motor/motor.c
++++ b/R1/KERNEL/ACTUATOR/motor/motor.c
+@@ -2,6 +2,9 @@
+ 
+ MODULE_LICENSE("GPL");
+ 
++static dev_t dev_num;
++static struct cdev *cd_cdev;
++
+ int steps[STEPS][4] = {
+ 	{1,0,0,0},
+ 	{1,1,0,0},
+@@ -49,12 +52,17 @@ void moveDegree(int degree, int delay, int direction){
+ 
+ }
+ 
+-struct int motor_open(struct inode *inode, struct file *file){
++static int motor_open(struct inode *inode, struct file *file){
++
++	while(1){
++		moveDegree(360, 1000, 0);
++		moveDegree(360, 1000, 1);
++	}
+ 	
+ 	return 0;
+ }
+ 
+-struct int motor_release(struct inode *inode, struct file *file){
++static int motor_release(struct inode *inode, struct file *file){
+ 	
+ 	return 0;
+ }
+@@ -65,10 +73,10 @@ struct file_operations motor_fops = {
+ };
+ 
+ static int __init simple_motor_init(void){
+-	gpio_request_one(PIN1, GPIOF_OUT_INIT_LOW, "p1");
+-	gpio_request_one(PIN2, GPIOF_OUT_INIT_LOW, "p2");
+-	gpio_request_one(PIN3, GPIOF_OUT_INIT_LOW, "p3");
+-	gpio_request_one(PIN4, GPIOF_OUT_INIT_LOW, "p4");
++	gpio_request_one(MOTOR_A, GPIOF_OUT_INIT_LOW, "MOTOR_A");
++	gpio_request_one(MOTOR_B, GPIOF_OUT_INIT_LOW, "MOTOR_B");
++	gpio_request_one(MOTOR_C, GPIOF_OUT_INIT_LOW, "MOTOR_C");
++	gpio_request_one(MOTOR_D, GPIOF_OUT_INIT_LOW, "MOTOR_D");
+ 
+ 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+ 	cd_cdev = cdev_alloc();
+@@ -79,10 +87,10 @@ static int __init simple_motor_init(void){
+ }
+ 
+ static void __exit simple_motor_exit(void){
+-	gpio_free(PIN1);
+-	gpio_free(PIN2);
+-	gpio_free(PIN3);
+-	gpio_free(PIN4);
++	gpio_free(MOTOR_A);
++	gpio_free(MOTOR_B);
++	gpio_free(MOTOR_C);
++	gpio_free(MOTOR_D);
+ }
+ 
+ module_init(simple_motor_init);
+diff --git a/R1/KERNEL/ACTUATOR/motor/motor.h b/R1/KERNEL/ACTUATOR/motor/motor.h
+index 0eae741..209392a 100644
+--- a/R1/KERNEL/ACTUATOR/motor/motor.h
++++ b/R1/KERNEL/ACTUATOR/motor/motor.h
+@@ -7,10 +7,12 @@
+ #include <linux/delay.h>
+ #include <linux/cdev.h>
+ 
+-#define PIN1 6
+-#define PIN2 13
+-#define PIN3 19
+-#define PIN4 26
++#define DEV_NAME "motor"
++
++#define MOTOR_A 6
++#define MOTOR_B 13
++#define MOTOR_C 19
++#define MOTOR_D 26
+ 
+ #define STEPS 8
+ 
+diff --git a/R1/KERNEL/ACTUATOR/waterpump/Makefile b/R1/KERNEL/ACTUATOR/waterpump/Makefile
+new file mode 100644
+index 0000000..6417ddb
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/waterpump/Makefile
+@@ -0,0 +1,14 @@
++KDIR := ~/linux-rpi
++ARM := ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
++PWD := $(shell pwd)
++
++obj-m := waterpump.o
++
++default:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
++
++copy:
++	scp waterpump.ko mknod.sh pi@10.10.10.13:~/
++
++clean:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
+diff --git a/R1/KERNEL/ACTUATOR/waterpump/mknod.sh b/R1/KERNEL/ACTUATOR/waterpump/mknod.sh
+new file mode 100644
+index 0000000..dd4a000
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/waterpump/mknod.sh
+@@ -0,0 +1,4 @@
++MODULE="waterpump"
++MAJOR=$(awk "\$2==\"$MODULE\" {print \$1}" /proc/devices)
++
++mknod /dev/$MODULE c $MAJOR 0
+diff --git a/R1/KERNEL/ACTUATOR/waterpump/waterpump.c b/R1/KERNEL/ACTUATOR/waterpump/waterpump.c
+new file mode 100644
+index 0000000..d8c83e2
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/waterpump/waterpump.c
+@@ -0,0 +1,88 @@
++#include "waterpump.h"
++
++MODULE_LICENSE("GPL");
++
++static dev_t dev_num;
++static struct cdev *cd_cdev;
++
++/*delay 시간만큼 워터펌프 온*/
++void pump_on(int delay){
++	printk("pump on");
++	/*이게 지금 작동은하는데 물이 어떻게 들어가는지는 잘 모르겠음*/
++	gpio_set_value(WATERPUMP_A, 1);
++    gpio_set_value(WATERPUMP_B, 0);
++	/*작동상태 ing*/
++	mdelay(delay);
++	/*펌프 오프*/
++	gpio_set_value(WATERPUMP_A, 0);
++	gpio_set_value(WATERPUMP_B, 0);
++
++}
++
++/*펌프 오프 근데 아마 안쓰일거 같음*/
++void pump_off(void){
++	printk("pump off");
++
++	gpio_set_value(WATERPUMP_A, 0);
++	gpio_set_value(WATERPUMP_B, 0);
++
++}
++
++static int waterpump_open(struct inode *inode, struct file *file){
++	pump_on();
++	return 0;
++}
++
++static int waterpump_release(struct inode *inode, struct file *file){
++	pump_off();
++	return 0;
++}
++
++struct file_operations waterpump_fops = {
++	.open = waterpump_open,
++	.release = waterpump_release
++};
++
++static int __init simple_waterpump_init(void){
++
++	gpio_request_one(WATERPUMP_A, GPIOF_OUT_INIT_LOW, "WATERPUMP_A");
++	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_LOW, "WATERPUMP_B");
++
++	printk("init waterpump");
++
++	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
++	cd_cdev = cdev_alloc();
++	cdev_init(cd_cdev, &waterpump_fops);
++	cdev_add(cd_cdev, dev_num, 1);
++
++	///*test 바로 지우셈
++	gpio_set_value(WATERPUMP_A, 1);
++    gpio_set_value(WATERPUMP_B, 0);
++    mdelay(3000);
++    gpio_set_value(WATERPUMP_A, 0);
++    gpio_set_value(WATERPUMP_B, 0);
++    mdelay(3000);
++    gpio_set_value(WATERPUMP_A, 0);
++    gpio_set_value(WATERPUMP_B, 1);
++    mdelay(3000);
++    gpio_set_value(WATERPUMP_A, 0);
++    gpio_set_value(WATERPUMP_B, 0);
++	//*/
++
++	return 0;
++}
++
++static void __exit simple_waterpump_exit(void){
++
++	cdev_del(cd_cdev);
++	unregister_chrdev_region(dev_num, 1);
++
++	gpio_set_value(WATERPUMP_A, 0);
++	gpio_set_value(WATERPUMP_B, 0);
++
++	gpio_free(WATERPUMP_A);
++	gpio_free(WATERPUMP_B);
++}
++
++module_init(simple_waterpump_init);
++module_exit(simple_waterpump_exit);
+diff --git a/R1/KERNEL/ACTUATOR/waterpump/waterpump.h b/R1/KERNEL/ACTUATOR/waterpump/waterpump.h
+new file mode 100644
+index 0000000..13499b4
+--- /dev/null
++++ b/R1/KERNEL/ACTUATOR/waterpump/waterpump.h
+@@ -0,0 +1,24 @@
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/fs.h>
++#include <linux/gpio.h>
++#include <linux/interrupt.h>
++#include <linux/delay.h>
++#include <linux/cdev.h>
++
++#define DEV_NAME "waterpump"
++
++#define WATERPUMP_A	12
++#define WATERPUMP_B	13
++
++/*delay 만큼 펌프 온*/
++void pump_on(int delay);
++/*펌프 오프. 아마 안쓰일거 같긴함.*/
++void pump_off(void);
++
++static int waterpump_open(struct inode *inode, struct file *file);
++
++static int waterpump_release(struct inode *inode, struct file *file);
++
++
+diff --git a/R1/KERNEL/KSF_NET/Makefile b/R1/KERNEL/KSF_NET/Makefile
+new file mode 100644
+index 0000000..25c94e7
+--- /dev/null
++++ b/R1/KERNEL/KSF_NET/Makefile
+@@ -0,0 +1,14 @@
++KDIR := ~/linux-rpi
++ARM := ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
++PWD := $(shell pwd)
++
++obj-m := ksf_net.o
++
++default:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
++
++copy:
++	scp ksf_net.ko pi@10.10.10.13:~/emso/TP/
++
++clean:
++	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
+diff --git a/R1/KERNEL/KSF_NET/ksf_net.c b/R1/KERNEL/KSF_NET/ksf_net.c
+new file mode 100644
+index 0000000..94993b3
+--- /dev/null
++++ b/R1/KERNEL/KSF_NET/ksf_net.c
+@@ -0,0 +1,139 @@
++/* KU Smart Farm - Network - Data Communication - REST API
++ * Msg    : @Request @Response
++ * Method : @GET @POST @PUT
++ * 
++ */
++#include "ksf_net.h"
++
++/* create a socket */
++static int ksf_net_open(struct inode *inode, struct file *file){
++    int err;    
++
++    if ( ( (err = sock_create(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &sock)) < 0) ||
++         ( (err = sock_create(AF_INET, SOCK_DGRAM, IPPROTO_UDP, &sock_send)) < 0 )) {
++            printk(KERN_INFO KSF_NET": Could not create a datagram socket, error = %d\n", -ENXIO);
++            return -1;
++    }
++
++    memset(&addr, 0, sizeof(struct sockaddr));
++    memset(&addr_send, 0, sizeof(struct sockaddr));
++    addr.sin_family      = AF_INET;
++    addr_send.sin_family = AF_INET;
++
++    addr.sin_addr.s_addr      = htonl(INADDR_ANY);
++    addr_send.sin_addr.s_addr = htonl(INADDR_SEND);
++
++    addr.sin_port      = htons(DEFAULT_PORT);
++    addr_send.sin_port = htons(CONNECT_PORT);
++    
++    if ( ( (err = sock->ops->bind(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr) ) ) < 0) ||
++           (err = sock_send->ops->connect(sock_send, (struct sockaddr *)&addr_send, sizeof(struct sockaddr), 0) < 0 )){
++            printk(KERN_INFO KSF_NET": Could not bind or connect to socket, error = %d\n", -err);
++            sock_release(sock);
++            sock_release(sock_send);
++            return -1;
++    }
++
++    return 0;
++}
++
++static int ksf_net_release(struct inode *inode, struct file *file){
++    sock_release(sock);
++    sock = NULL;
++
++    printk(KERN_INFO KSF_NET": socket released\n");
++    return 0;
++}
++
++
++static int ksf_net_read(struct file *file, char *buf, size_t len, loff_t *loff){
++    struct msghdr msg;      /* Msg */
++    struct iovec iov;       /* Data */
++    int size = 0;
++    unsigned long nr_segments = 1;
++    size_t count = 1;
++
++    if (sock->sk==NULL) 
++        return 0;
++
++    /* msg set */
++    msg.msg_flags = 0;
++    msg.msg_name = &addr;            /* Socket name */
++    msg.msg_namelen  = sizeof(struct sockaddr_in);
++    msg.msg_control = NULL;         /* (void*)msg Control */
++    msg.msg_controllen = 0;
++    /* Data set */
++    iov.iov_base = buf;
++    iov.iov_len = len;
++    iov_iter_init(&msg.msg_iter, READ, &iov, nr_segments, count);
++    /* receive msg */
++    size = sock_recvmsg(sock, &msg, msg.msg_flags);
++
++    return size;
++}
++
++static int ksf_net_write(struct file *file, const char *buf, size_t len, loff_t *loff){
++    struct msghdr msg;
++    struct iovec iov;
++    int size = 0;
++    void *k_buf;
++    int ret;
++    unsigned long nr_segments = 1;
++    size_t count = 1;
++    
++    if(sock->sk == NULL)
++        return 0;
++
++    /* Msg Set */
++    msg.msg_flags = 0;
++    msg.msg_name = &addr;            /* Socket name */
++    msg.msg_namelen  = sizeof(struct sockaddr_in);
++    msg.msg_control = NULL;         /* (void*)msg Control */
++    msg.msg_controllen = 0;
++    /* Copy Data from user */
++    k_buf = (void*)kmalloc(sizeof(len), GFP_KERNEL);
++    ret = copy_from_user(k_buf, buf, len);
++    if(ret < 0)
++        return -1;
++    /* Data set */
++    iov.iov_base = k_buf;
++    iov.iov_len = len;
++    iov_iter_init(&msg.msg_iter, READ, &iov, nr_segments, count);
++    /* Send msg */
++    size = sock_sendmsg(sock, &msg);
++
++    kfree(k_buf);
++    return size;
++}
++
++struct file_operations ksf_net_fops =
++{
++	.read = ksf_net_read,
++	.write = ksf_net_write,
++	/* .unlocked_ioctl = ksf_net_ioctl, */
++	.open = ksf_net_open,
++	.release = ksf_net_release
++};
++
++static int __init ksf_net_init(void){
++
++    /* Character Device init */
++	alloc_chrdev_region(&dev_num, 0, 1, KSF_NET);
++	cd_cdev = cdev_alloc();
++	cdev_init(cd_cdev, &ksf_net_fops);
++	cdev_add(cd_cdev, dev_num, 1);
++	
++    return 0;
++}
++
++static void __exit ksf_net_exit(void){
++
++    /* Character Device free */
++	cdev_del(cd_cdev);
++	unregister_chrdev_region(dev_num, 1);
++	
++}
++
++
++module_init(ksf_net_init);
++module_exit(ksf_net_exit);
+diff --git a/R1/KERNEL/KSF_NET/ksf_net.h b/R1/KERNEL/KSF_NET/ksf_net.h
+new file mode 100644
+index 0000000..118860a
+--- /dev/null
++++ b/R1/KERNEL/KSF_NET/ksf_net.h
+@@ -0,0 +1,52 @@
++/* KU Smart Farm - Network - Data Communication - REST API
++ * Msg    : @Request @Response
++ * Method : @GET @POST @PUT
++ *
++ */
++
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/fcntl.h>
++#include <linux/cdev.h>
++#include <linux/uaccess.h>
++#include <linux/slab.h>
++/* kernel socket programming */
++#include <linux/net.h>
++#include <linux/socket.h>
++#include <linux/uio.h>
++#include <linux/ip.h>
++#include <linux/in.h>
++
++#define KSF_NET "ksf_net"
++
++#define DEFAULT_PORT 2325   /* Src */
++#define CONNECT_PORT 23     /* Dest */
++//#define INADDR_SEND ((unsigned long int)0x7f000001) /* 127.0.0.1 */
++#define INADDR_SEND INADDR_LOOPBACK
++
++static dev_t dev_num;
++static struct cdev *cd_cdev;
++/* src */
++static struct socket *sock;
++static struct sockaddr_in addr;
++/* dest */
++static struct socket *sock_send;
++static struct sockaddr_in addr_send;
++
++/* create socket */
++static int ksf_net_open(struct inode *inode, struct file *file);
++
++/* release socket */
++static int ksf_net_release(struct inode *inode, struct file *file);
++
++/*  */
++//static long ksf_net_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
++
++/* Send data */
++static int ksf_net_read(struct file *file, char *buf, size_t len, loff_t *loff);
++
++/* receive data */
++static int ksf_net_write(struct file *file, const char *buf, size_t len, loff_t *loff);
++
+diff --git a/R1/KERNEL/SENSOR/dht11/Makefile b/R1/KERNEL/SENSOR/dht11/Makefile
+index 9d78528..8a0bf41 100644
+--- a/R1/KERNEL/SENSOR/dht11/Makefile
++++ b/R1/KERNEL/SENSOR/dht11/Makefile
+@@ -8,7 +8,7 @@ default:
+ 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
+ 
+ copy:
+-	scp dht11.ko mknod.sh pi@10.10.10.13:~/emso/TP/led
++	scp dht11.ko mknod.sh pi@10.10.10.13:~/emso/TP/dht11
+ 
+ clean:
+ 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
+diff --git a/R1/KERNEL/SENSOR/dht11/dht11.c b/R1/KERNEL/SENSOR/dht11/dht11.c
+index ff529a0..1f110a1 100755
+--- a/R1/KERNEL/SENSOR/dht11/dht11.c
++++ b/R1/KERNEL/SENSOR/dht11/dht11.c
+@@ -15,58 +15,66 @@ static struct cdev *cd_cdev;
+ 
+ static int dht11_data[5] = {0,};
+ 
+-static void dht11_read(void){
+-	int last_state = 1;
+-	int counter = 0;
+-	int i = 0;
+-	int j = 0;
+-
+-	dht11_data[0] = dht11_data[1] = dht11_data[2] = dht11_data[3] = dht11_data[4] = 0;
+-
+-	gpio_direction_output(DHT11, 0);
+-	gpio_set_value(DHT11, 0);
+-	mdelay(18);
+-	gpio_set_value(DHT11, 1);
+-	udelay(40);
+-	gpio_direction_input(DHT11);
+-
+-	for(i = 0;i < MAX_TIMING; i++){
+-		counter++;
+-		while(gpio_get_value(DHT11) == last_state){
++static void dht_read(void){
++	int flag=0;
++	while(flag==0)
++	{
++		int last_state = 1;
++		int counter = 0;
++		int i = 0;
++		int j = 0;
++
++		dht11_data[0] = dht11_data[1] = dht11_data[2] = dht11_data[3] = dht11_data[4] = 0;
++
++		gpio_direction_output(DHT, 0);
++		gpio_set_value(DHT, 0);
++		mdelay(18);
++		gpio_set_value(DHT, 1);
++		udelay(40);
++		gpio_direction_input(DHT);
++	
++		for(i = 0;i < MAX_TIMING; i++){
+ 			counter++;
+-			udelay(1);
++			while(gpio_get_value(DHT) == last_state){
++				counter++;
++				udelay(1);
++				if(counter == 255)	break;
++			
++			}
++	
++
++			last_state = gpio_get_value(DHT);
++	
+ 			if(counter == 255)	break;
+ 		
++			if( (i >= 4) && (i%2 == 0) ){
++				dht11_data[j/8] <<= 1;
++				if(counter > 16)	dht11_data[j/8] |= 1;
++		
++				j++;
++			}
+ 		}
+-	
+ 
+-		last_state = gpio_get_value(DHT11);
+-	
+-		if(counter == 255)	break;
+-	
+-		if( (i >= 4) && (i%2 == 0) ){
+-			dht11_data[j/8] <<= 1;
+-			if(counter > 16)	dht11_data[j/8] |= 1;
+-	
+-			j++;
++		if( (j >= 40) && (dht11_data[4] == ( (dht11_data[0]+dht11_data[1]+dht11_data[2]+dht11_data[3]) & 0xFF) ) ){
++			printk("Humidity:%d.%d Temperature = %d.%dC \n", dht11_data[0], dht11_data[1], dht11_data[2], dht11_data[3]);
++			flag=1;
++		}else{
++			mdelay(200);
+ 		}
+ 	}
++	
++}
+ 
+-	if( (j >= 40) && (dht11_data[4] == ( (dht11_data[0]+dht11_data[1]+dht11_data[2]+dht11_data[3]) & 0xFF) ) ){
+-		printk("Humidity:%d.%d Temperature = %d.%dC \n", dht11_data[0], dht11_data[1], dht11_data[2], dht11_data[3]);
+-	}else{
+-		printk("Data not good, skip\n");
+-	}
++static int dht11_read(struct file *file, char *buf, size_t len, loff_t *lof){
++	int ret;
++	dht_read();
++	printk("Humidity:%d.%d Temperature = %d.%dC \n", dht11_data[0], dht11_data[1], dht11_data[2], dht11_data[3]);
++	ret = copy_to_user(buf,dht11_data,4*sizeof(int));
+ 	
++	return 0;
+ }
+ 
+ static dht11_open(struct inode *inode, struct file *file){
+-	int i=0;
+-
+-	for(i=0;i<20;i++){
+-		dht11_read();
+-		mdelay(200);
+-	}
+ 
+ 	return 0;
+ }
+@@ -78,12 +86,13 @@ static dht11_release(struct inode *inode, struct file *file){
+ 
+ struct file_operations dht11_fops = {
+ 	.open = dht11_open,
+-	.release = dht11_release
++	.release = dht11_release,
++	.read = dht11_read
+ };
+ 
+ static int __init dht11_init(void){
+ 
+-	gpio_request(DHT11, "DHT11");
++	gpio_request(DHT, "DHT11");
+ 
+ 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+ 	cd_cdev = cdev_alloc();
+@@ -94,8 +103,8 @@ static int __init dht11_init(void){
+ }
+ 
+ static void __exit dht11_exit(void){
+-	gpio_set_value(DHT11, 0);
+-	gpio_free(DHT11);
++	gpio_set_value(DHT, 0);
++	gpio_free(DHT);
+ }
+ 
+ module_init(dht11_init);
+diff --git a/R1/KERNEL/SENSOR/dht11/dht11.h b/R1/KERNEL/SENSOR/dht11/dht11.h
+index 1619542..e4baf34 100644
+--- a/R1/KERNEL/SENSOR/dht11/dht11.h
++++ b/R1/KERNEL/SENSOR/dht11/dht11.h
+@@ -8,7 +8,7 @@
+ #define DEV_NAME "dht11"
+ 
+ #define MAX_TIMING 85
+-#define DHT11 21
++#define DHT 21
+ 
+ /*
+ 	function : dht11 on
+@@ -18,3 +18,5 @@ static void dht11_read(void);
+ 	function : dht11 repeat 
+ */
+ static int dht11_open(struct inode *inode, struct file *file);
++
++static int dht11_read(struct file *file, char *buf, size_t len, loff_t *lof);
+diff --git a/R1/KERNEL/SENSOR/light_sensor/light_sensor.c b/R1/KERNEL/SENSOR/light_sensor/light_sensor.c
+index 9844619..1b2babd 100644
+--- a/R1/KERNEL/SENSOR/light_sensor/light_sensor.c
++++ b/R1/KERNEL/SENSOR/light_sensor/light_sensor.c
+@@ -20,7 +20,7 @@ MODULE_LICENSE("GPL");
+ 
+ #define DEV_NAME "light_sensor_dev"
+ 
+-#define MAX_CLK 8
++#define MAX_CLK 12
+ static dev_t dev_num;
+ static struct cdev *cd_cdev;
+ static int light_data;
+diff --git a/R1/KERNEL/SENSOR/pir/pir.h b/R1/KERNEL/SENSOR/pir/pir.h
+index 338f5bf..c68cb9b 100644
+--- a/R1/KERNEL/SENSOR/pir/pir.h
++++ b/R1/KERNEL/SENSOR/pir/pir.h
+@@ -5,6 +5,8 @@
+ #include <linux/gpio.h>
+ #include <linux/interrupt.h>
+ #include <linux/cdev.h>
++#include <linux/wait.h>
++#include <linux/sched.h>
+ 
+ #define SENSOR 17
+ #define DEV_NAME "pir_sensor_dev"
+diff --git a/R1/KERNEL/SENSOR/soil_sensor/Makefile b/R1/KERNEL/SENSOR/soil_sensor/Makefile
+new file mode 100644
+index 0000000..9e14cb8
+--- /dev/null
++++ b/R1/KERNEL/SENSOR/soil_sensor/Makefile
+@@ -0,0 +1,14 @@
++KERNELDIR := ~/linux-rpi/
++ARM := ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabi-
++PWD := $(shell pwd)
++
++obj-m := soil_sensor.o
++
++default:
++	$(MAKE) -C $(KERNELDIR) M=$(PWD) $(ARM) modules
++
++copy:
++
++
++clean:
++	$(MAKE) -C $(KERNELDIR) M=$(PWD) $(ARM) clean
+diff --git a/R1/KERNEL/SENSOR/soil_sensor/mknod.sh b/R1/KERNEL/SENSOR/soil_sensor/mknod.sh
+new file mode 100644
+index 0000000..2522d18
+--- /dev/null
++++ b/R1/KERNEL/SENSOR/soil_sensor/mknod.sh
+@@ -0,0 +1,4 @@
++MODULE="soil_sensor_dev"
++MAJOR=$(awk "\$2==\"$MODULE\" {print \$1}" /proc/devices)
++
++mknod /dev/$MODULE c $MAJOR 0
+diff --git a/R1/KERNEL/SENSOR/soil_sensor/soil_sensor.c b/R1/KERNEL/SENSOR/soil_sensor/soil_sensor.c
+new file mode 100644
+index 0000000..2794a55
+--- /dev/null
++++ b/R1/KERNEL/SENSOR/soil_sensor/soil_sensor.c
+@@ -0,0 +1,155 @@
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/gpio.h>
++#include <linux/delay.h>
++#include <linux/cdev.h>
++#include <linux/fs.h>
++#include <linux/errno.h>
++#include <linux/fcntl.h>
++#include <linux/uaccess.h>
++
++
++
++MODULE_LICENSE("GPL");
++
++#define MOSI 10
++#define MISO 9
++#define SCLK 11
++#define CE0 8
++
++#define DEV_NAME "soil_sensor_dev"
++
++#define MAX_CLK 10
++static dev_t dev_num;
++static struct cdev *cd_cdev;
++static int soil_data;
++
++/*
++* light_sensor로 부터 값을 받기 위해 start 신호 등등을 보내는 함수.
++*/
++void start_mcp(void){
++	gpio_direction_output(CE0,0);
++	
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	gpio_direction_output(MOSI,1); 
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	gpio_direction_output(MOSI,1);
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	gpio_direction_output(MOSI,0);
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	gpio_direction_output(MOSI,0);
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	gpio_direction_output(MOSI,1);	//D0
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	udelay(1);
++	gpio_direction_output(SCLK,1);
++	udelay(1);
++	gpio_direction_output(SCLK,0);
++	udelay(1);
++}
++
++void start_soil_sensor(void){
++	int i=0;
++	soil_data=0;
++	
++	gpio_direction_input(MISO);
++	start_mcp();
++	gpio_set_value(SCLK,1);
++	udelay(1);
++
++
++	for(i=0; i<MAX_CLK; i++){
++		gpio_direction_output(SCLK,0);
++		udelay(1);
++		soil_data <<= 1;
++		if(gpio_get_value(MISO)==1){
++			soil_data |= 1;
++		}
++		gpio_direction_output(SCLK,1);
++		udelay(1);
++	}
++	gpio_direction_output(SCLK,0);
++	udelay(1);
++	gpio_direction_output(CE0,1);
++}
++/*
++* Parameter : File Description, Buffer(int), lenght(sizeof(int))
++* Return : light_data
++*/
++
++static int soil_sensor_read(struct file *file, char *buf, size_t len, loff_t *lof){
++	int ret;
++	start_soil_sensor();
++	printk("soil value: %u\n",soil_data);
++	ret = copy_to_user(buf,&soil_data,sizeof(int));
++	
++	return 0;
++}
++
++static int soil_sensor_open(struct inode *inode, struct file *file){
++	
++
++	return 0;
++}
++
++static int soil_sensor_release(struct inode *inode, struct file *file){
++
++
++
++	return 0;
++}
++
++struct file_operations soil_sensor_fops =
++{	
++	.open = soil_sensor_open,
++	.release = soil_sensor_release,
++	.read = soil_sensor_read,
++
++};
++
++static int __init soil_sensor_init(void) {
++
++	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
++	cd_cdev = cdev_alloc();
++	cdev_init(cd_cdev, &soil_sensor_fops);
++	cdev_add(cd_cdev, dev_num, 1);
++
++	gpio_request_one(MOSI, GPIOF_OUT_INIT_LOW,"Master Out/ Slave In");
++	gpio_request_one(MISO, GPIOF_OUT_INIT_LOW,"Master In/Slave Out");
++	gpio_request_one(SCLK, GPIOF_OUT_INIT_LOW,"SCLK");
++	gpio_request_one(CE0, GPIOF_OUT_INIT_LOW,"CE0");
++	start_soil_sensor();
++	
++
++
++	return 0;
++}
++static void __exit soil_sensor_exit(void){
++	gpio_free(MOSI);
++	gpio_free(MISO);
++	gpio_free(SCLK);
++	gpio_free(CE0);
++	cdev_del(cd_cdev);
++	unregister_chrdev_region(dev_num, 1);
++}
++
++module_init(soil_sensor_init);
++module_exit(soil_sensor_exit);
+diff --git a/R1/KERNEL/SF_NET/sf_net.c b/R1/KERNEL/SF_NET/sf_net.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R1/KERNEL/SF_NET/sf_net.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R1/KERNEL/SF_NET/sf_net.h b/R1/KERNEL/SF_NET/sf_net.h
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R1/KERNEL/SF_NET/sf_net.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R1/compile.sh b/R1/compile.sh
+index b198248..46e5465 100644
+--- a/R1/compile.sh
++++ b/R1/compile.sh
+@@ -1,12 +1,19 @@
+ #lib compile
+-arm-linux-gnueabi-gcc -c ./lib/ACTUATOR/actuator_lib.c
++#arm-linux-gnueabi-gcc -c ./lib/ACTUATOR/actuator_lib.c
++arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_server_lib.c
++arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_client_lib.c
+ 
+ #app compile
+-arm-linux-gnueabi-gcc -c ./App/sf_subctr.c
+-arm-linux-gnueabi-gcc -I. -o daemon ./App/daemon.c actuator_lib.o sf_subctr.o
++#arm-linux-gnueabi-gcc -c ./App/sf_subctr.c
++#arm-linux-gnueabi-gcc -I. -o daemon ./App/daemon.c actuator_lib.o sf_subctr.o
++arm-linux-gnueabi-gcc -I. -o server ./App/ksf_net_server.c ksf_server_lib.o
++arm-linux-gnueabi-gcc -I. -o client ./App/ksf_net_client.c ksf_client_lib.o
+ 
+ #delete .o
+-rm actuator_lib.o sf_subctr.o
++#rm actuator_lib.o sf_subctr.o
++rm ksf_server_lib.o ksf_client_lib.o
+ 
+ #move binary
+-mv daemon ./App/
++#mv daemon ./App/
++mv server ./App/
++mv client ./App/
+diff --git a/R1/lib/ACTUATOR/actuator_lib.c b/R1/lib/ACTUATOR/actuator_lib.c
+index 2a71d62..e812a2c 100644
+--- a/R1/lib/ACTUATOR/actuator_lib.c
++++ b/R1/lib/ACTUATOR/actuator_lib.c
+@@ -16,6 +16,30 @@ int turn_off_led(int fd){
+     return ret;
+ }
+ 
++int turn_on_led_alert(){
++    int ret;
++    ret = open("/dev/led_alert", O_RDWR);
++    return ret;
++}
++int turn_off_led_alert(int fd){
++    int ret;
++    ret = close(fd);
++    return ret;
++}
++
++/* turn on  buzzer*/
++int turn_on_buzzer(){
++    int ret;
++    ret = open("/dev/buzzer", O_RDWR);
++    return ret;
++}
++
++/* turn off buzzer*/
++int turn_off_buzzer(int fd){
++    int ret;
++    ret = close(fd);
++    return ret;
++
+ /* buzzer on '미' */
+ int turn_on_buzzer_me(){
+ 	int ret;
+@@ -24,6 +48,7 @@ int turn_on_buzzer_me(){
+ 
+ 	return ret;	/* success = 0 */
+ }
++
+ /* buzzer on '도' */
+ int turn_on_buzzer_do(){
+ 	int ret;
+@@ -40,17 +65,41 @@ int turn_off_buzzer(int fd){
+ 	return ret;
+ }
+ 
+-/* read value from light sensor*/
+-int read_light_sensor(){
+-	int dev;
++/*
++	motor turn on
++	counter-clockwise 180 -> clockwise 360 -> counter-clockwise 360
++*/
++int turn_on_motor(){
++	int ret;
++	ret = open("/dev/motor_dev", O_RDWR);
++	return ret;
++}
++
++/*turn off motor*/
++int turn_off_motor(int fd){
+ 	int ret;
+-	int light_value=0;
++	ret = close(fd);
++	return ret;
++}
+ 
+-	dev = open("/dev/light_sensor_dev",O_RDWR);
+-	
+-	ret=read(dev,&light_value,sizeof(int));
+-	
+-	ret = close(dev);
+ 
+-	return light_value;
++/* camera snapshot */
++int snapshot(void){
++    pid_t pid;
++    pid = fork();
++    
++    if(pid < 0){
++        /* fail to fork */
++        printf("fail to fork\n");
++        return -1;
++    }
++    else if(pid == 0){
++        /* child process */
++        execl("snapshot.sh", "10230", NULL);
++    }
++    else{
++        /* parents process */
++        printf("return pid(%d)\n", pid);
++        return pid;
++    }
+ }
+diff --git a/R1/lib/ACTUATOR/actuator_lib.h b/R1/lib/ACTUATOR/actuator_lib.h
+index b0aafa0..6b4a0d7 100644
+--- a/R1/lib/ACTUATOR/actuator_lib.h
++++ b/R1/lib/ACTUATOR/actuator_lib.h
+@@ -1,5 +1,9 @@
+-#include <sys/fcntl.h>		
+-#include <unistd.h>		/* close */
++#include <unistd.h>		
++#include <sys/types.h>
++#include <sys/fcntl.h>
++#include <sys/ioctl.h>
++
++/* close */
+ 
+ #define IOCTL_START_NUM 0x80
+ #define IOCTL_NUM1 IOCTL_START_NUM+1
+@@ -11,9 +15,15 @@
+ 
+ int turn_on_led();
+ int turn_off_led(int fd);
++int turn_on_led_alert();
++int turn_off_led_alert(int fd);
+ 
+ int turn_on_buzzer_me();
+ int turn_on_buzzer_do();
++
+ int turn_off_buzzer(int fd);
+ 
+ int read_light_sensor();
++
++int turn_on_motor();
++int turn_off_motor(int fd);
+diff --git a/R1/lib/KSF_NET/ksf_net_lib.c b/R1/lib/KSF_NET/ksf_net_lib.c
+new file mode 100644
+index 0000000..ab0a7dc
+--- /dev/null
++++ b/R1/lib/KSF_NET/ksf_net_lib.c
+@@ -0,0 +1,168 @@
++#include "ksf_net_lib.h"
++
++/* Client REST API */
++/* 20190603 aeomhs "rest api - client #interface"
++ * Client request to server
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++
++int client_open(char *dest_ip, int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    /* hdr set */
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = inet_addr(dest_ip);
++    
++    ret = connect(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    if(ret < 0){
++        printf("failed connect\n");
++        return -1;
++    }
++    
++    return sock;
++}
++
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data){
++    struct request req;
++    struct response rsp;
++    int ret;
++
++    //memset(&req, 0, sizeof(req));
++    //memset(&rsp, 0, sizeof(rsp));
++    
++    /* request init */
++    req.method = method;
++    req.type = type; 
++    req.cmd = cmd;   
++    req.len = len;
++    strcpy(req.data, data);
++
++    /* send request */
++    ret = write(sock, &req, sizeof(struct request));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "send request fail\n");
++        return rsp;
++    }
++    
++    /* maybe wait until receive response */
++    ret = read(sock, &rsp, sizeof(struct response));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "receive response fail\n");
++        return rsp;
++    }
++
++    return rsp;
++}
++
++int client_close(int sock){
++    int ret;
++    ret = close(sock);
++    
++    return ret;
++}
++
++/* Server REST API */
++/* 20190602 aeomhs "rest api - server #interface"
++ * Server is always on.
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++int server_open(int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;  /* server address */
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = htonl(INADDR_ANY);
++    
++    ret = bind(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    
++    if(ret < 0){
++        printf("failed bind\n");
++        return -1;
++    }
++
++    return sock;
++}
++
++int server_close(int sock){
++    int ret;
++    
++    ret = close(sock);
++
++    return ret;
++}
++
++/* Server should be run alyways */
++int wait_request(int sock, struct request *req){
++    int ret;
++    int c_sock; /* client socket */
++    int c_addr_size;
++    struct sockaddr_in c_addr; /* client address */
++    
++    ret = listen(sock, 5);
++    if(ret < 0){
++        printf("failed listen\n");
++        return -1;
++    }
++    
++    c_addr_size = sizeof(struct sockaddr_in);
++    c_sock = accept(sock, (struct sockaddr*)&c_addr, &c_addr_size);
++    
++    if(c_sock < 0){
++        printf("failed connect to client\n");
++        return -1;
++    }
++    
++    read(c_sock, req, sizeof(struct request));
++    printf("received\n");
++    
++    return c_sock;
++}
++
++/* Send response */
++int response(int c_sock, char type, unsigned long len, char *data){
++    struct response rsp;
++    int ret;
++
++    /* response init */
++    rsp.type = type;
++    rsp.len = len;
++    memset(rsp.data, 0, BUFF_SIZE);
++    strcpy(rsp.data, data);
++    
++    write(c_sock, &rsp, sizeof(struct response));
++    close(c_sock);
++
++    return 0;
++}
++
+diff --git a/R1/lib/KSF_NET/ksf_net_lib.h b/R1/lib/KSF_NET/ksf_net_lib.h
+new file mode 100644
+index 0000000..e4c12f1
+--- /dev/null
++++ b/R1/lib/KSF_NET/ksf_net_lib.h
+@@ -0,0 +1,46 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <arpa/inet.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++
++#define BUFF_SIZE 1024
++
++#define R1_ADDR "10.10.10.13"
++#define R1_SNR_PORT 1010  /* Client */
++#define R1_ACT_PORT 1020  /* Server */
++#define R2_ADDR "10.10.10.14"
++#define R2_DATA_PORT 2010 /* Server */
++#define R2_DATB_PORT 2010 /* Client */
++#define R2_CMD_PORT 2020  /* Client */
++#define R3_ADDR "10.10.10.15"
++#define R3_STG_PORT 3010  /* Server */
++#define R3_REF_PORT 3020  /* Server */
++#define LOCAL_HOST "127.0.0.1"
++#define LOCAL_PORT 4000
++
++struct request{
++    char method;
++    char type;
++    char cmd;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++struct response{
++    char type;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++/* Client Function */
++int client_open(char *dest_ip, int port);
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);
++int client_close(int sock);
++/* Server Function */
++int server_open(int port);
++int server_close(int sock);
++int wait_request(int sock, struct request *req);
++int response(int c_sock, char type, unsigned long len, char *data);
+diff --git a/R1/lib/SENSOR/sensor_lib.c b/R1/lib/SENSOR/sensor_lib.c
+index 67d6171..96e45be 100644
+--- a/R1/lib/SENSOR/sensor_lib.c
++++ b/R1/lib/SENSOR/sensor_lib.c
+@@ -1,30 +1,142 @@
+-#include "sensor_lib.h"
+ /* sensor library */
++#include "sensor_lib.h"
++
++/*	read_light_senser()
++
++Description : 빛 조도 값을 읽어오는 함수 (알아서 오픈하고 읽어서 닫고 읽은 값 리턴해줌)
++Parameter : void
++Return : int light_value
++
++*/
++int read_light_sensor()
++{
++	int dev;
++	int ret;
++	int light_value=0;
++
++	dev = open("/dev/light_sensor_dev",O_RDWR);
++	
++	ret=read(dev,&light_value,sizeof(int));
++	
++	ret = close(dev);
++
++	return light_value;
++}
++
++
++/*	read_soil_senser()			미구현!!
++
++Description : 토양 온습도 값을 읽어오는 함수 (알아서 오픈하고 읽어서 닫고 읽은 값 리턴해줌)
++Parameter : void
++Return : int light_value
++
++*/
++int read_soil_sensor()
++{
++	int dev;
++	int ret;
++	int soil_value=0;
++
++	dev = open("/dev/soil_sensor_dev",O_RDWR);
++	
++	ret=read(dev,&soil_value,sizeof(int));
++	
++	ret = close(dev);
++
++	return soil_value;
++}
++
++
++
++/*	read_dht11_senser()
++
++Description : 대기 중 온습도 값을 읽어오는 함수 (알아서 오픈하고 읽어서 닫고 읽은 값 리턴해줌)
++Parameter : int dht11_data[4]   (습도 : dht11_data[0].dht11_data[1] / 온도 : dht11_data[2].dht11_data[3]도) 
++Return : void
+ 
+-int turn_on_pir(){
++*/
++void read_dht11_sensor(int dht11_data[])
++{
++	int dev;
+ 	int ret;
+-	ret = open("/dev/pir", O_RDWR);
++
++	dev = open("/dev/dht11_dev",O_RDWR);
++	
++	ret=read(dev,dht11_data,4*sizeof(int));
+ 	
+-	return ret;	/* success : 0 */
++	ret = close(dev);
++
+ }
+ 
+-int turn_off_pir(int fd){
++
++/*
++	pir이나 ultrasonic 센서의 경우 시나리오상 한번씩 실행 되는 것이 아니라 계속 켜저서 값이 어느정도 이하 일 때, Interrupt가 	발생함.
++*/
++
++/*	open_pir_senser()
++
++Description : 모션을 감지하는 센서를 켜는 함수
++Parameter : void
++Return : int dev (file description)
++
++*/
++int open_pir_sensor()
++{
++	int dev;
+ 	int ret;
+-	ret = close(fd);
+ 
+-	return ret;	/* success : 0 */
++	dev = open("/dev/pir_sensor_dev",O_RDWR);
++	
++	return dev
++
+ }
+ 
+-int turn_on_ultrasonic(){
++/*	close_pir_senser()
++
++Description : 모션을 감지하는 센서를 끄는 함
++Parameter : int dev  (file description)
++Return : void
++
++*/
++
++void close_pir_sensor(int dev)
++{
+ 	int ret;
+-	ret = open("/dev/ultrasonic", O_RDWR);
+ 
+-	return ret;	/* success : distance */
++	ret = close(dev);
++
+ }
+ 
+-int turn_off_pir(int fd){
++
++/*	open_ultrasonic_senser()
++
++Description : 거리를 측정하는 센서를 켜는 함수
++Parameter : void
++Return : int dev (file description)
++
++*/
++int open_ultrasonic_sensor()
++{
++	int dev;
++	int ret;
++
++	dev = open("/dev/ultrasonic_sensor_dev",O_RDWR);
++	
++	return dev
++
++}
++
++/*	close_ultrasonic_senser()
++
++Description : 거리를 측정하는 센서를 끄는 함수
++Parameter : int dev  (file description)
++Return : void
++
++*/
++
++void close_ultrasonic_sensor(int dev)
++{
+ 	int ret;
+-	ret = close(fd);
+ 
+-	return ret;	/* success : 0 */
++	ret = close(dev);
+ }
+diff --git a/R1/lib/SENSOR/sensor_lib.h b/R1/lib/SENSOR/sensor_lib.h
+index 3f39185..cba215f 100644
+--- a/R1/lib/SENSOR/sensor_lib.h
++++ b/R1/lib/SENSOR/sensor_lib.h
+@@ -1,10 +1,18 @@
+-#include <sys/fcntl.h>		
++/* sensor library header */
++#include <stdio.h>
++#include <stdlib.h>
+ #include <unistd.h>		/* close */
++#include <sys/fcntl.h>
++#include <sys/ioctl.h>
+ 
+-/* sensor library header */
++int read_light_sensor();
++
++void read_soil_sensor();
++void read_dht11_sensor(int dht11_data[]);
++
++int open_pir_sensor();
++void close_pir_sensor(int dev);
+ 
+-int turn_on_pir();
+-int turn_off_pir(int fd);
++int open_ultrasonic_sensor();
++void close_ultrasonic_sensor(int dev);
+ 
+-int turn_on_ultrasonic();
+-int turn_off_ultrasonic(int fd);
+diff --git a/R1/lib/SF_NET/sf_net_lib.c b/R1/lib/SF_NET/sf_net_lib.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R1/lib/SF_NET/sf_net_lib.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R1/lib/SF_NET/sf_net_lib.h b/R1/lib/SF_NET/sf_net_lib.h
+deleted file mode 100644
+index d57ab28..0000000
+--- a/R1/lib/SF_NET/sf_net_lib.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api header */
+diff --git a/R1/lib/dht11_lib.c b/R1/lib/dht11_lib.c
+deleted file mode 100644
+index d319fde..0000000
+--- a/R1/lib/dht11_lib.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "dht11_lib.h"
+-
+-int turn_on_dht11(){
+-	int ret;
+-
+-	ret = open("/dev/dht11", O_RDWR);
+-
+-	return ret;
+-}
+-
+-int turn_off_dht11(int fd){
+-	int ret;
+-
+-	ret = close(fd);
+-
+-	return ret;
+-}
+diff --git a/R1/lib/dht11_lib.h b/R1/lib/dht11_lib.h
+deleted file mode 100644
+index d756fb8..0000000
+--- a/R1/lib/dht11_lib.h
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include <sys/fcntl.h>
+-#include <unistd.h>
+-
+-int turn_on_dht11();
+-int turn_off_dht11(int fd);
+diff --git a/R2/App/command_controller.c b/R2/App/command_controller.c
+new file mode 100644
+index 0000000..6028753
+--- /dev/null
++++ b/R2/App/command_controller.c
+@@ -0,0 +1,40 @@
++#include <stdio.h>
++
++/*커맨드 라이브러리*/
++#include "../lib/abnormal_situation_lib.h"
++#include "../lib/unidentifid_object_lib.h"
++#include "../lib/led_lib.h"
++#include "../lib/sprinkler_lib.h"
++/*네트워크 라이브러리*/
++#include "../lib/SF_NET/ksf_client.lib.h"
++
++int main(){
++
++	struct response rcv;
++	bool sig;	/*actuator 작동여부*/
++	int socket_r1, socket_r3;
++
++	/*클라이언트 초기화*/
++	socket_r1 = client_open(dest_ip, port);
++	socket_r3 = client_open(dest_ip, port);
++
++	/*r3에 일정주기마다 데이터 요청*/
++	while(1){
++		/*일정주기마다 요청하기위해 delay를 줌*/
++		delay(1000);
++
++		/*r3에 토양 온습도 데이터를 요청함.*/
++		rcv = request(socket_r3, 'G', 's', 'v', len, data);
++		sig = check_sprinkler(rcv);	/*rcv값에 따라서 스프링클러 작동여부 구하는 함수*/		
++		send_sprinkler_siganl(socket_r3, sig);	/*작동하기로 했으면 시그널을 보냄*/
++
++		/*r3에 조도 데이터를 요청함*/
++		rcv = request_get(socket_r1, 'G', 'l', 'v', len, data);
++		sig = check_led(rcv);	/*rcv값에 따라서 led 작동여부 구하는 함수*/
++		send_led_signal(socket_r1, sig);	/*작동하기로 했으면 시그널을 보냄*/
++		
++	
++	}
++
++	return 0;
++}
+diff --git a/R2/App/daemon.c b/R2/App/daemon.c
+deleted file mode 100644
+index ff62c35..0000000
+--- a/R2/App/daemon.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* daemon.c */
+diff --git a/R2/App/data_controller.c b/R2/App/data_controller.c
+new file mode 100644
+index 0000000..f30376e
+--- /dev/null
++++ b/R2/App/data_controller.c
+@@ -0,0 +1,41 @@
++#include <stdio.h>터
++#include <stdlib.h>
++#include "../lib/SF_NET/ksf_server_lib.h"
++#include "../lib/SF_NET/ksf_client-lib.h"
++
++/*R1으로부터 받는 데이터를 처리*/
++int main(void){
++
++	struct request rcv;
++
++	/*소켓 초기화*/
++	socket_r1 = server_open(port);
++	socket_r3 = client_open(dest_ip, port)
++
++
++	/*요청 대기*/
++	while(1){
++		rcv = wait_request(socket_r1);
++
++		if(rcv.type == ""){	/*온습도 데이터*/
++			/*r3에게 데이터 전송*/
++			send_humidity_data_to_r3(socket_r3);
++		}else if(rcv.type == ""){	/*조도 데이터*/
++			/*r3에게 데이터 전송*/
++			send_light_data_to_r3(socket_r3);
++		}else if(){	/*비정상 상황 신호*/
++			/*r3에게 데이터 전송 및 알람 메시지*/
++			send_abnormal_situation_to_r3(socket_r3);
++		}else if(){	/*미확인 물체 신호*/
++			/*r3에게 데이터 전송 및 알람 메시지*/
++			send_unidentified_object_to_r3(socket_r3);
++		}else{	/**/
++
++		}
++	
++	}
++
++	server_close(socket_r1);
++
++	return 0;
++}
+diff --git a/R2/KERNEL/SF_NET/sf_net.c b/R2/KERNEL/SF_NET/sf_net.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R2/KERNEL/SF_NET/sf_net.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R2/KERNEL/SF_NET/sf_net.h b/R2/KERNEL/SF_NET/sf_net.h
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R2/KERNEL/SF_NET/sf_net.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R2/lib/KSF_NET/ksf_net_lib.c b/R2/lib/KSF_NET/ksf_net_lib.c
+new file mode 100644
+index 0000000..ab0a7dc
+--- /dev/null
++++ b/R2/lib/KSF_NET/ksf_net_lib.c
+@@ -0,0 +1,168 @@
++#include "ksf_net_lib.h"
++
++/* Client REST API */
++/* 20190603 aeomhs "rest api - client #interface"
++ * Client request to server
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++
++int client_open(char *dest_ip, int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    /* hdr set */
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = inet_addr(dest_ip);
++    
++    ret = connect(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    if(ret < 0){
++        printf("failed connect\n");
++        return -1;
++    }
++    
++    return sock;
++}
++
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data){
++    struct request req;
++    struct response rsp;
++    int ret;
++
++    //memset(&req, 0, sizeof(req));
++    //memset(&rsp, 0, sizeof(rsp));
++    
++    /* request init */
++    req.method = method;
++    req.type = type; 
++    req.cmd = cmd;   
++    req.len = len;
++    strcpy(req.data, data);
++
++    /* send request */
++    ret = write(sock, &req, sizeof(struct request));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "send request fail\n");
++        return rsp;
++    }
++    
++    /* maybe wait until receive response */
++    ret = read(sock, &rsp, sizeof(struct response));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "receive response fail\n");
++        return rsp;
++    }
++
++    return rsp;
++}
++
++int client_close(int sock){
++    int ret;
++    ret = close(sock);
++    
++    return ret;
++}
++
++/* Server REST API */
++/* 20190602 aeomhs "rest api - server #interface"
++ * Server is always on.
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++int server_open(int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;  /* server address */
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = htonl(INADDR_ANY);
++    
++    ret = bind(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    
++    if(ret < 0){
++        printf("failed bind\n");
++        return -1;
++    }
++
++    return sock;
++}
++
++int server_close(int sock){
++    int ret;
++    
++    ret = close(sock);
++
++    return ret;
++}
++
++/* Server should be run alyways */
++int wait_request(int sock, struct request *req){
++    int ret;
++    int c_sock; /* client socket */
++    int c_addr_size;
++    struct sockaddr_in c_addr; /* client address */
++    
++    ret = listen(sock, 5);
++    if(ret < 0){
++        printf("failed listen\n");
++        return -1;
++    }
++    
++    c_addr_size = sizeof(struct sockaddr_in);
++    c_sock = accept(sock, (struct sockaddr*)&c_addr, &c_addr_size);
++    
++    if(c_sock < 0){
++        printf("failed connect to client\n");
++        return -1;
++    }
++    
++    read(c_sock, req, sizeof(struct request));
++    printf("received\n");
++    
++    return c_sock;
++}
++
++/* Send response */
++int response(int c_sock, char type, unsigned long len, char *data){
++    struct response rsp;
++    int ret;
++
++    /* response init */
++    rsp.type = type;
++    rsp.len = len;
++    memset(rsp.data, 0, BUFF_SIZE);
++    strcpy(rsp.data, data);
++    
++    write(c_sock, &rsp, sizeof(struct response));
++    close(c_sock);
++
++    return 0;
++}
++
+diff --git a/R2/lib/KSF_NET/ksf_net_lib.h b/R2/lib/KSF_NET/ksf_net_lib.h
+new file mode 100644
+index 0000000..e4c12f1
+--- /dev/null
++++ b/R2/lib/KSF_NET/ksf_net_lib.h
+@@ -0,0 +1,46 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <arpa/inet.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++
++#define BUFF_SIZE 1024
++
++#define R1_ADDR "10.10.10.13"
++#define R1_SNR_PORT 1010  /* Client */
++#define R1_ACT_PORT 1020  /* Server */
++#define R2_ADDR "10.10.10.14"
++#define R2_DATA_PORT 2010 /* Server */
++#define R2_DATB_PORT 2010 /* Client */
++#define R2_CMD_PORT 2020  /* Client */
++#define R3_ADDR "10.10.10.15"
++#define R3_STG_PORT 3010  /* Server */
++#define R3_REF_PORT 3020  /* Server */
++#define LOCAL_HOST "127.0.0.1"
++#define LOCAL_PORT 4000
++
++struct request{
++    char method;
++    char type;
++    char cmd;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++struct response{
++    char type;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++/* Client Function */
++int client_open(char *dest_ip, int port);
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);
++int client_close(int sock);
++/* Server Function */
++int server_open(int port);
++int server_close(int sock);
++int wait_request(int sock, struct request *req);
++int response(int c_sock, char type, unsigned long len, char *data);
+diff --git a/R2/lib/SF_NET/sf_net_lib.c b/R2/lib/SF_NET/sf_net_lib.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R2/lib/SF_NET/sf_net_lib.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R2/lib/SF_NET/sf_net_lib.h b/R2/lib/SF_NET/sf_net_lib.h
+deleted file mode 100644
+index d57ab28..0000000
+--- a/R2/lib/SF_NET/sf_net_lib.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api header */
+diff --git a/R2/lib/abnormal_situation_lib.c b/R2/lib/abnormal_situation_lib.c
+new file mode 100644
+index 0000000..c8569c3
+--- /dev/null
++++ b/R2/lib/abnormal_situation_lib.c
+@@ -0,0 +1,39 @@
++
++
++/*r1으로부터 비정상 상황 통신 대기*/
++int wait_abnormal_situation_from_r1(){
++
++	return 0;
++}
++
++/*r1으로부터 비정상 상황 데이터 수신*/
++int recieve_abnormal_situation_from_r1(){
++
++	return 0;
++}
++
++/*r3에 연결 요청*/
++int request_connection_to_r3(){
++
++	return 0;
++}
++
++/*비정상 상황 r3에 전송*/
++int send_abnormal_situation_to_r3(){
++
++	struct response rcv;
++
++	rcv = request(socket, 'O', 'a', 's', len, data);
++
++	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
++	if(rcv.data){
++
++	}
++
++}
++
++/*비정상 상황시 알람 메시지*/
++int alert_abnormal_situation(){
++	/*비정상 상황 발생시 부저 울림*/
++	return 0;
++}
+diff --git a/R2/lib/humidity_lib.c b/R2/lib/humidity_lib.c
+new file mode 100644
+index 0000000..bb6dbc0
+--- /dev/null
++++ b/R2/lib/humidity_lib.c
+@@ -0,0 +1,32 @@
++
++/*r1 통신 대기*/
++int wait_humidity_data_from_r1(){
++
++	return 0;
++}
++
++/*r1으로부터 데이터 수신*/
++int recieve_humidity_data_from_r1(){
++
++	return 0;
++}
++
++/*r3에 연결 요청*/
++int request_connection_to_r3(){
++
++	return 0;
++}
++
++/*r3에 토양 온습도데이터 전달*/
++void send_humidity_data_to_r3(int socket){
++
++	struct response rcv;
++
++	rcv = request(socket, 'O', 's', 's', len, data);
++
++	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
++	if(rcv.data){
++
++	}
++
++}
+diff --git a/R2/lib/led_lib.c b/R2/lib/led_lib.c
+new file mode 100644
+index 0000000..00bdf57
+--- /dev/null
++++ b/R2/lib/led_lib.c
+@@ -0,0 +1,44 @@
++
++
++/*r3에서 led 작동여부를 위한 빛감지 센서 데이터를 위한 연결 요청*/
++int reqeust_connection_to_r3(){
++
++	return 0;
++}
++
++/*r3에서 led 작동여부를 위한 빛감지 센서 데이터를 수신 */
++int recieve_light_data_from_r3(){
++
++	return 0;
++}
++
++/*led 작동여부 판단*/
++bool check_led(struct response res){
++	int operation = false;
++
++	/*light sensor값이 일정 수준 이하이면 led를 작동하는 것으로 판단*/
++	if( (res.type == 'l') && (data < 10) ){
++		operation = true;
++	}
++
++	return operation;
++}
++
++/*r1에 연결 요청*/
++int requset_connection_to_r1(){
++
++	return 0;
++}
++
++/*led 작동여부 전송*/
++void send_led_signal(int socket, bool sig){
++
++	if(sig == true){
++		request(socket, 'U', 'l', '1', len, data);
++	}else{
++		/*보낼필요없음*/
++	}
++
++	return 0;
++}
++
+diff --git a/R2/lib/light_lib.c b/R2/lib/light_lib.c
+new file mode 100644
+index 0000000..30c78e5
+--- /dev/null
++++ b/R2/lib/light_lib.c
+@@ -0,0 +1,32 @@
++
++/*r1으로부터 통신 대기*/
++int wait_light_data_from_r1(){
++
++	return 0;
++}
++
++/*r1으로부터 데이터 수신*/
++int recieve_light_data_from_r1(){
++
++	return 0;
++}
++
++/*r3에 연결 요청*/
++int request_connection_to_r3(){
++
++	return 0;
++}
++
++/*r3에 빛 데이터 전송*/
++void send_light_data_to_r3(int socket){
++	struct response rcv;
++
++	rcv = request(socket, 'O', 'l', 's', len, data);
++
++	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
++	if(rcv.data){
++
++	}
++
++	return 0;
++}
+diff --git a/R2/lib/sprinkler_lib.c b/R2/lib/sprinkler_lib.c
+new file mode 100644
+index 0000000..0af63e0
+--- /dev/null
++++ b/R2/lib/sprinkler_lib.c
+@@ -0,0 +1,53 @@
++
++/*r3에 연결 요청*/
++int request_connection_to_r3(){
++
++	return 0;
++}
++
++/*r3에 온습도 데이터 요청*/
++int request_humidity_data_to_r3(){
++
++	return 0;
++}
++
++/*r3로부터 온습도 데이터 수신 대기*/
++int wait_humidity_data_from_r3(){
++
++	return 0;
++}
++
++/*r3로부터 온습도 데이터 수신*/
++int recieve_humidity_data_from_r3(){
++
++	return 0;
++}
++
++/*스프링클러 작동여부 판단*/
++bool check_sprinkler(struct response res){
++	bool operation = false;
++
++	/*습도 데이터가 일정 수준 이하이면 스프링클러를 작동신호를 출력*/
++	if( (res.type == 's') && (res.data < 20) ){
++		operation = true;
++	}	
++
++	return operation;
++}
++
++/*r1에 연결 요청*/
++int reqeust_connection_to_r1(){
++	
++	return 0;
++}
++
++/*스프링클러 제어 신호 전송*/
++void send_sprinkler_signal(int socket, bool sig){
++
++	if(sig == true){
++		request(socket, 'U', 's', '1', len, data);
++	}else{
++		/*보낼필요없음*/
++	}
++
++}
+diff --git a/R2/lib/unidentified_object_lib.c b/R2/lib/unidentified_object_lib.c
+new file mode 100644
+index 0000000..c2b8f05
+--- /dev/null
++++ b/R2/lib/unidentified_object_lib.c
+@@ -0,0 +1,39 @@
++
++
++/* 미확인 물체 접근 데이터 통신 대기
++ * Caller : R2.DataController 
++ * Description : R1으로부터 request 대기
++ * request : 미확인 물체가 접근하고 있으니, 관리자에게 알람 및 기록 요청 
++ */
++int wait_unidentified_object_from_r1(){
++
++	return 0;
++}
++
++/*미확인 물체 접근 데이터 수신*/
++int recieve_unidentified_object_from_r1(){
++	/*  */
++	return 0;
++}
++
++/*r3에 연결 요청*/
++int request_connection_to_r3(){
++
++	return 0;
++}
++
++/*r3에 미확인 물체 데이터 전송*/
++void send_unidentified_object_to_r3(int socket){
++	struct response rcv;
++
++	rcv = request(socket, 'O', 'a', 's', len, data);
++
++	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
++	if(rcv.data){
++
++	}
++
++	return 0;
++}
++
++
+diff --git a/R3/App/refine_controller.c b/R3/App/refine_controller.c
+index 3a56c7a..fc206bc 100644
+--- a/R3/App/refine_controller.c
++++ b/R3/App/refine_controller.c
+@@ -1,6 +1,6 @@
+ #include <stdio.h>
+ 
+-#include "../lib/ksf_server_lib.h"
++#include "../lib/KSF_NET/ksf_net_lib.h"
+ 
+ int main(void){
+ 	int srv, clt;
+@@ -9,6 +9,7 @@ int main(void){
+ 	struct request req;
+ 	unsigned long data_len;
+ 	int data = 0;
++	char *data = "";
+ 
+ 	srv = server_open(R3_REF_PORT);
+ 	//clt = client_open("127.0.0.1", 3020);
+@@ -19,7 +20,7 @@ int main(void){
+ 
+ 		if(req.method == 'G'){
+ 			data = refine_data(req.type, req.cmd);
+-			data_len = strlen(data);
++			data_len = strlen(abc);
+ 
+ 			response(c_sock, 's', data_len, data);
+ 		}
+@@ -28,6 +29,5 @@ int main(void){
+ 		}
+ 		server_close(srv);
+ 	}
+-
+ 	return 0;
+ }
+diff --git a/R3/App/storage_controller.c b/R3/App/storage_controller.c
+index 6dc35b1..31b4b1a 100644
+--- a/R3/App/storage_controller.c
++++ b/R3/App/storage_controller.c
+@@ -1,21 +1,23 @@
+ #include <stdio.h>
+ 
+-#include "../lib/SF_NET/ksf_server_lib.h"
++#include "../lib/KSF_NET/ksf_net_lib.h"
++#include "../lib/controllers.h"
+ 
+ int main(){
+-	struct response rcv;
+ 	struct request req;
+-	int sock, c_sock;
++	int sock, c_sock, ret;
++	char *suc = "success";
+ 	
+ 	while(1){
+ 		sock = server_open(R3_STG_PORT);
+-
+-		c_sock = wait_request(sock, req);		/* 데이터 수신 대기 */
++		c_sock = wait_request(sock, &req);		/* 데이터 수신 대기 */
+ 		
+ 		/* cmd is save('s') */
+ 		if(req.cmd == 's'){		//method??
+-			save_data(req.type, req.data);
+-
++			ret = save_data(req.type, req.data);
++			if(ret < 0){
++				ret = response(c_sock, 'f', 0 , "Failed not save_data func");
++			}
+ 			/*
+ 			if(req.type == 'l'){
+ 				save_light(req.len, req.data);
+@@ -27,7 +29,7 @@ int main(){
+ 				save_data
+ 			}
+ 			*/
+-			ret = response(c_sock, 's', 0, '\n');
++			ret = response(c_sock, 's', 0, suc);
+ 		}
+ 		else{
+ 			ret = response(c_sock, 'f', 0 , "Failed not save");
+diff --git a/R3/KERNEL/SF_NET/sf_net.c b/R3/KERNEL/SF_NET/sf_net.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R3/KERNEL/SF_NET/sf_net.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R3/KERNEL/SF_NET/sf_net.h b/R3/KERNEL/SF_NET/sf_net.h
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R3/KERNEL/SF_NET/sf_net.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R3/lib/KSF_NET/ksf_net_lib.c b/R3/lib/KSF_NET/ksf_net_lib.c
+new file mode 100644
+index 0000000..ab0a7dc
+--- /dev/null
++++ b/R3/lib/KSF_NET/ksf_net_lib.c
+@@ -0,0 +1,168 @@
++#include "ksf_net_lib.h"
++
++/* Client REST API */
++/* 20190603 aeomhs "rest api - client #interface"
++ * Client request to server
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++
++int client_open(char *dest_ip, int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    /* hdr set */
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = inet_addr(dest_ip);
++    
++    ret = connect(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    if(ret < 0){
++        printf("failed connect\n");
++        return -1;
++    }
++    
++    return sock;
++}
++
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data){
++    struct request req;
++    struct response rsp;
++    int ret;
++
++    //memset(&req, 0, sizeof(req));
++    //memset(&rsp, 0, sizeof(rsp));
++    
++    /* request init */
++    req.method = method;
++    req.type = type; 
++    req.cmd = cmd;   
++    req.len = len;
++    strcpy(req.data, data);
++
++    /* send request */
++    ret = write(sock, &req, sizeof(struct request));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "send request fail\n");
++        return rsp;
++    }
++    
++    /* maybe wait until receive response */
++    ret = read(sock, &rsp, sizeof(struct response));
++    if(ret < 0){
++        /* fail request */
++        rsp.type = 'f';
++        rsp.len = 0;
++        strcpy(rsp.data, "receive response fail\n");
++        return rsp;
++    }
++
++    return rsp;
++}
++
++int client_close(int sock){
++    int ret;
++    ret = close(sock);
++    
++    return ret;
++}
++
++/* Server REST API */
++/* 20190602 aeomhs "rest api - server #interface"
++ * Server is always on.
++ * support method GET / POST / PUT
++ * @GET : request send information : select data
++ * @PUT : request change something's status : update data
++ * @POST: request save information : create new data
++ * */
++
++int server_open(int port){
++    int sock, ret;
++    struct sockaddr_in s_addr;  /* server address */
++    
++    sock = socket(PF_INET, SOCK_STREAM, 0);
++    if(sock < 0){
++        printf("failed init\n");
++        return -1;
++    }
++    
++    memset(&s_addr, 0, sizeof(s_addr));
++    s_addr.sin_family = AF_INET;
++    s_addr.sin_port = htons(port);
++    s_addr.sin_addr.s_addr = htonl(INADDR_ANY);
++    
++    ret = bind(sock, (struct sockaddr*)&s_addr, sizeof(s_addr));
++    
++    if(ret < 0){
++        printf("failed bind\n");
++        return -1;
++    }
++
++    return sock;
++}
++
++int server_close(int sock){
++    int ret;
++    
++    ret = close(sock);
++
++    return ret;
++}
++
++/* Server should be run alyways */
++int wait_request(int sock, struct request *req){
++    int ret;
++    int c_sock; /* client socket */
++    int c_addr_size;
++    struct sockaddr_in c_addr; /* client address */
++    
++    ret = listen(sock, 5);
++    if(ret < 0){
++        printf("failed listen\n");
++        return -1;
++    }
++    
++    c_addr_size = sizeof(struct sockaddr_in);
++    c_sock = accept(sock, (struct sockaddr*)&c_addr, &c_addr_size);
++    
++    if(c_sock < 0){
++        printf("failed connect to client\n");
++        return -1;
++    }
++    
++    read(c_sock, req, sizeof(struct request));
++    printf("received\n");
++    
++    return c_sock;
++}
++
++/* Send response */
++int response(int c_sock, char type, unsigned long len, char *data){
++    struct response rsp;
++    int ret;
++
++    /* response init */
++    rsp.type = type;
++    rsp.len = len;
++    memset(rsp.data, 0, BUFF_SIZE);
++    strcpy(rsp.data, data);
++    
++    write(c_sock, &rsp, sizeof(struct response));
++    close(c_sock);
++
++    return 0;
++}
++
+diff --git a/R3/lib/KSF_NET/ksf_net_lib.h b/R3/lib/KSF_NET/ksf_net_lib.h
+new file mode 100644
+index 0000000..e4c12f1
+--- /dev/null
++++ b/R3/lib/KSF_NET/ksf_net_lib.h
+@@ -0,0 +1,46 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <arpa/inet.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++
++#define BUFF_SIZE 1024
++
++#define R1_ADDR "10.10.10.13"
++#define R1_SNR_PORT 1010  /* Client */
++#define R1_ACT_PORT 1020  /* Server */
++#define R2_ADDR "10.10.10.14"
++#define R2_DATA_PORT 2010 /* Server */
++#define R2_DATB_PORT 2010 /* Client */
++#define R2_CMD_PORT 2020  /* Client */
++#define R3_ADDR "10.10.10.15"
++#define R3_STG_PORT 3010  /* Server */
++#define R3_REF_PORT 3020  /* Server */
++#define LOCAL_HOST "127.0.0.1"
++#define LOCAL_PORT 4000
++
++struct request{
++    char method;
++    char type;
++    char cmd;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++struct response{
++    char type;
++    unsigned long len;
++    char data[BUFF_SIZE];
++};
++
++/* Client Function */
++int client_open(char *dest_ip, int port);
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);
++int client_close(int sock);
++/* Server Function */
++int server_open(int port);
++int server_close(int sock);
++int wait_request(int sock, struct request *req);
++int response(int c_sock, char type, unsigned long len, char *data);
+diff --git a/R3/lib/SF_NET/sf_net_lib.c b/R3/lib/SF_NET/sf_net_lib.c
+deleted file mode 100644
+index fc82acf..0000000
+--- a/R3/lib/SF_NET/sf_net_lib.c
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api */
+diff --git a/R3/lib/SF_NET/sf_net_lib.h b/R3/lib/SF_NET/sf_net_lib.h
+deleted file mode 100644
+index d57ab28..0000000
+--- a/R3/lib/SF_NET/sf_net_lib.h
++++ /dev/null
+@@ -1 +0,0 @@
+-/* ku smart farm system network api header */
+diff --git a/R3/lib/controllers.c b/R3/lib/controllers.c
+index c484804..e203ba4 100644
+--- a/R3/lib/controllers.c
++++ b/R3/lib/controllers.c
+@@ -1,29 +1,67 @@
+ #include "controllers.h"
+ 
+ int save_data(char type, char *data){
+-
+-	char *enter = "\n";
+-	strcat(data, enter);
++	FILE *fp;
++	int size;
+ 
+ 	switch(type){
+ 
+-		case l:
+-			FILE *fp = fopen("light.txt", "a");
+-			fputs(data, fp);
++		case 'l':
++			fp = fopen("light.txt", "a+");
++			if(fp < 0){
++				printf("File open Fail!!\n");
++				return -1;
++			}
++			fseek(fp, 0L, SEEK_END);
++			size = ftell(fp);
++
++			if (size == 0)
++				fprintf(fp, "%s", data);
++			else
++				fprintf(fp, "\n%s", data);
++			//fwrite(data1, 1, sizeof(data1), fp);
++			//fputs(data1, fp);
++
+ 			fclose(fp);
+ 
+ 			return 0;
+-			
+-		case s:
+-			FILE *fp = fopen("soil.txt", "a");
+-			fputs(data, fp);
++	
++		case 's':
++			fp = fopen("soil.txt", "a+");
++			if(fp < 0){
++				printf("File open Fail!!\n");
++				return -1;
++			}
++			fseek(fp, 0L, SEEK_END);
++			size = ftell(fp);
++
++			if (size == 0)
++				fprintf(fp, "%s", data);
++			else
++				fprintf(fp, "\n%s", data);
++			//fwrite(data1, 1, sizeof(data1), fp);
++			//fputs(data1, fp);
++
+ 			fclose(fp);
+ 
+ 			return 0;
+ 
+-		case a:
+-			FILE *fp = fopen("alert_log.txt", "a");
+-			fputs(data, fp);
++		case 'a':
++			fp = fopen("alert_log.txt", "a+");
++			if(fp < 0){
++				printf("File open Fail!!\n");
++				return -1;
++			}
++			fseek(fp, 0L, SEEK_END);
++			size = ftell(fp);
++
++			if (size == 0)
++				fprintf(fp, "%s", data);
++			else
++				fprintf(fp, "\n%s", data);
++			//fwrite(data1, 1, sizeof(data1), fp);
++			//fputs(data1, fp);
++
+ 			fclose(fp);
+ 
+ 			return 0;
+@@ -43,18 +81,43 @@ int save_data(char type, char *data){
+ }
+ 
+ char* refine_data(char type, char cmd){
+-	char *buffer = malloc(sizeof(char) * 20);
++	//char *buffer = malloc(sizeof(char) * 20);
+ 	//char *dArr[10] = { NULL, };
+ 	FILE *fp;
++	int temp = 0;
++	int lines = 0;
++	char s[81];
++	static char s1[10];
+ 
+ 	if(type == 'l'){
+ 		fp = fopen("light.txt", "r");
+ 
+ 		if(cmd == 'v'){
+-			fgets(buffer, sizeof(buffer), fp);
+-			
+-			return buffer;
++
++			/* Count num of Lines */
++			fseek(fp, 0L, SEEK_SET);
++			while(!feof(fp)){
++				fgets(s, 80, fp);
++				lines++;
++			}
++			printf("Lines : %d\n", lines);
++
++			/* Extract Data  */
++			fseek(fp, 0L, SEEK_SET);
++			while(!feof(fp)){
++				fgets(s, 80, fp);
++				lines--;
++				if(lines < 10) {
++					printf("s : %s\n", s);
++					temp += atoi(s);
++				}
++			}
++			sprintf(s1, "%d", temp);
++			printf("abc : %s\n", s1);
++
++			return s1;
+ 		}
++
+ 		else if(cmd == 'a'){
+ 
+ 		}
+diff --git a/R3/lib/controllers.h b/R3/lib/controllers.h
+index d7ff1b2..4535c10 100644
+--- a/R3/lib/controllers.h
++++ b/R3/lib/controllers.h
+@@ -1,9 +1,12 @@
+ #include <stdio.h>
+ #include <sys/fcntl.h>
+ #include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
+ 
+ #define _CRT_SECURE_NO_WARNINGS
+ 
++/*
+ #define START_NUM 0x80
+ #define IOCTL_NUM1 START_NUM+1
+ #define IOCTL_NUM2 START_NUM+2
+@@ -17,6 +20,7 @@
+ #define LIGHT_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM3, unsigned long *)	
+ #define ULSN_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM4, unsigned long *)	
+ #define TEMP_SAVE _IOWR(SIMPLE_IOCTL_NUM, IOCTL_NUM5, unsigned long *)
++*/
+ 
+-int save_data(int type, int data);
+-int refine_data(int type, int data);
++int save_data(char type, char* data);
++char* refine_data(char type, char cmd);
+diff --git a/docs/wiki.md b/docs/wiki.md
+index f3ce26f..e70d876 100644
+--- a/docs/wiki.md
++++ b/docs/wiki.md
+@@ -5,7 +5,7 @@
+ 
+ ## Device GPIO num 
+ 
+-```
++```C
+ #define LED 4          /*  led  */
+ #define MOTOR_A 6      /* motor */
+ #define CE0 8          /* light */
+@@ -17,10 +17,12 @@
+ #define MOTOR_C 19     /* motor */
+ #define DHT 21         /* dht11 */
+ #define MOTOR_D 26     /* motor */
++#define WATERPUMP_A    /*이거 */
++#define WATERPUMP_B
+ ```
+ 
+ ## Device name
+-```
++```C
+ #define DEV_LED "led"
+ #define DEV_DHT "dht11"
+ #define DEV_LIGHT "light"
+@@ -29,6 +31,79 @@
+ 
+ ---
+ 
++# Network (Data Communictation)
++> RESTful Library  
++> Client request to server  
++> Server response to client  
++## Server function lib
++```C
++int server_open(int port);                                           /* socket open & bind */
++int server_close(int sock);                                          /* socket close */
++int wait_request(int sock, struct request *req);                     /* connect(listen,accpet) & read */
++int response(int c_sock, char type, unsigned long len, char *data);  /* write */
++```
++## Client function lib
++```C
++int client_open(char *dest_ip, int port);                                                          /* socket open & connect */
++struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);/* write & read */
++int client_close(int sock);                                                                        /* socket close */
++```
++
++## Request struct
++```C
++struct request{
++    char method;          /* Request Method */
++    char type;            /* Data Type */
++    char cmd;             /* Command */
++    unsigned long len;    /* Real Data length */
++    char data[BUFF_SIZE]; /* BUFF_SIZE = 1024 */
++};
++```
++
++### @GET
++```
++> Usage  : R2.cmd_ctl.client->R3.refine_ctl.server
++> method : 'G' (should be fixed)
++> type   : light('l'), soil('s'), alert_log('a')  
++> cmd    : value('v'), average('a'), sum('s')  
++> len    : data length  
++> data   :   
++```
++### @POST
++```
++> Usage  : R1.sensor_ctl.client->R2.data_ctl.server  
++>        : R2.data_ctl.client->R3.storage_ctl.server  
++> method : 'O' (should be fixed)  
++> type   : light('l'), soil('s'), alert_log('a')  
++> cmd    : save('s')  
++> len    : data length   
++> data   :   
++```
++### @PUT
++```
++> Usage  : R2.cmd_ctl.client->R1.act_ctl.server  
++> method : 'U' (should be fixed)  
++> type   : led_light('l'), led_alert('a'), buzzer('b')  
++>           , camera('c'), motor('m'), water_pump('p'), sprinkler('s'),    
++> cmd    : turn_on('1'), turn_off('0')  
++> len    : data length  
++> data   : timer(positive), infinit(zero), error(negative)
++```
++## Response struct
++```C
++struct response{
++    char type;            /* Request Result */
++    unsigned long len;    /* Real Data length */
++    char data[BUFF_SIZE]; /* BUFF_SIZE = 1024 */
++};
++```
++```
++> Usage  : Successful('s'), Failure('f'), Timeout('t')  
++> len    : data length  
++> data   :   
++```
++---
++
+ # Dictionary
+ 
+ 1. Device
