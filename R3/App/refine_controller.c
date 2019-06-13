@@ -8,17 +8,17 @@ int main(void){
 	int c_sock;
 
 	struct response rsp;
-	struct request req;
+	struct request *req;
 
 	unsigned long data_len;
 	char *data = "";
 
 	while(1){
-		srv = server_open(R3_REF_PORT);
-		c_sock = wait_request(srv, &req);
+		srv = server_open(3020);
+		c_sock = wait_request(srv, req);
 
-		if(req.method == 'G'){
-			data = refine_data(req.type, req.cmd);
+		if(req->method == 'G'){
+			data = refine_data(req->type, req->cmd);
 			data_len = strlen(data);
 
 			response(c_sock, 's', data_len, data);
