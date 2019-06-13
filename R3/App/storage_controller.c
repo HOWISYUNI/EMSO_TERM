@@ -18,18 +18,7 @@ int main(){
 			if(ret < 0){
 				ret = response(c_sock, 'f', 0 , "Failed not save_data func");
 			}
-			/*
-			if(req.type == 'l'){
-				save_light(req.len, req.data);
-			}
-			else if(req.type == 's'){
-				save_soil(req.len, req.data);
-			}
-			else if(req.type == 'a'){
-				save_data
-			}
-			*/
-			ret = response(c_sock, 's', 0, suc);
+			ret = response(c_sock, 's', 0, siuc);
 		}
 		else{
 			ret = response(c_sock, 'f', 0 , "Failed not save");

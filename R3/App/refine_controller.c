@@ -6,14 +6,12 @@
 int main(void){
 	int srv, clt;
 	int c_sock;
+
 	struct response rsp;
 	struct request req;
-	unsigned long data_len;
-	//int data = 0;
-	char *data = "";
 
-	srv = server_open(R3_REF_PORT);
-	//clt = client_open("127.0.0.1", 3020);
+	unsigned long data_len;
+	char *data = "";
 
 	while(1){
 		srv = server_open(R3_REF_PORT);
