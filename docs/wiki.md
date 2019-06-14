@@ -45,7 +45,7 @@ int response(int c_sock, char type, unsigned long len, char *data);  /* write */
 ```
 ## Client function lib
 ```C
-int client_open(char *dest_ip, int port);                                                          /* socket open & connect */
+int client_open(char *dest_ip, int port, long timeout);                                            /* socket open & connect */
 struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);/* write & read */
 int client_close(int sock);                                                                        /* socket close */
 ```
