@@ -22,7 +22,7 @@ int main(void){
 	int time=0;
 
 	/*소켓 초기화*/
-	socket_r2 = client_open(R2_ADDR, R2_DATA_PORT);
+	socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 	printf("시작\n");
 	pid=fork();
 	
