@@ -54,3 +54,4 @@ int read_light_sensor();
 
 int turn_on_motor();
 int turn_off_motor(int fd);
+int snapshot(void);

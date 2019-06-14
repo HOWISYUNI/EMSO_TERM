@@ -18,10 +18,10 @@
 > Usage  : Successful('s'), Failure('f'), Timeout('t')  
 */
 void send_response(char type);
-
+static int socket_r2;
 
 int main(void){
-	int socket_r2;
+	
 	struct request rcv;
 	int time;
 
@@ -30,24 +30,26 @@ int main(void){
 
 	/*요청 대기*/
 	while(1){
-		rcv = wait_request(socket_r1);
+		int ret = wait_request(socket_r2,&rcv);
 
-		if(rcv.type == "l"){	/*광합성용 LED */
+		if(rcv.type == 'l'){	/*광합성용 LED */
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
 					if(turn_on_led_timer(time)<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else if(time==0){
 					if(turn_on_led()<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else{
 					/*Error*/
@@ -58,29 +60,32 @@ int main(void){
 				if(turn_off_led()<0){
 					/*Error*/
 					send_response('f');						
+				}else{
+					send_response('s');
 				}
-				send_response('s');
 			}
 			else{
 				/*Error*/
 				send_response('f');
 			}
-		}else if(rcv.type == "a"){	/*비상시 불빛 신호*/
+		}else if(rcv.type == 'a'){	/*비상시 불빛 신호*/
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
 					if(turn_on_led_alert_timer(time)<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else if(time==0){
 					if(turn_on_led_alert()<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else{
 					/*Error*/
@@ -88,32 +93,35 @@ int main(void){
 				}
 			}
 			else if(rcv.cmd == '0'){
-				if(turn_off_led()_alert<0){
+				if(turn_off_led_alert()<0){
 					/*Error*/
 					send_response('f');						
+				}else{
+					send_response('s');
 				}
-				send_response('s');
 			}
 			else{
 				/*Error*/
 				send_response('f');
 			}
-		}else if(rcv.type == "b"){	/*비정상 버저 신호*/
+		}else if(rcv.type == 'b'){	/*비정상 버저 신호*/
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
 					if(turn_on_buzzer_timer(time)<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else if(time==0){
 					if(turn_on_buzzer()<0){
 						/*Error*/
 						send_response('f');						
+					}else{
+						send_response('s');
 					}
-					send_response('s');
 				}
 				else{
 					/*Error*/
@@ -124,22 +132,24 @@ int main(void){
 				if(turn_off_buzzer<0){
 					/*Error*/
 					send_response('f');						
+				}else{
+					send_response('s');
 				}
-				send_response('s');
 			}
 			else{
 				/*Error*/
 				send_response('f');
 			}
-		}else if(rcv.type == "c"){	/*카메라 신호*/
+		}else if(rcv.type == 'c'){	/*카메라 신호*/
 			if(snapshot<0){
 				/*Error*/	
 				send_response('f');
+			}else{
+				send_response('s');
 			}
-			send_response('s');
 /*****************이거 FTP 방식 고려할 생각 있는지 한번 고민해보셈******************/
 			
-		}else if(rcv.type == "s"){	/*스프링 쿨러 신호*/
+		}else if(rcv.type == 's'){	/*스프링 쿨러 신호*/
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
@@ -171,7 +181,7 @@ void send_response(char type){
 	struct response rsp;
 	rsp.type = type;
 	rsp.len = 0;
-	strcpy(rsp.data, '\n');
+	strcpy(rsp.data, "\n");
 
 	if(response(socket_r2, rsp.type, rsp.len, rsp.data)<0){
 		/*Error*/
