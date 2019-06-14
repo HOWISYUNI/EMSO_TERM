@@ -1,6 +1,5 @@
 #include "ksf_net_lib.h"
 
-
 /* Client REST API */
 /* 20190603 aeomhs "rest api - client #interface"
  * Client request to server
@@ -11,21 +10,15 @@
  * */
 
 
-int client_open(char *dest_ip, int port, long timeout){
+int client_open(char *dest_ip, int port){
     int sock, ret;
     struct sockaddr_in s_addr;
-    struct timeval wait_time;        /* timeout value */
     
     sock = socket(PF_INET, SOCK_STREAM, 0);
     if(sock < 0){
         printf("failed init\n");
         return -1;
     }
-    
-    /* Socket option*/
-    wait_time.tv_sec = timeout;
-    wait_time.tv_usec = 0;
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&wait_time, sizeof(wait_time));
     
     /* hdr set */
     memset(&s_addr, 0, sizeof(s_addr));
@@ -99,16 +92,12 @@ int client_close(int sock){
 int server_open(int port){
     int sock, ret;
     struct sockaddr_in s_addr;  /* server address */
-    int reuse_port = 1;         /* port reuse */
     
     sock = socket(PF_INET, SOCK_STREAM, 0);
     if(sock < 0){
         printf("failed init\n");
         return -1;
     }
-    
-    /* socket option */
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse_port, sizeof(reuse_port));
     
     memset(&s_addr, 0, sizeof(s_addr));
     s_addr.sin_family = AF_INET;
@@ -120,11 +109,6 @@ int server_open(int port){
     if(ret < 0){
         printf("failed bind\n");
         return -1;
-    }
-    
-    ret = listen(sock, BACK_LOG_N);
-    if(ret < 0){
-        printf("failed listen\n");
     }
 
     return sock;
@@ -143,9 +127,14 @@ int wait_request(int sock, struct request *req){
     int ret;
     int c_sock; /* client socket */
     int c_addr_size;
-    struct sockaddr_in c_addr; /* client address */   
+    struct sockaddr_in c_addr; /* client address */
     
-    /* wait for connection from client */
+    ret = listen(sock, 5);
+    if(ret < 0){
+        printf("failed listen\n");
+        return -1;
+    }
+    
     c_addr_size = sizeof(struct sockaddr_in);
     c_sock = accept(sock, (struct sockaddr*)&c_addr, &c_addr_size);
     
@@ -154,7 +143,6 @@ int wait_request(int sock, struct request *req){
         return -1;
     }
     
-    /* read buffer net socket io queue */
     read(c_sock, req, sizeof(struct request));
     printf("received\n");
     

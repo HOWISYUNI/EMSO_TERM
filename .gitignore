@@ -13,8 +13,4 @@
 **/.DS_Store
 
 /* binary */
-*.daemon
-
-/* server & client test binary */
-*.server
-*.client
+bin/
