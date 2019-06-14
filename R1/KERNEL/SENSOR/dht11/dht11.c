@@ -69,7 +69,7 @@ static int dht11_read(struct file *file, char *buf, size_t len, loff_t *lof){
 	int ret;
 	dht_read();
 	printk("Humidity:%d.%d Temperature = %d.%dC \n", dht11_data[0], dht11_data[1], dht11_data[2], dht11_data[3]);
-	ret = copy_to_user(buf,dht11_data,4*sizeof(int));
+	ret = copy_to_user(buf,dht11_data[2],sizeof(int));
 	
 	return 0;
 }
