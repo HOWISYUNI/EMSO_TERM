@@ -80,13 +80,9 @@ static int sprinkler_release(struct inode *inode, struct file *file){
 	return 0;
 }
 
-<<<<<<< HEAD
 
 
 static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
-=======
-static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
->>>>>>> 7d3fcce65132c93e790f668c54241597b29d4a76
 	int i = 0;		
 	int d = (int)arg;
 	switch(cmd){
@@ -148,11 +144,7 @@ static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 struct file_operations sprinkler_fops = {
 	.open = sprinkler_open,
 	.release = sprinkler_release,
-<<<<<<< HEAD
 	.unlocked_ioctl = sprinkler_ioctl,
-=======
-	.unlocked_ioctl = sprinkler,
->>>>>>> 7d3fcce65132c93e790f668c54241597b29d4a76
 };
 
 
