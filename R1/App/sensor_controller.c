@@ -33,14 +33,17 @@ int main(void){
 	else if(pid==0){
 			printf("fork(1)\n");
 			while(1){
+				printf("보내는 거 시도!\n");
 				if(send_light_data_to_r2(socket_r2)<0){
 					/*send 실패*/
 					printf("light data send() failed.\n");
 				}
+				/*
 				if(send_soil_data_to_r2(socket_r2)<0){
-					/*send 실패*/
+					/*send 실패/* /*
 					printf("soil data send() failed.\n");					
 				}
+				*/
 				printf("Sensor send() periodly.\n");
 				sleep(PERIOD);
 			}
@@ -100,9 +103,11 @@ int send_light_data_to_r2(int socket){
 	rcv = request(socket, 'O', 'l', 's', len, data);
 
 	if(rcv.type=='f'){
+		printf("light receive failed.\n");
 		return -1;
 	}
 	else if(rcv.type=='t'){
+		printf("light receive timeout.\n");
 		return -2;
 	}
 
@@ -121,9 +126,11 @@ int send_soil_data_to_r2(int socket){
 	rcv = request(socket, 'O', 's', 's', len, data);
 
 	if(rcv.type=='f'){
+		printf("soil receive failed.\n");
 		return -1;
 	}
 	else if(rcv.type=='t'){
+		printf("soil receive timeout.\n");
 		return -2;
 	}
 
