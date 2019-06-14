@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "../../lib/KSF_NET/ksf_net_lib.h"
 
 
@@ -15,8 +16,8 @@ int main(void){
         return -1;
     }
     req = (struct request*)malloc(sizeof(struct request));
-    memset(req, 0, sizeof(struct request));
     while(1){
+    memset(req, 0, sizeof(struct request));
     c_sock = wait_request(sock, req);
     count++;
     printf("req.method : %c\n", req->method);
@@ -29,6 +30,7 @@ int main(void){
         printf("fail get request\n");
         return -1;
     }
+    sleep(6);
     ret = response(c_sock, 's', count, "hello\n");
     if(ret < 0){
         printf("fail response\n");
