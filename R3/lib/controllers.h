@@ -24,3 +24,4 @@
 
 int save_data(char type, char* data);
 char* refine_data(char type, char cmd);
+//void refine_data(char type, char cmd, char* data);
