@@ -14,7 +14,7 @@ int main(void){
 	struct response res;
 	/*소켓 초기화*/
 	socket_r1 = server_open(R2_DATA_PORT);
-	socket_r3 = client_open(R3_ADDR, R3_STG_PORT);
+	socket_r3 = client_open(R3_ADDR, R3_STG_PORT,10);
 	
 	/*요청 대기*/
 	while(1){
