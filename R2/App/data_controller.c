@@ -14,7 +14,7 @@ int main(void){
 	struct response res;
 	/*소켓 초기화*/
 	socket_r1 = server_open(R2_DATA_PORT);
-	socket_r3 = client_open(R3_ADDR, R3_STG_PORT);
+	socket_r3 = client_open(R3_ADDR, R3_STG_PORT,10);
 	
 	/*요청 대기*/
 	while(1){
@@ -61,7 +61,8 @@ void send_abnormal_situation_to_r3(int socket, struct request data_r1){
 
 	struct response rcv;
 
-	rcv = request(socket, 'O', 'a', 's', data_r1.len, data_r1.data);
+	int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
@@ -75,7 +76,8 @@ void send_humidity_data_to_r3(int socket, struct request data_r1){
 
 	struct response rcv;
 
-	rcv = request(socket, 'O', 's', 's', data_r1.len, data_r1.data);
+	int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 's', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
@@ -88,7 +90,8 @@ void send_humidity_data_to_r3(int socket, struct request data_r1){
 void send_light_data_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
-	rcv = request(socket, 'O', 'l', 's', data_r1.len, data_r1.data);
+    int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 'l', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
@@ -101,7 +104,8 @@ void send_light_data_to_r3(int socket, struct request data_r1){
 void send_unidentified_object_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
-	rcv = request(socket, 'O', 'a', 's', data_r1.len, data_r1.data);
+	int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){

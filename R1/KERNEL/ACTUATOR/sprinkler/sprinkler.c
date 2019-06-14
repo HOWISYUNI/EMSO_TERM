@@ -6,7 +6,7 @@ static dev_t dev_num;
 static struct cdev *cd_cdev;
 
 /*delay 시간만큼 워터펌프 온*/
-void pump_on(){
+void pump_on(void){
 	printk("pump on");
 	/*이게 지금 작동은하는데 물이 어떻게 들어가는지는 잘 모르겠음*/
 	gpio_set_value(WATERPUMP_A, 1);
@@ -36,11 +36,11 @@ int steps[STEPS][4] = {
 	{1,0,0,1}
 };
 
-void setStep(int step){
-	gpio_set_value(PIN1, steps[step][0]);
-    gpio_set_value(PIN2, steps[step][1]);
-    gpio_set_value(PIN3, steps[step][2]);
-    gpio_set_value(PIN4, steps[step][3]);
+void set_step(int step){
+	gpio_set_value(MOTOR_A, steps[step][0]);
+    gpio_set_value(MOTOR_B, steps[step][1]);
+    gpio_set_value(MOTOR_C, steps[step][2]);
+    gpio_set_value(MOTOR_D, steps[step][3]);
 }
 
 void forward(int round, int delay){
@@ -48,24 +48,24 @@ void forward(int round, int delay){
 	int j=0;
 	for(i=1;i<=64*round;i++){
 		for(j=1;j<=64;j++){//5.625도
-			setStep(j%8);
+			set_step(j%8);
 			udelay(delay);
 		}
 	}
 
 }
 
-void moveDegree(int degree, int delay, int direction){
+void move_degree(int degree, int delay, int direction){
 	int i=0;
 	if(direction == 0){
 		for(i=1;i<=(64*64*degree)/360;i++){//360도
-			setStep(i%8);
+			set_step(i%8);
 			udelay(delay);
 		}
 
 	}else{
 		for(i=1;i<=(64*64*degree)/360;i++){
-			setStep(STEPS-i%8);
+			set_step(STEPS-i%8);
 			udelay(delay);
 		}	
 	}
@@ -82,8 +82,7 @@ static int sprinkler_release(struct inode *inode, struct file *file){
 	return 0;
 }
 
-static long response(socket_r1, 's', 0, "");
-sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
+static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 	int i = 0;		
 	int d = (int)arg;
 	switch(cmd){
@@ -114,7 +113,7 @@ sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 		    break;*/
 
 		//jinhoski가 구현한부분
-		case sprinkler_ON:
+		case SPRINKLER_ON:
 			gpio_set_value(WATERPUMP_A, 1);
 		    gpio_set_value(WATERPUMP_B, 0);
 			while(1){
@@ -141,7 +140,7 @@ sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 struct file_operations sprinkler_fops = {
 	.open = sprinkler_open,
 	.release = sprinkler_release,
-	.unlocked_ioctl = sprinkler
+	.unlocked_ioctl = sprinkler,
 };
 
 

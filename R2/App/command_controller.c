@@ -7,11 +7,11 @@ int main(){
 	int socket_r1, socket_r3;
 
 	/*클라이언트 초기화*/
-	//socket_r1 = client_open(R1_ADDR, R1_ACT_PORT);
-	//socket_r3 = client_open(R3_ADDR, R3_REF_PORT);
+	socket_r1 = client_open(R1_ADDR, R1_ACT_PORT);
+	socket_r3 = client_open(R3_ADDR, R3_REF_PORT);
 
-    socket_r1 = client_open("127.0.0.1", 1000);
-    socket_r3 = client_open("127.0.0.1", 3020);
+    //socket_r1 = client_open("127.0.0.1", 1000);
+    //socket_r3 = client_open("127.0.0.1", 3020);
 
 	/*r3에 일정주기마다 데이터 요청*/
 	while(1){
