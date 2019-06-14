@@ -61,7 +61,8 @@ void send_abnormal_situation_to_r3(int socket, struct request data_r1){
 
 	struct response rcv;
 
-	rcv = request(socket, 'O', 'a', 's', data_r1.len, data_r1.data);
+	int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
@@ -103,7 +104,8 @@ void send_light_data_to_r3(int socket, struct request data_r1){
 void send_unidentified_object_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
-	rcv = request(socket, 'O', 'a', 's', data_r1.len, data_r1.data);
+	int len = strlen(data_r1.data);
+	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
 	if(rcv.data){
