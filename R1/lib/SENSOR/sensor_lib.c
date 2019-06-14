@@ -55,16 +55,19 @@ Parameter : int dht11_data[4]   (습도 : dht11_data[0].dht11_data[1] / 온도 :
 Return : void
 
 */
-void read_dht11_sensor(int dht11_data[])
+int read_dht11_sensor()
 {
 	int dev;
 	int ret;
+	int dht11_data;
 
 	dev = open("/dev/dht11_dev",O_RDWR);
 	
-	ret=read(dev,dht11_data,4*sizeof(int));
+	ret=read(dev,dht11_data,sizeof(int));
 	
 	ret = close(dev);
+
+	return dht11_data;
 
 }
 
