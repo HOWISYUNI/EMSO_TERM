@@ -63,7 +63,7 @@ int read_dht11_sensor()
 
 	dev = open("/dev/dht11_dev",O_RDWR);
 	
-	ret=read(dev,dht11_data,sizeof(int));
+	ret=read(dev,&dht11_data,sizeof(int));
 	
 	ret = close(dev);
 
