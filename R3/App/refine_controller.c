@@ -5,7 +5,7 @@
 #include "../lib/controllers.h"
 
 int main(void){
-	int srv, clt;	/* srv = server sock */
+	int srv;		/* srv = server sock */
 	int c_sock;		/* client server sock */
 
 	//struct response rsp;
@@ -17,21 +17,20 @@ int main(void){
 	req = (struct request*)malloc(sizeof(struct request));
 	//data = (char*)malloc(BUFF_SIZE);
 
-	srv = server_open(3020);
+	srv = server_open(R3_REF_PORT);		//3020
 	while(1){
 		printf("Wait!!\n");
 		c_sock = wait_request(srv, req);
 		printf("type : %c\n", req->type);
 		printf("cmd : %c\n", req->cmd);
 
+		sleep(1);
 		if(req->method == 'G'){
 			printf("Come here!!\n");
 			//refine_data(req->type, req->cmd, data);
 			//refine_data('l', 'v', data);
-			data = refine_data(req->type, req->cmd);
+			data = refine_data(req->type, req->cmd, req->data);
 			
-			sleep(1);
-
 			printf("data : %s\n", data);
 			data_len = strlen(data);
 			printf("data_len : %ld\n", data_len);
@@ -44,7 +43,7 @@ int main(void){
 			printf("Fail to send!!\n");
 		
 		}
-		sleep(5);
+		sleep(3);
 	}
 	free(req);
 	free(data);
