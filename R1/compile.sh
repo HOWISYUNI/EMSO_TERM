@@ -1,3 +1,6 @@
+#mkdir ./bin
+mkdir bin
+
 #lib compile
 #arm-linux-gnueabi-gcc -c ./lib/ACTUATOR/actuator_lib.c
 arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_server_lib.c
@@ -13,7 +16,3 @@ arm-linux-gnueabi-gcc -I. -o client ./App/ksf_net_client.c ksf_client_lib.o
 #rm actuator_lib.o sf_subctr.o
 rm ksf_server_lib.o ksf_client_lib.o
 
-#move binary
-#mv daemon ./App/
-mv server ./App/
-mv client ./App/
