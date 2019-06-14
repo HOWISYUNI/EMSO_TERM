@@ -26,6 +26,7 @@ int client_open(char *dest_ip, int port, long timeout){
     wait_time.tv_sec = timeout;
     wait_time.tv_usec = 0;
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&wait_time, sizeof(wait_time));
+    setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&wait_time, sizeof(wait_time));
     
     /* hdr set */
     memset(&s_addr, 0, sizeof(s_addr));
@@ -165,7 +166,7 @@ int wait_request(int sock, struct request *req){
 int response(int c_sock, char type, unsigned long len, char *data){
     struct response rsp;
     int ret;
-
+    
     /* response init */
     rsp.type = type;
     rsp.len = len;

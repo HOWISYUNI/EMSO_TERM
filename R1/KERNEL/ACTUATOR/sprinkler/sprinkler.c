@@ -6,7 +6,7 @@ static dev_t dev_num;
 static struct cdev *cd_cdev;
 
 /*delay 시간만큼 워터펌프 온*/
-void pump_on(){
+void pump_on(void){
 	printk("pump on");
 	/*이게 지금 작동은하는데 물이 어떻게 들어가는지는 잘 모르겠음*/
 	gpio_set_value(WATERPUMP_A, 1);
@@ -48,7 +48,7 @@ void forward(int round, int delay){
 	int j=0;
 	for(i=1;i<=64*round;i++){
 		for(j=1;j<=64;j++){//5.625도
-			setStep(j%8);
+			set_step(j%8);
 			udelay(delay);
 		}
 	}
@@ -59,13 +59,13 @@ void move_degree(int degree, int delay, int direction){
 	int i=0;
 	if(direction == 0){
 		for(i=1;i<=(64*64*degree)/360;i++){//360도
-			setStep(i%8);
+			set_step(i%8);
 			udelay(delay);
 		}
 
 	}else{
 		for(i=1;i<=(64*64*degree)/360;i++){
-			setStep(STEPS-i%8);
+			set_step(STEPS-i%8);
 			udelay(delay);
 		}	
 	}
@@ -80,9 +80,13 @@ static int sprinkler_release(struct inode *inode, struct file *file){
 	return 0;
 }
 
+<<<<<<< HEAD
 
 
 static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
+=======
+static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
+>>>>>>> 7d3fcce65132c93e790f668c54241597b29d4a76
 	int i = 0;		
 	int d = (int)arg;
 	switch(cmd){
@@ -144,7 +148,11 @@ static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long a
 struct file_operations sprinkler_fops = {
 	.open = sprinkler_open,
 	.release = sprinkler_release,
+<<<<<<< HEAD
 	.unlocked_ioctl = sprinkler_ioctl,
+=======
+	.unlocked_ioctl = sprinkler,
+>>>>>>> 7d3fcce65132c93e790f668c54241597b29d4a76
 };
 
 
