@@ -18,16 +18,18 @@
 
 #define STEPS 8
 
-#define IOCTL_START_NUM 0x00
-#define IOCTL_NUM1 IOCTL_START_NUM+1
-#define IOCTL_NUM2 IOCTL_START_NUM+2
-#define IOCTL_NUM3 IOCTL_START_NUM+3
-#define IOCTL_NUM4 IOCTL_START_NUM+4
+#define SPRINKLER_NUM 0x30
+#define SPRINKLER_IOCTL_NUM1 SPRINKLER_NUM+1
+#define SPRINKLER_IOCTL_NUM2 SPRINKLER_NUM+2
+#define SPRINKLER_IOCTL_NUM3 SPRINKLER_NUM+3
+#define SPRINKLER_IOCTL_NUM 'c'
+#define SPRINKLER_ON _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM1, unsigned long *)
+#define SPRINKLER_OFF _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM2, unsigned long *)
+#define SPRINKLER_DELAY _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM3, unsigned long *)
 
 #define MOTOR_SPEED 1000
 
 /*delay 만큼 펌프 온*/
-void pump_on(int delay);
+void pump_on(void);
 /*펌프 오프. 아마 안쓰일거 같긴함.*/
 void pump_off(void);
-

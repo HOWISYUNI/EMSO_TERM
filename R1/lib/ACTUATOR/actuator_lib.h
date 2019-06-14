@@ -37,7 +37,7 @@
 #define SPRINKLER_IOCTL_NUM 'c'
 #define SPRINKLER_ON _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM1, unsigned long *)
 #define SPRINKLER_OFF _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM2, unsigned long *)
-#define SPRINKLER_TIME _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM3, unsigned long *)
+#define SPRINKLER_DELAY _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM3, unsigned long *)
 /* LED & LED for ALERT */
 int turn_on_led();
 int turn_on_led_timer(unsigned long sec);

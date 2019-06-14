@@ -16,7 +16,7 @@ void pump_on(){
 }
 
 /*펌프 오프 근데 아마 안쓰일거 같음*/
-void pump_off(void){
+void pump_off(){
 	printk("pump off");
 
 	gpio_set_value(WATERPUMP_A, 0);
@@ -37,10 +37,10 @@ int steps[STEPS][4] = {
 };
 
 void setStep(int step){
-	gpio_set_value(PIN1, steps[step][0]);
-    gpio_set_value(PIN2, steps[step][1]);
-    gpio_set_value(PIN3, steps[step][2]);
-    gpio_set_value(PIN4, steps[step][3]);
+	gpio_set_value(MOTOR_A, steps[step][0]);
+    gpio_set_value(MOTOR_B, steps[step][1]);
+    gpio_set_value(MOTOR_C, steps[step][2]);
+    gpio_set_value(MOTOR_D, steps[step][3]);
 }
 
 void forward(int round, int delay){
@@ -55,7 +55,7 @@ void forward(int round, int delay){
 
 }
 
-void moveDegree(int degree, int delay, int direction){
+void move_degree(int degree, int delay, int direction){
 	int i=0;
 	if(direction == 0){
 		for(i=1;i<=(64*64*degree)/360;i++){//360도
@@ -73,17 +73,16 @@ void moveDegree(int degree, int delay, int direction){
 }
 
 static int sprinkler_open(struct inode *inode, struct file *file){
-	pump_on();
 	return 0;
 }
 
 static int sprinkler_release(struct inode *inode, struct file *file){
-	pump_off();
 	return 0;
 }
 
-static long response(socket_r1, 's', 0, "");
-sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
+
+
+static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 	int i = 0;		
 	int d = (int)arg;
 	switch(cmd){
@@ -114,23 +113,27 @@ sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 		    break;*/
 
 		//jinhoski가 구현한부분
-		case sprinkler_ON:
+		case SPRINKLER_ON:
 			gpio_set_value(WATERPUMP_A, 1);
-		    gpio_set_value(WATERPUMP_B, 0);
+			gpio_set_value(WATERPUMP_B, 0);
 			while(1){
 				move_degree(360, MOTOR_SPEED, 1);
-				move_degree(360, MOTOR_SPEED, 1);
+				move_degree(360, MOTOR_SPEED, 0);
 			}
+		case SPRINKLER_OFF:
+		   	gpio_set_value(WATERPUMP_A, 0);
+			gpio_set_value(WATERPUMP_B, 0);
+			
 		case SPRINKLER_DELAY:
 			gpio_set_value(WATERPUMP_A, 1);
-            gpio_set_value(WATERPUMP_B, 0);
+            		gpio_set_value(WATERPUMP_B, 0);
 			
 			for(i=0;i<d;i++){
 				move_degree(360, MOTOR_SPEED, 1);
 				move_degree(360, MOTOR_SPEED, 0);
 			}
 			gpio_set_value(WATERPUMP_A, 0);
-		    gpio_set_value(WATERPUMP_B, 0);
+			gpio_set_value(WATERPUMP_B, 0);
 		default:
 			return -1;
 	}
@@ -141,7 +144,7 @@ sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 struct file_operations sprinkler_fops = {
 	.open = sprinkler_open,
 	.release = sprinkler_release,
-	.unlocked_ioctl = sprinkler
+	.unlocked_ioctl = sprinkler_ioctl,
 };
 
 
