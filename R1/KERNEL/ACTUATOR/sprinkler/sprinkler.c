@@ -1,4 +1,4 @@
-#include "motor.h"
+#include "sprinkler.h"
 
 MODULE_LICENSE("GPL");
 
@@ -82,10 +82,12 @@ static int sprinkler_release(struct inode *inode, struct file *file){
 	return 0;
 }
 
-static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
-		
+static long response(socket_r1, 's', 0, "");
+sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
+	int i = 0;		
+	int d = (int)arg;
 	switch(cmd){
-		case SPRINKLER_ON:
+		/*case SPRINKLER_ON:
 		    del_timer(&timer);
 	    	timer.function = buzzer_me;
         	timer.expires = jiffies + (HZ);
@@ -109,8 +111,26 @@ static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
 			end_timer.function = timer_buzzer;
 			end_timer.expires = jiffies + (arg*HZ);
 		    add_timer(&end_timer);
-		    break;
-		    
+		    break;*/
+
+		//jinhoski가 구현한부분
+		case sprinkler_ON:
+			gpio_set_value(WATERPUMP_A, 1);
+		    gpio_set_value(WATERPUMP_B, 0);
+			while(1){
+				move_degree(360, MOTOR_SPEED, 1);
+				move_degree(360, MOTOR_SPEED, 1);
+			}
+		case SPRINKLER_DELAY:
+			gpio_set_value(WATERPUMP_A, 1);
+            gpio_set_value(WATERPUMP_B, 0);
+			
+			for(i=0;i<d;i++){
+				move_degree(360, MOTOR_SPEED, 1);
+				move_degree(360, MOTOR_SPEED, 0);
+			}
+			gpio_set_value(WATERPUMP_A, 0);
+		    gpio_set_value(WATERPUMP_B, 0);
 		default:
 			return -1;
 	}

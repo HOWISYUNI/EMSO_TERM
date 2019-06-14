@@ -1,5 +1,5 @@
 #include "./data_controller.h"
-
+#include <pthread.h>
 /*R1으로부터 받는 데이터를 처리*/
 int main(void){
 
@@ -8,6 +8,7 @@ int main(void){
 	pid_t pid;
 	
 	int c_socket;
+	int flag;
 	int ret;
 	
 	struct request rcv;
@@ -16,42 +17,59 @@ int main(void){
 	socket_r1 = server_open(R2_DATA_PORT);
 	socket_r3 = client_open(R3_ADDR, R3_STG_PORT);
 	
+	pthread_mutex_init(&lock,NULL);
+
 	/*요청 대기*/
 	while(1){
 		printf("-1\n");
 		
 		c_socket = wait_request(socket_r1, &rcv);
-
-		printf("0\n");
-		strcpy(res.data,"\n");
-		if(response(c_socket, 's', 0, res.data) < 0 ){
-			/*ERROR*/
-			printf("response error");
+		pid=fork();
+		if(pid<0){
+			printf("fork() failed.\n");
 		}
-		printf("1\n");
-		if(rcv.type == 's'){	/*온습도 데이터*/
-			/*r3에게 데이터 전송*/
-			printf("2\n");
-			send_humidity_data_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'l'){	/*조도 데이터*/
-			/*r3에게 데이터 전송*/
-			printf("3\n");
-			send_light_data_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'a'){	/*비정상 상황 신호*/
-			/*r3에게 데이터 전송 및 알람 메시지*/
-			printf("4\n");
-			send_abnormal_situation_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'a'){	/*미확인 물체 신호*/
-			/*r3에게 데이터 전송 및 알람 메시지*/
-			printf("5\n");
-			send_unidentified_object_to_r3(socket_r3, rcv);
-		}else{	/**/
-
+		else if(pid==0){
+			flag=1;
+			printf("0\n");
+			strcpy(res.data,"\n");
+			if(response(c_socket, 's', 0, res.data) < 0 ){
+				/*ERROR*/
+				printf("response error");
+			}
+			printf("1\n");
+			if(rcv.type == 's'){	/*온습도 데이터*/
+				/*r3에게 데이터 전송*/
+				printf("2\n");
+				send_humidity_data_to_r3(socket_r3, rcv);
+			}else if(rcv.type == 'l'){	/*조도 데이터*/
+				/*r3에게 데이터 전송*/
+				printf("3\n");
+				send_light_data_to_r3(socket_r3, rcv);
+			}else if(rcv.type == 'a'){	/*비정상 상황 신호*/
+				/*r3에게 데이터 전송 및 알람 메시지*/
+				printf("4\n");
+				send_abnormal_situation_to_r3(socket_r3, rcv);
+			}else if(rcv.type == 'a'){	/*미확인 물체 신호*/
+				/*r3에게 데이터 전송 및 알람 메시지*/
+				printf("5\n");
+				send_unidentified_object_to_r3(socket_r3, rcv);
+			}else{	/**/
+	
+			}
+			break;
 		}
-		
+		else{
+			flag=0;
+			printf("listen().");
+			
+		}
+	
 	}
-	printf("server close\n");
-	server_close(socket_r1);
+	if(flag==0)
+	{
+		printf("server close\n");
+		server_close(socket_r1);
+	}
 
 	return 0;
 }

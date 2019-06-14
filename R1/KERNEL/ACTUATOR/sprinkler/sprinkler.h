@@ -24,7 +24,7 @@
 #define IOCTL_NUM3 IOCTL_START_NUM+3
 #define IOCTL_NUM4 IOCTL_START_NUM+4
 
-
+#define MOTOR_SPEED 1000
 
 /*delay 만큼 펌프 온*/
 void pump_on(int delay);
