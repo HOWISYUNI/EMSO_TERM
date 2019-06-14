@@ -7,6 +7,7 @@
 
 ```C
 #define LED 4          /*  led  */
+#define LED_ALERT 5    /* led_alert */
 #define MOTOR_A 6      /* motor */
 #define CE0 8          /* light */
 #define MISO 9         /* light */

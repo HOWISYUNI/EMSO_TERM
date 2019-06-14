@@ -9,12 +9,13 @@ int main(void){
 	struct request rcv;
 
 	/*소켓 초기화*/
-	socket_r1 = server_open(R2_DATA_PORT);
-	socket_r3 = client_open(R3_ADDR, R3_STG_PORT);
+	socket_r1 = server_open(2000);
+	socket_r3 = client_open("127.0.0.1", 3010);
 
 	/*요청 대기*/
 	while(1){
 		wait_request(socket_r1, &rcv);
+        printf("request received\n");
 
 		if(rcv.type == 's'){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/
