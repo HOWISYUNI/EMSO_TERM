@@ -103,6 +103,8 @@ static int __init dht11_init(void){
 }
 
 static void __exit dht11_exit(void){
+	cdev_del(cd_cdev);
+	unregister_chrdev_region(dev_num, 1);
 	gpio_set_value(DHT, 0);
 	gpio_free(DHT);
 }

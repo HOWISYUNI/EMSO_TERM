@@ -207,6 +207,7 @@ printf("[SPRINKLER] OFF\n");
 				/*Error*/
 			}
 		}else{	/**/
+printf("[이상한 값] type\n");
 
 		}
 	
