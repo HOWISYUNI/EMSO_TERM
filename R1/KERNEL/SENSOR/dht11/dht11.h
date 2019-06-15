@@ -6,7 +6,7 @@
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
 
-#define DEV_NAME "dht11"
+#define DEV_NAME "dht11_dev"
 
 #define MAX_TIMING 85
 #define DHT 21

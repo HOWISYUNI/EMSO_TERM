@@ -174,7 +174,8 @@ int timer_sprinkler(unsigned long sec){
 
 
 /* camera snapshot */
-int snapshot(void){
+int snapshot(char *file_name){
+    int status, ret;
     pid_t pid;
     pid = fork();
     
@@ -185,11 +186,18 @@ int snapshot(void){
     }
     else if(pid == 0){
         /* child process */
-        execl("snapshot.sh", "10230", NULL);
+        execl("/bin/sh", "sh", "./snapshot.sh", file_name, NULL);
     }
     else{
         /* parents process */
         printf("return pid(%d)\n", pid);
+        printf("wait...\n");
+        ret = wait(&status);    
+        if(ret < 0){
+            printf("failed child exit\n");
+            return -1;
+        }
+        printf("snapshot success\n");
         return pid;
     }
 }
