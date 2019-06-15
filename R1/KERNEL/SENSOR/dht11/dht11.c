@@ -34,7 +34,7 @@ static void dht_read(void){
 		gpio_direction_input(DHT);
 	
 		for(i = 0;i < MAX_TIMING; i++){
-			counter++;
+			counter = 0;
 			while(gpio_get_value(DHT) == last_state){
 				counter++;
 				udelay(1);
@@ -94,7 +94,7 @@ static int __init dht11_init(void){
 
 	gpio_request(DHT, "DHT11");
 
-	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+	alloc_chrdev_region(&dev_num, 0, 1, DEV_DHT);
 	cd_cdev = cdev_alloc();
 	cdev_init(cd_cdev, &dht11_fops);
 	cdev_add(cd_cdev, dev_num, 1);

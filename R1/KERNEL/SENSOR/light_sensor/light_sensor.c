@@ -8,17 +8,8 @@
 #include <linux/errno.h>
 #include <linux/fcntl.h>
 #include <linux/uaccess.h>
-
-
-
+#include "../../devices.h"
 MODULE_LICENSE("GPL");
-
-#define MOSI 10
-#define MISO 9
-#define SCLK 11
-#define CE0 8
-
-#define DEV_NAME "light_sensor_dev"
 
 #define MAX_CLK 12
 static dev_t dev_num;
@@ -128,7 +119,7 @@ struct file_operations light_sensor_fops =
 
 static int __init light_sensor_init(void) {
 
-	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+	alloc_chrdev_region(&dev_num, 0, 1, DEV_LIGHT);
 	cd_cdev = cdev_alloc();
 	cdev_init(cd_cdev, &light_sensor_fops);
 	cdev_add(cd_cdev, dev_num, 1);

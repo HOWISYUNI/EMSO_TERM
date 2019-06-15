@@ -5,11 +5,8 @@
 #include <linux/delay.h>
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
-
-#define DEV_NAME "dht11"
-
+#include "../../devices.h"
 #define MAX_TIMING 85
-#define DHT 21
 
 /*
 	function : dht11 on

@@ -6,30 +6,18 @@
 #include <linux/interrupt.h>
 #include <linux/delay.h>
 #include <linux/cdev.h>
-
-#define DEV_NAME "sprinkler"
-
-#define MOTOR_A 6
-#define MOTOR_B 13
-#define MOTOR_C 19
-#define MOTOR_D 26
-#define WATERPUMP_A	12
-#define WATERPUMP_B	13
-
+#include <linux/ioctl.h>
+#include <linux/kthread.h>
+#include "../../devices.h"
 #define STEPS 8
-
-#define SPRINKLER_NUM 0x30
-#define SPRINKLER_IOCTL_NUM1 SPRINKLER_NUM+1
-#define SPRINKLER_IOCTL_NUM2 SPRINKLER_NUM+2
-#define SPRINKLER_IOCTL_NUM3 SPRINKLER_NUM+3
-#define SPRINKLER_IOCTL_NUM 'c'
-#define SPRINKLER_ON _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM1, unsigned long *)
-#define SPRINKLER_OFF _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM2, unsigned long *)
-#define SPRINKLER_DELAY _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM3, unsigned long *)
-
 #define MOTOR_SPEED 1000
 
-/*delay 만큼 펌프 온*/
+/* moter */
+void setStep(int pin1, int pin2, int pin3, int pin4);
+void forward(int cycle, int delay);
+void backward(int cycle, int delay);
+void moveDegree(int degree, int delay, int direction);
+/* water_pump */
 void pump_on(void);
-/*펌프 오프. 아마 안쓰일거 같긴함.*/
 void pump_off(void);
+

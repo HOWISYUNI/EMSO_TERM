@@ -30,11 +30,6 @@ int ultrasonic_go(void){
 	return dist;
 }
 
-
-
-
-
-
 static int ultrasonic_read(struct file *file, char *buf, size_t len, loff_t *lof){
 	int ret;
 	int value;
@@ -80,7 +75,7 @@ static int __init ultrasonic_init(void){
 
 	printk("Init ultrasonic Module!!\n");
 
-	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+	alloc_chrdev_region(&dev_num, 0, 1, DEV_ULTRA);
 	cd_cdev = cdev_alloc();
 	cdev_init(cd_cdev, &ultrasonic_fops);
 	cdev_add(cd_cdev, dev_num, 1);
