@@ -9,8 +9,8 @@
 int main(){
 
 	int value;
-	value = read_soil_sensor();
+	value = read_light_sensor();
 
-	printf("soil_data : %d\n",value);
+	printf("light_data : %d\n",value);
 	return 0;	
 }
