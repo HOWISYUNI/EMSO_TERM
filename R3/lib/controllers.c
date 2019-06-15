@@ -21,7 +21,7 @@ int save_data(char type, char *data){
 	fseek(fp, 0L, SEEK_END);
 	size = ftell(fp);
 
-	if (size == 0)
+	if(size == 0)
 		fprintf(fp, "%s", data);	
 	else
 		fprintf(fp, "\n%s", data);
@@ -42,11 +42,11 @@ char* refine_data(char type, char cmd, char* data){
 	rcv_data = atoi(data);
 
 	if(type == 'l')
-		fp = fopen("light.txt", "r");
+		fp = fopen("light.txt", "a+");
 	else if(type == 's')
-		fp = fopen("soil.txt", "r");
+		fp = fopen("soil.txt", "a+");
 	else if(type == 'a')
-		fp = fopen("alert_log.txt", "r");
+		fp = fopen("alert_log.txt", "a+");
 	else{
 		return_data[0] = '\0';
 		return_data[0] = 'f';
@@ -54,7 +54,9 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '0';
-		printf("return_data(fail) : %s\n", return_data);
+		return_data[5] = '\0';
+		return_data[6] = '\0';
+		printf("return_data(fail0) : %s\n", return_data);
 
 		return return_data;
 	}
@@ -74,7 +76,10 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '1';
-		
+		return_data[5] = '\0';
+		return_data[6] = '\0';
+		printf("return_Data(fail1) : %s\n", return_data);
+
 		return return_data;
 	}
 
@@ -114,7 +119,9 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '2';
-		printf("Failed because cmd is not 'a' or 'v'\n");
+		return_data[5] = '\0';
+		return_data[6] = '\0';
+		printf("Failed because cmd is not 'a' or 'v'(fail2) : %s\n",return_data);
 	}
 
 	return return_data;

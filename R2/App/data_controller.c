@@ -5,7 +5,6 @@ int main(void){
 
 	int socket_r1;
 	int socket_r3;
-	pid_t pid;
 	
 	int c_socket;
 	int ret;
@@ -17,40 +16,41 @@ int main(void){
 	
 	/*요청 대기*/
 	while(1){
-		printf("-1\n");
-		
+		printf("wait_request\n");
 		c_socket = wait_request(socket_r1, &rcv);
 
-		printf("0\n");
+		//printf("0\n");
 		strcpy(res.data,"\n");
 		if(response(c_socket, 's', 0, res.data) < 0 ){
 			/*ERROR*/
 			printf("response error");
 		}
-		printf("1\n");
+		printf("r3에게 보내기위한 소켓 OPEN\n");
 		socket_r3 = client_open(R3_ADDR, R3_STG_PORT,10);
-		printf("2\n");
+		
 		if(rcv.type == 's'){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/
-			printf("3\n");
+			printf("온습도데이터 전송\n");
 			send_humidity_data_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'l'){	/*조도 데이터*/
 			/*r3에게 데이터 전송*/
-			printf("4\n");
+			printf("조도데이터 전송\n");
 			send_light_data_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'a'){	/*비정상 상황 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			printf("5\n");
+			printf("비정상 상황 신호 전송\n");
 			send_abnormal_situation_to_r3(socket_r3, rcv);
 		}else if(rcv.type == 'a'){	/*미확인 물체 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
-			printf("6\n");
+			printf("미확인 물체 신호 전송\n");
 			send_unidentified_object_to_r3(socket_r3, rcv);
 		}else{	/**/
 
 		}
+		printf("r3에게 보내기위한 소켓 CLOSE\n");
 		client_close(socket_r3);
 	}
+
 	printf("server close\n");
 	server_close(socket_r1);
 
