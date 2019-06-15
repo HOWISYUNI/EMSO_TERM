@@ -106,7 +106,7 @@ int send_light_data_to_r2(int socket){
 	sprintf(data, "%d", value);
 	len = sizeof(int);
 	rcv = request(socket, 'O', 'l', 's', len, data);
-
+	printf("1. light : %d\n",value);
 	if(rcv.type=='f'){
 		printf("1. light receive failed.\n");
 		return -1;
@@ -125,6 +125,7 @@ int send_soil_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
+	printf("1. soil : %d\n",value);
 	value = read_soil_sensor();
 	sprintf(data, "%d", value);
 	len = sizeof(int);

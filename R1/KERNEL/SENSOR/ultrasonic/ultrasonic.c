@@ -120,6 +120,8 @@ static int __init ultrasonic_init(void){
 
 static void __exit ultrasonic_exit(void){
 	printk("Exit ultra_sonic Module!!\n");
+	cdev_del(cd_cdev);
+	unregister_chrdev_region(dev_num, 1);
 
 	if(irq_num != -1){
 		free_irq(irq_num, NULL);
