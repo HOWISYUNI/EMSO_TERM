@@ -15,7 +15,9 @@ static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
             printk("wait!\n");
             wait_event(wq, detect == TRUE); /* wake up when detected from isr */
             disable_irq(irq_num);
+	    printk("return!\n");
             return 0;
+	    break;
             
         default :
             return -1;
@@ -50,7 +52,7 @@ static int __init pir_init(void){
     /* gpio & interrupt init */
 	gpio_request_one(SENSOR, GPIOF_IN, "pir");
 	irq_num = gpio_to_irq(SENSOR);
-	ret = request_irq(irq_num, pir_isr, IRQF_TRIGGER_RISING, "pir_irq", NULL);
+	ret = request_irq(irq_num, pir_isr, IRQF_TRIGGER_RISING, "pir", NULL);
 	
 	/* irq fail */
 	if(ret){
@@ -58,11 +60,11 @@ static int __init pir_init(void){
 		free_irq(irq_num, NULL);
 	}
 	/* success */
-	else
+	else{
 	   	disable_irq(irq_num);
-
+	}
 	init_waitqueue_head(&wq);
-
+	printk("PIR Init\n");
 	return 0;
 }
 

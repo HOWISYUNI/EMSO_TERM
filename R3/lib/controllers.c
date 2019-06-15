@@ -25,6 +25,7 @@ int save_data(char type, char *data){
 		fprintf(fp, "%s", data);	
 	else
 		fprintf(fp, "\n%s", data);
+	
 	fclose(fp);
 
 	return 0;	
@@ -34,9 +35,9 @@ char* refine_data(char type, char cmd, char* data){
 	FILE *fp = NULL;
 	int temp = 0;
 	int lines = 0;
-	int rcv_data;
+	int rcv_data, i;
 	char read_one_line[DATA_LEN] = {0, }; /* temporary for reading text file */
-	static char return_data[10];
+	static char return_data[DATA_LEN];
 
 	rcv_data = atoi(data);
 
@@ -47,25 +48,39 @@ char* refine_data(char type, char cmd, char* data){
 	else if(type == 'a')
 		fp = fopen("alert_log.txt", "r");
 	else{
+		return_data[0] = '\0';
 		return_data[0] = 'f';
 		return_data[1] = 'a';
 		return_data[2] = 'i';
 		return_data[3] = 'l';
+		return_data[4] = '0';
+		printf("return_data(fail) : %s\n", return_data);
+
 		return return_data;
 	}
 
-	if(cmd == 'a'){
-		/* Count num of Lines */
-		fseek(fp, 0L, SEEK_SET);
-		while(!feof(fp)){
-			fgets(read_one_line, (DATA_LEN - 1), fp);
-			lines++;
-		}
+	/* Count num of Lines */
+	fseek(fp, 0L, SEEK_SET);
+	while(!feof(fp)){
+		fgets(read_one_line, (DATA_LEN - 1), fp);
+		lines++;
+	}
 
-		lines--;
-		printf("Lines : %d\n", lines);
-			
-		/* Extract Data  */
+	printf("Lines : %d\n", lines);
+	if(rcv_data > lines){
+		return_data[0] = '\0';
+		return_data[0] = 'f';
+		return_data[1] = 'a';
+		return_data[2] = 'i';
+		return_data[3] = 'l';
+		return_data[4] = '1';
+		
+		return return_data;
+	}
+
+	if(cmd == 'a'){	
+		return_data[0] = '\0';
+		/* Extract Data */
 		fseek(fp, 0L, SEEK_SET);
 		while(!feof(fp)){
 			fgets(read_one_line, (DATA_LEN - 1), fp);
@@ -78,16 +93,29 @@ char* refine_data(char type, char cmd, char* data){
 		temp = temp / rcv_data;
 		sprintf(return_data, "%d", temp);	//itoa
 		printf("return_data : %s\n", return_data);
+	}
+	else if(cmd == 'v'){
+		return_data[0] = '\0';
+		/* Extract Data */
+		fseek(fp, 0L, SEEK_SET);
+		while(!feof(fp)){
+			fgets(read_one_line, (DATA_LEN - 1), fp);
+			lines--;
+			if(lines >= 0 && lines < rcv_data) {
+				strncat(return_data, read_one_line, strlen(read_one_line));
+			}
+		}
+		printf("return_data : %s\n", return_data);
+	}
+	else{
+		return_data[0] = '\0';
+		return_data[0] = 'f';
+		return_data[1] = 'a';
+		return_data[2] = 'i';
+		return_data[3] = 'l';
+		return_data[4] = '2';
+		printf("Failed because cmd is not 'a' or 'v'\n");
+	}
 
 	return return_data;
-	}
-
-	else if(cmd == 'v'){
-
-	}
-	else if(cmd == 's'){
-			
-	}
-
-
 }

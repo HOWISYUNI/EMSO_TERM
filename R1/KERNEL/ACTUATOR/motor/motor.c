@@ -17,10 +17,10 @@ int steps[STEPS][4] = {
 };
 
 void setStep(int step){
-	gpio_set_value(PIN1, steps[step][0]);
-    gpio_set_value(PIN2, steps[step][1]);
-    gpio_set_value(PIN3, steps[step][2]);
-    gpio_set_value(PIN4, steps[step][3]);
+	gpio_set_value(MOTOR_A, steps[step][0]);
+    gpio_set_value(MOTOR_B, steps[step][1]);
+    gpio_set_value(MOTOR_C, steps[step][2]);
+    gpio_set_value(MOTOR_D, steps[step][3]);
 }
 
 void forward(int round, int delay){
