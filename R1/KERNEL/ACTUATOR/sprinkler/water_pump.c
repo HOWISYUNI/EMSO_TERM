@@ -12,14 +12,14 @@ static void timer_func(unsigned long data){
 }
 
 void pump_on(void){
-	gpio_set_value(WATERPUMP_A, 0);
+	gpio_set_value(WATERPUMP_A, 1);
 	gpio_set_value(WATERPUMP_B, 0);
 
 }
 
 void pump_off(void){
 	gpio_set_value(WATERPUMP_A, 1);
-	gpio_set_value(WATERPUMP_B, 0);
+	gpio_set_value(WATERPUMP_B, 1);
 
 }
 

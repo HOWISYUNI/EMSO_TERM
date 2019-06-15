@@ -26,7 +26,7 @@ int main(void){
 	struct request rcv;
 	int time;
 
-   	socket_r2 = server_open(R2_DATA_PORT);
+   	socket_r2 = server_open(R1_ACT_PORT);
 
 
 	/*요청 대기*/

@@ -104,9 +104,10 @@ int send_light_data_to_r2(int socket){
 	int len;
 	value = read_light_sensor();
 	sprintf(data, "%d", value);
-	len = sizeof(int);
+	len = sizeof(data);
 	rcv = request(socket, 'O', 'l', 's', len, data);
 	printf("1. light : %d\n",value);
+	printf("1. data : %s\n",data);
 	if(rcv.type=='f'){
 		printf("1. light receive failed.\n");
 		return -1;
@@ -125,10 +126,10 @@ int send_soil_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
-	printf("1. soil : %d\n",value);
 	value = read_soil_sensor();
+	printf("1. soil : %d\n",value);	
 	sprintf(data, "%d", value);
-	len = sizeof(int);
+	len = sizeof(data);
 	rcv = request(socket, 'O', 's', 's', len, data);
 
 	if(rcv.type=='f'){
@@ -151,7 +152,7 @@ int send_alert_temperature_data_to_r2(int socket){
 	int len;
 	value = read_dht11_sensor();
 	sprintf(data, "%d", value);
-	len = sizeof(int);
+	len = sizeof(data);
 
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
 	if(value>ALERT_TEMPERATURE){
@@ -199,7 +200,7 @@ int send_alert_distance_data_to_r2(int socket, int value){
 	int len;
 	printf("2. 거리 : %d\n",value);
 	sprintf(data, "%d", value);
-	len = sizeof(int);
+	len = sizeof(data);
 	rcv = request(socket, 'O', 'a', 's', len, data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
