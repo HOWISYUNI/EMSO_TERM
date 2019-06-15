@@ -18,7 +18,7 @@ int main(void){
 	while(1){
 		printf("wait_request\n");
 		c_socket = wait_request(socket_r1, &rcv);
-
+		printf("받은 값 : %d\n", atoi(rcv.data));
 		//printf("0\n");
 		strcpy(res.data,"\n");
 		if(response(c_socket, 's', 0, res.data) < 0 ){
