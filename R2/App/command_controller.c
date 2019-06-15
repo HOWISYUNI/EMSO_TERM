@@ -13,7 +13,7 @@ int main(){
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r3에 소켓 OPEN\n");
-	    	socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 10);
+	    socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 10);
 		
 		/*r3에 토양 온습도 데이터를 요청함.*/
 		printf("r3에 request\n");
@@ -31,9 +31,9 @@ int main(){
 		socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 10);
 		if(rcv.type == 'f'){
 			printf("토양온습도 fail\n");
-    		}else if(rcv.type == 't'){
+    	}else if(rcv.type == 't'){
 			printf("토양온습도 timeout\n");
-	    	}
+	    }
 		send_sprinkler_signal(socket_r1, sig);	/*작동하기로 했으면 시그널을 보냄*/
         
 		printf("r1에 연결된 소켓 CLOSE\n");
@@ -42,7 +42,7 @@ int main(){
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r3에 소켓 OPEN\n");
-	    	socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 10);
+	    socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 10);
 
 		/*r3에 조도 데이터를 요청함*/
 		printf("r3에 request\n");
@@ -56,12 +56,13 @@ int main(){
 		sig = check_led((int)rcv.data);
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
+		printf("r1에 소켓 OPEN\n");
 		socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 10);
 		if(rcv.type == 'f'){
 			printf("조도 fail\n");
    		}else if(rcv.type == 't'){
 			printf("조도 fail\n");
-    		}
+    	}
 		send_led_signal(socket_r1, sig);	/*작동하기로 했으면 시그널을 보냄*/
 		
 		printf("r1에 연결된 소켓 CLOSE\n");
