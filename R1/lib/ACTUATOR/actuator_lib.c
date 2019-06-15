@@ -143,6 +143,8 @@ int turn_on_sprinkler(){
 
     close(fd_m);    
     close(fd_w);
+
+    return 0;
 }
 
 int turn_off_sprinkler(){
@@ -156,6 +158,8 @@ int turn_off_sprinkler(){
 
     close(fd_m);    
     close(fd_w);
+
+    return 0;
 }
 /* kernel panic */
 int timer_sprinkler(unsigned long sec){
@@ -169,6 +173,8 @@ int timer_sprinkler(unsigned long sec){
 
     close(fd_m);    
     close(fd_w);
+
+    return 0;
 }
 
 

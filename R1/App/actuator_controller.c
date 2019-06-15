@@ -34,9 +34,11 @@ int main(void){
 		c_socket = wait_request(socket_r2,&rcv);
 
 		if(rcv.type == 'l'){	/*광합성용 LED */
+printf("[LED] type\n");
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
+printf("[LED] %d만큼 ON\n",time);
 					if(turn_on_led_timer(time)<0){
 						/*Error*/
 						send_response('f');						
@@ -45,6 +47,7 @@ int main(void){
 					}
 				}
 				else if(time==0){
+printf("[LED] ON\n");
 					if(turn_on_led()<0){
 						/*Error*/
 						send_response('f');						
@@ -58,6 +61,7 @@ int main(void){
 				}
 			}
 			else if(rcv.cmd == '0'){
+printf("[LED] OFF\n");
 				if(turn_off_led()<0){
 					/*Error*/
 					send_response('f');						
@@ -70,9 +74,11 @@ int main(void){
 				send_response('f');
 			}
 		}else if(rcv.type == 'a'){	/*비상시 불빛 신호*/
+printf("[ALERT_LED] type\n");
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
+printf("[ALERT_LED] %d만큼 ON\n",time);
 					if(turn_on_led_alert_timer(time)<0){
 						/*Error*/
 						send_response('f');						
@@ -81,6 +87,7 @@ int main(void){
 					}
 				}
 				else if(time==0){
+printf("[ALERT_LED] ON\n");
 					if(turn_on_led_alert()<0){
 						/*Error*/
 						send_response('f');						
@@ -94,6 +101,7 @@ int main(void){
 				}
 			}
 			else if(rcv.cmd == '0'){
+printf("[ALERT_LED] OFF\n");
 				if(turn_off_led_alert()<0){
 					/*Error*/
 					send_response('f');						
@@ -106,17 +114,19 @@ int main(void){
 				send_response('f');
 			}
 		}else if(rcv.type == 'b'){	/*비정상 버저 신호*/
+printf("[BUZZER] type\n");
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
+printf("[BUZZER] %d만큼 ON\n",time);
 					if(turn_on_buzzer_timer(time)<0){
 						/*Error*/
 						send_response('f');						
 					}else{
 						send_response('s');
 					}
-				}
-				else if(time==0){
+				}else if(time==0){
+printf("[BUZZER] ON\n");
 					if(turn_on_buzzer()<0){
 						/*Error*/
 						send_response('f');						
@@ -130,6 +140,7 @@ int main(void){
 				}
 			}
 			else if(rcv.cmd == '0'){
+printf("[BUZZER] OFF\n");
 				if(turn_off_buzzer<0){
 					/*Error*/
 					send_response('f');						
@@ -141,7 +152,9 @@ int main(void){
 				/*Error*/
 				send_response('f');
 			}
+		
 		}else if(rcv.type == 'c'){	/*카메라 신호*/
+printf("[CAMERA] type \n");
 			if(snapshot<0){
 				/*Error*/	
 				send_response('f');
@@ -151,12 +164,28 @@ int main(void){
 /*****************이거 FTP 방식 고려할 생각 있는지 한번 고민해보셈******************/
 			
 		}else if(rcv.type == 's'){	/*스프링 쿨러 신호*/
+printf("[SPRINKLER] type\n");
 			if(rcv.cmd == '1'){
 				time=atoi(rcv.data);
 				if(time>0){
+printf("[SPRINKLER] %d만큼 ON\n",time);
+					if(timer_sprinkler(time)<0){
+						/*Error*/
+						send_response('f');						
+					}else{
+						send_response('s');
 					
+					}
 				}
 				else if(time==0){
+printf("[SPRINKLER] ON\n");
+					if(turn_on_sprinkler()<0){
+						/*Error*/
+						send_response('f');						
+					}else{
+						send_response('s');
+					
+					}
 					
 				}
 				else{
@@ -164,6 +193,14 @@ int main(void){
 				}
 			}
 			else if(rcv.cmd == '0'){
+printf("[SPRINKLER] OFF\n");
+				if(turn_off_sprinkler()<0){
+					/*Error*/
+					send_response('f');						
+				}else{
+					send_response('s');
+				
+				}
 				
 			}
 			else{

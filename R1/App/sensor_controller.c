@@ -23,7 +23,6 @@ int main(void){
 
 	/*소켓 초기화*/
 
-	printf("시작\n");
 	pid=fork();
 	
 	if(pid<0){
@@ -31,22 +30,21 @@ int main(void){
 		printf("fork() failed.\n");
 	}
 	else if(pid==0){
-			printf("fork(1)\n");
 			while(1){
-				printf("보내는 거 시도!\n");
+				printf("1. 조도 값, 습도 값 보내는 거 시도!\n");
 				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);	
 				if(send_light_data_to_r2(socket_r2)<0){
 					/*send 실패*/
-					printf("light data send() failed.\n");
+					printf("1. light data send() failed.\n");
 				}
 				client_close(socket_r2);
 				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 				if(send_soil_data_to_r2(socket_r2)<0){
 					/*send 실패*/
-					printf("soil data send() failed.\n");					
+					printf("1. soil data send() failed.\n");					
 				}
 				client_close(socket_r2);
-				printf("Sensor send() periodly.\n");
+				printf("1. 주기적 값 보내는 것 성공.\n");
 				sleep(PERIOD);
 			}
 	}
@@ -57,14 +55,15 @@ int main(void){
 			printf("fork() failed. (2)\n");
 		}
 		else if(pid==0){
-			printf("fork(2)\n");
 			while(1){
 				/*PIR 예훈이가 짜야 짠다*/
 				if(wait_for_pir()==0){
+					printf("2. PIR 발견.\n");
 					while(time<=10){
 						time=(clock()/CLOCKS_PER_SEC);
 						if(get_ultrasonic()<ALERT_DISTANCE){
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
+							printf("2. 침입 알람 R2에게 전송\n");	
 							if(send_alert_distance_data_to_r2(socket_r2, get_ultrasonic())<0){
 								/*send 실패*/
 							}
@@ -76,8 +75,8 @@ int main(void){
 			}					
 		}
 		else{
-			printf("fork(3)\n");			
 			while(1){
+				printf("3. 온도 측정!\n");
 				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 				if(send_alert_temperature_data_to_r2(socket_r2)<0){
 					/*send 실패*/
@@ -109,11 +108,11 @@ int send_light_data_to_r2(int socket){
 	rcv = request(socket, 'O', 'l', 's', len, data);
 
 	if(rcv.type=='f'){
-		printf("light receive failed.\n");
+		printf("1. light receive failed.\n");
 		return -1;
 	}
 	else if(rcv.type=='t'){
-		printf("light receive timeout.\n");
+		printf("1. light receive timeout.\n");
 		return -2;
 	}
 
@@ -132,11 +131,11 @@ int send_soil_data_to_r2(int socket){
 	rcv = request(socket, 'O', 's', 's', len, data);
 
 	if(rcv.type=='f'){
-		printf("soil receive failed.\n");
+		printf("1. soil receive failed.\n");
 		return -1;
 	}
 	else if(rcv.type=='t'){
-		printf("soil receive timeout.\n");
+		printf("1. soil receive timeout.\n");
 		return -2;
 	}
 
@@ -156,6 +155,7 @@ int send_alert_temperature_data_to_r2(int socket){
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
 	if(value>ALERT_TEMPERATURE){
 		rcv = request(socket, 'O', 't', 's', len, data);
+		printf("3. 온도 이상 현재 온도 : %d 도 \n",value);
 		if(rcv.type=='f'){
 			return -1;
 		}
@@ -196,6 +196,7 @@ int send_alert_distance_data_to_r2(int socket, int value){
 	struct response rcv;
 	char data[1024];
 	int len;
+	printf("2. 거리 : %d\n",value);
 	sprintf(data, "%d", value);
 	len = sizeof(int);
 	rcv = request(socket, 'O', 'a', 's', len, data);
