@@ -16,11 +16,11 @@ MODULE_LICENSE("GPL");
 #define MOSI 10
 #define MISO 9
 #define SCLK 11
-#define CE0 8
+#define CE0 7
 
 #define DEV_NAME "soil_sensor_dev"
 
-#define MAX_CLK 10
+#define MAX_CLK 12
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 static int soil_data;
@@ -46,15 +46,15 @@ void start_mcp(void){
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,0);
 	udelay(1);
-	gpio_direction_output(SCLK,1);
+	gpio_direction_output(SCLK,0);
 	udelay(1);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,0);
 	udelay(1);
-	gpio_direction_output(SCLK,1);
+	gpio_direction_output(SCLK,0);
 	udelay(1);
 	gpio_direction_output(SCLK,0);
-	gpio_direction_output(MOSI,1);	//D0
+	gpio_direction_output(MOSI,0);	//D0
 	udelay(1);
 	gpio_direction_output(SCLK,1);
 	udelay(1);
