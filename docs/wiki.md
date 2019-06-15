@@ -22,8 +22,8 @@
 #define BUZZER 25      /* buzzer*/
 #define WATERPUMP_A 12   /*waterpump */
 #define WATERPUMP_B 24    /*waterpump*/
-#define TRIG 23
-#define ECHO 27
+#define TRIG 23        /* UltraSonic */
+#define ECHO 27        /* UltraSonic */
 ```
 
 ## Device name
