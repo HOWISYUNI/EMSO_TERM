@@ -1,4 +1,5 @@
 #include "actuator_lib.h"
+#include <stdio.h>
 /* LED device path : /dev/LED
    BUZZER device path : /dev/buzzer */
 
@@ -8,7 +9,7 @@ int turn_on_led(){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -22,7 +23,7 @@ int turn_off_led(){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -36,7 +37,7 @@ int turn_on_led_timer(unsigned long sec){
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TIME_LED, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -49,7 +50,7 @@ int turn_on_led_alert(){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -63,7 +64,7 @@ int turn_off_led_alert(){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -77,7 +78,7 @@ int turn_on_led_alert_timer(unsigned long sec){
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TIME_LED, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -91,7 +92,7 @@ int turn_on_buzzer(){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_ON, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -104,7 +105,7 @@ int turn_off_buzzer(){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_OFF, NULL);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -117,7 +118,7 @@ int turn_on_buzzer_timer(unsigned long sec){
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_TIME, sec);
     if(ret < 0){
-        pritnf("failed\n");
+        printf("failed\n");
         close(fd);
         return -1;
     }
@@ -126,25 +127,55 @@ int turn_on_buzzer_timer(unsigned long sec){
 }
  
 /*
-	motor turn on
-	counter-clockwise 180 -> clockwise 360 -> counter-clockwise 360
+    prinkler lib
+    on
+    off 
+    timer - can but after finish kernel panic (bad pc value)
 */
-int turn_on_motor(){
-	int ret;
-	ret = open("/dev/motor_dev", O_RDWR);
-	return ret;
+int turn_on_sprinkler(){
+	int fd_m, fd_w;
+    fd_m = open("/dev/motor", O_RDWR);
+    fd_w = open("/dev/water_pump", O_RDWR);
+    /* motor running */
+    ioctl(fd_m, MOTOR_ON, 0);    
+    /* water_pump running */
+    ioctl(fd_w, PUMP_ON, 0);
+
+    close(fd_m);    
+    close(fd_w);
 }
 
-/*turn off motor*/
-int turn_off_motor(int fd){
-	int ret;
-	ret = close(fd);
-	return ret;
+int turn_off_sprinkler(){
+	int fd_m, fd_w;
+    fd_m = open("/dev/motor", O_RDWR);
+    fd_w = open("/dev/water_pump", O_RDWR);
+    /* motor stop */
+    ioctl(fd_m, MOTOR_OFF, 0);    
+    /* water_pump stop */
+    ioctl(fd_w, PUMP_OFF, 0);
+
+    close(fd_m);    
+    close(fd_w);
 }
+/* kernel panic */
+int timer_sprinkler(unsigned long sec){
+	int fd_m, fd_w;
+    fd_m = open("/dev/motor", O_RDWR);
+    fd_w = open("/dev/water_pump", O_RDWR);
+    /* motor stop */
+    ioctl(fd_m, MOTOR_TIMER, sec);    
+    /* water_pump stop */
+    ioctl(fd_w, PUMP_TIMER, sec);
+
+    close(fd_m);    
+    close(fd_w);
+}
+
 
 
 /* camera snapshot */
-int snapshot(void){
+int snapshot(char *file_name){
+    int status, ret;
     pid_t pid;
     pid = fork();
     
@@ -155,11 +186,18 @@ int snapshot(void){
     }
     else if(pid == 0){
         /* child process */
-        execl("snapshot.sh", "10230", NULL);
+        execl("/bin/sh", "sh", "./snapshot.sh", file_name, NULL);
     }
     else{
         /* parents process */
         printf("return pid(%d)\n", pid);
+        printf("wait...\n");
+        ret = wait(&status);    
+        if(ret < 0){
+            printf("failed child exit\n");
+            return -1;
+        }
+        printf("snapshot success\n");
         return pid;
     }
 }

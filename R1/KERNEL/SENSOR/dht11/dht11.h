@@ -4,8 +4,9 @@
 #include <linux/gpio.h>
 #include <linux/delay.h>
 #include <linux/cdev.h>
+#include <linux/uaccess.h>
 
-#define DEV_NAME "dht11"
+#define DEV_NAME "dht11_dev"
 
 #define MAX_TIMING 85
 #define DHT 21
@@ -13,7 +14,7 @@
 /*
 	function : dht11 on
 */
-static void dht11_read(void);
+static void dht_read(void);
 /*
 	function : dht11 repeat 
 */

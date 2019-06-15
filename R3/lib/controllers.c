@@ -1,148 +1,121 @@
 #include "controllers.h"
 
 int save_data(char type, char *data){
-	FILE *fp;
+	FILE *fp = NULL;
 	int size;
 
-	switch(type){
-
-		case 'l':
-			fp = fopen("light.txt", "a+");
-			if(fp < 0){
-				printf("File open Fail!!\n");
-				return -1;
-			}
-			fseek(fp, 0L, SEEK_END);
-			size = ftell(fp);
-
-			if (size == 0)
-				fprintf(fp, "%s", data);
-			else
-				fprintf(fp, "\n%s", data);
-			//fwrite(data1, 1, sizeof(data1), fp);
-			//fputs(data1, fp);
-
-			fclose(fp);
-
-			return 0;
+	if(type == 'l')
+		fp = fopen("light.txt", "a+");
+	else if(type == 's')
+		fp = fopen("soil.txt", "a+");
+	else if(type == 'a')
+		fp = fopen("alert_log.txt", "a+");
+	else
+		return -1;
 	
-		case 's':
-			fp = fopen("soil.txt", "a+");
-			if(fp < 0){
-				printf("File open Fail!!\n");
-				return -1;
-			}
-			fseek(fp, 0L, SEEK_END);
-			size = ftell(fp);
-
-			if (size == 0)
-				fprintf(fp, "%s", data);
-			else
-				fprintf(fp, "\n%s", data);
-			//fwrite(data1, 1, sizeof(data1), fp);
-			//fputs(data1, fp);
-
-			fclose(fp);
-
-			return 0;
-
-		case 'a':
-			fp = fopen("alert_log.txt", "a+");
-			if(fp < 0){
-				printf("File open Fail!!\n");
-				return -1;
-			}
-			fseek(fp, 0L, SEEK_END);
-			size = ftell(fp);
-
-			if (size == 0)
-				fprintf(fp, "%s", data);
-			else
-				fprintf(fp, "\n%s", data);
-			//fwrite(data1, 1, sizeof(data1), fp);
-			//fputs(data1, fp);
-
-			fclose(fp);
-
-			return 0;
-
-			/*
-		case DIST:
-			FILE *fp = fopen("ulsn.txt", "w");
-			fputs(data, fp);
-			fclose(fp);
-
-			return 0;
-			*/
-
-		default:
-			return -1;
+	if(fp < 0){
+		printf("File open Fail!!\n");
+		return -1;
 	}
+
+	fseek(fp, 0L, SEEK_END);
+	size = ftell(fp);
+
+	if (size == 0)
+		fprintf(fp, "%s", data);	
+	else
+		fprintf(fp, "\n%s", data);
+	
+	fclose(fp);
+
+	return 0;	
 }
 
-char* refine_data(char type, char cmd){
-	//char *buffer = malloc(sizeof(char) * 20);
-	//char *dArr[10] = { NULL, };
-	FILE *fp;
+char* refine_data(char type, char cmd, char* data){
+	FILE *fp = NULL;
 	int temp = 0;
 	int lines = 0;
-	char s[81];
-	static char s1[10];
+	int rcv_data, i;
+	char read_one_line[DATA_LEN] = {0, }; /* temporary for reading text file */
+	static char return_data[DATA_LEN];
 
-	if(type == 'l'){
+	rcv_data = atoi(data);
+
+	if(type == 'l')
 		fp = fopen("light.txt", "r");
-
-		if(cmd == 'v'){
-
-			/* Count num of Lines */
-			fseek(fp, 0L, SEEK_SET);
-			while(!feof(fp)){
-				fgets(s, 80, fp);
-				lines++;
-			}
-			printf("Lines : %d\n", lines);
-
-			/* Extract Data  */
-			fseek(fp, 0L, SEEK_SET);
-			while(!feof(fp)){
-				fgets(s, 80, fp);
-				lines--;
-				if(lines < 10) {
-					printf("s : %s\n", s);
-					temp += atoi(s);
-				}
-			}
-			sprintf(s1, "%d", temp);
-			printf("abc : %s\n", s1);
-
-			return s1;
-		}
-
-		else if(cmd == 'a'){
-
-		}
-		else if(cmd == 's'){
-			
-		}
-	}
-	else if(type == 's'){
+	else if(type == 's')
 		fp = fopen("soil.txt", "r");
-
-		if(cmd == 'v'){
-
-		}
-		else if(cmd == 'a'){
-
-		}
-		else if(cmd == 's'){
-
-		}
-	}
-	else if(type == 'a'){
+	else if(type == 'a')
 		fp = fopen("alert_log.txt", "r");
+	else{
+		return_data[0] = '\0';
+		return_data[0] = 'f';
+		return_data[1] = 'a';
+		return_data[2] = 'i';
+		return_data[3] = 'l';
+		return_data[4] = '0';
+		printf("return_data(fail) : %s\n", return_data);
 
+		return return_data;
+	}
+
+	/* Count num of Lines */
+	fseek(fp, 0L, SEEK_SET);
+	while(!feof(fp)){
+		fgets(read_one_line, (DATA_LEN - 1), fp);
+		lines++;
+	}
+
+	printf("Lines : %d\n", lines);
+	if(rcv_data > lines){
+		return_data[0] = '\0';
+		return_data[0] = 'f';
+		return_data[1] = 'a';
+		return_data[2] = 'i';
+		return_data[3] = 'l';
+		return_data[4] = '1';
+		
+		return return_data;
+	}
+
+	if(cmd == 'a'){	
+		return_data[0] = '\0';
+		/* Extract Data */
+		fseek(fp, 0L, SEEK_SET);
+		while(!feof(fp)){
+			fgets(read_one_line, (DATA_LEN - 1), fp);
+			lines--;
+			if(lines >= 0 && lines < rcv_data) {
+				printf("DATA : %s\n", read_one_line);
+				temp += atoi(read_one_line);
+			}
+		}
+		temp = temp / rcv_data;
+		sprintf(return_data, "%d", temp);	//itoa
+		printf("return_data : %s\n", return_data);
+	}
+	else if(cmd == 'v'){
+		return_data[0] = '\0';
+		/* Extract Data */
+		fseek(fp, 0L, SEEK_SET);
+		while(!feof(fp)){
+			fgets(read_one_line, (DATA_LEN - 1), fp);
+			lines--;
+			if(lines >= 0 && lines < rcv_data) {
+				strncat(return_data, read_one_line, strlen(read_one_line));
+			}
+		}
+		printf("return_data : %s\n", return_data);
 	}
 	else{
-		
+		return_data[0] = '\0';
+		return_data[0] = 'f';
+		return_data[1] = 'a';
+		return_data[2] = 'i';
+		return_data[3] = 'l';
+		return_data[4] = '2';
+		printf("Failed because cmd is not 'a' or 'v'\n");
 	}
+
+	return return_data;
 }

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #define _CRT_SECURE_NO_WARNINGS
+#define DATA_LEN 10
 
 /*
 #define START_NUM 0x80
@@ -23,4 +24,5 @@
 */
 
 int save_data(char type, char* data);
-char* refine_data(char type, char cmd);
+char* refine_data(char type, char cmd, char* data);
+//void refine_data(char type, char cmd, char* data);

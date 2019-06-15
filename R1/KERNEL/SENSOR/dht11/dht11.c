@@ -34,7 +34,7 @@ static void dht_read(void){
 		gpio_direction_input(DHT);
 	
 		for(i = 0;i < MAX_TIMING; i++){
-			counter++;
+			counter = 0;
 			while(gpio_get_value(DHT) == last_state){
 				counter++;
 				udelay(1);
@@ -69,17 +69,17 @@ static int dht11_read(struct file *file, char *buf, size_t len, loff_t *lof){
 	int ret;
 	dht_read();
 	printk("Humidity:%d.%d Temperature = %d.%dC \n", dht11_data[0], dht11_data[1], dht11_data[2], dht11_data[3]);
-	ret = copy_to_user(buf,dht11_data[2],sizeof(int));
+	ret = copy_to_user(buf,&dht11_data[2],sizeof(int));
 	
 	return 0;
 }
 
-static dht11_open(struct inode *inode, struct file *file){
+static int dht11_open(struct inode *inode, struct file *file){
 
 	return 0;
 }
 
-static dht11_release(struct inode *inode, struct file *file){
+static int dht11_release(struct inode *inode, struct file *file){
 	
 	return 0;
 }
@@ -87,7 +87,7 @@ static dht11_release(struct inode *inode, struct file *file){
 struct file_operations dht11_fops = {
 	.open = dht11_open,
 	.release = dht11_release,
-	.read = dht11_read
+	.read = dht11_read,
 };
 
 static int __init dht11_init(void){
