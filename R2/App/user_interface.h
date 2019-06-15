@@ -5,7 +5,12 @@
 #include "../lib/KSF_NET/ksf_net_lib.h"
 
 #define BUF 1024
+#define true 1
+#define false 0
 
+void send_sprinkler_signal(int socket, int sig);
+
+void send_led_signal(int socket, int sig);
 
 void request_soil_recent_to_r3(int socket, char* str);
 
