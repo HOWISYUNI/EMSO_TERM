@@ -68,7 +68,13 @@ char* refine_data(char type, char cmd, char* data){
 		lines++;
 	}
 
-	printf("Lines : %d\n", lines);
+	if(type == 'l')
+		printf("light.txt - Lines : %d\n", lines);
+	else if(type == 's')
+		printf("soil.txt - Lines : %d\n", lines);
+	else if(type == 'a')
+		printf("alert.txt - Lines : %d\n", lines);
+	
 	if(rcv_data > lines){
 		return_data[0] = '\0';
 		return_data[0] = 'f';
@@ -91,13 +97,25 @@ char* refine_data(char type, char cmd, char* data){
 			fgets(read_one_line, (DATA_LEN - 1), fp);
 			lines--;
 			if(lines >= 0 && lines < rcv_data) {
-				printf("DATA : %s\n", read_one_line);
+				if(type == 'l')
+					printf("Light DATA : %s\n", read_one_line);
+				else if(type == 's')
+					printf("Soil DATA : %s\n", read_one_line);
+				else if(type == 'a')
+					printf("Alert DATA : %s\n", read_one_line);
+
 				temp += atoi(read_one_line);
 			}
 		}
 		temp = temp / rcv_data;
 		sprintf(return_data, "%d", temp);	//itoa
-		printf("return_data : %s\n", return_data);
+
+		if(type == 'l')
+			printf("Average Light Data: %s\n", return_data);
+		else if(type == 's')
+			printf("Average Soil Data: %s\n", return_data);
+		else if(type == 'a')
+			printf("Average Alert Data: %s\n", return_data);
 	}
 	else if(cmd == 'v'){
 		return_data[0] = '\0';
@@ -110,7 +128,12 @@ char* refine_data(char type, char cmd, char* data){
 				strncat(return_data, read_one_line, strlen(read_one_line));
 			}
 		}
-		printf("return_data : %s\n", return_data);
+		if(type == 'l')
+			printf("Light data : %s\n", return_data);
+		else if(type == 's')
+			printf("Soil data : %s\n", return_data);
+		else if(type == 'a')
+			printf("Alert data : %s\n", return_data);
 	}
 	else{
 		return_data[0] = '\0';
