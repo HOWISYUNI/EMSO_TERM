@@ -8,17 +8,8 @@
 #include <linux/errno.h>
 #include <linux/fcntl.h>
 #include <linux/uaccess.h>
-
-
-
+#include "../../devices.h"
 MODULE_LICENSE("GPL");
-
-#define MOSI 10
-#define MISO 9
-#define SCLK 11
-#define CE0 7
-
-#define DEV_NAME "soil_sensor_dev"
 
 #define MAX_CLK 12
 static dev_t dev_num;
@@ -29,7 +20,7 @@ static int soil_data;
 * light_sensor로 부터 값을 받기 위해 start 신호 등등을 보내는 함수.
 */
 void start_mcp(void){
-	gpio_direction_output(CE0,0);
+	gpio_direction_output(CE1,0);
 	
 	gpio_direction_output(SCLK,1);
 	udelay(1);
@@ -88,7 +79,7 @@ void start_soil_sensor(void){
 	}
 	gpio_direction_output(SCLK,0);
 	udelay(1);
-	gpio_direction_output(CE0,1);
+	gpio_direction_output(CE1,1);
 }
 /*
 * Parameter : File Description, Buffer(int), lenght(sizeof(int))
@@ -127,7 +118,7 @@ struct file_operations soil_sensor_fops =
 
 static int __init soil_sensor_init(void) {
 
-	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
+	alloc_chrdev_region(&dev_num, 0, 1, DEV_SOIL);
 	cd_cdev = cdev_alloc();
 	cdev_init(cd_cdev, &soil_sensor_fops);
 	cdev_add(cd_cdev, dev_num, 1);
@@ -135,7 +126,7 @@ static int __init soil_sensor_init(void) {
 	gpio_request_one(MOSI, GPIOF_OUT_INIT_LOW,"Master Out/ Slave In");
 	gpio_request_one(MISO, GPIOF_OUT_INIT_LOW,"Master In/Slave Out");
 	gpio_request_one(SCLK, GPIOF_OUT_INIT_LOW,"SCLK");
-	gpio_request_one(CE0, GPIOF_OUT_INIT_LOW,"CE0");
+	gpio_request_one(CE1, GPIOF_OUT_INIT_LOW,"CE1");
 	start_soil_sensor();
 	
 
@@ -146,7 +137,7 @@ static void __exit soil_sensor_exit(void){
 	gpio_free(MOSI);
 	gpio_free(MISO);
 	gpio_free(SCLK);
-	gpio_free(CE0);
+	gpio_free(CE1);
 	cdev_del(cd_cdev);
 	unregister_chrdev_region(dev_num, 1);
 }

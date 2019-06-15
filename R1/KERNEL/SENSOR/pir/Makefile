@@ -8,7 +8,7 @@ default:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
 
 copy:
-	scp pir.ko mknod.sh pi@10.10.10.13:~/TP/pir
+	scp pir.ko pir_mknod.sh pi@10.10.10.13:~/ku_smart_farm/modules
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
