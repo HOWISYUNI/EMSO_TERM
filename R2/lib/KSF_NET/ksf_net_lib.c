@@ -58,6 +58,8 @@ struct response request(int sock, char method, char type, char cmd, unsigned lon
     req.len = len;
     strcpy(req.data, data);
 
+    printf("request : %c %c %c %ld %s\n", req.method, req.type, req.cmd, req.len, req.data);
+    
     /* send request */
     ret = write(sock, &req, sizeof(struct request));
     if(ret < 0){
@@ -67,6 +69,8 @@ struct response request(int sock, char method, char type, char cmd, unsigned lon
         strcpy(rsp.data, "send request fail\n");
         return rsp;
     }
+
+    printf("request success\n");
     
     /* maybe wait until receive response */
     ret = read(sock, &rsp, sizeof(struct response));
@@ -77,6 +81,8 @@ struct response request(int sock, char method, char type, char cmd, unsigned lon
         strcpy(rsp.data, "receive response fail\n");
         return rsp;
     }
+    
+    printf("response : %c %ld %s\n", rsp.type, rsp.len, rsp.data);
 
     return rsp;
 }
@@ -84,7 +90,8 @@ struct response request(int sock, char method, char type, char cmd, unsigned lon
 int client_close(int sock){
     int ret;
     ret = close(sock);
-    
+    if(ret < 0)
+        printf("client socket close failed\n");
     return ret;
 }
 
@@ -135,6 +142,8 @@ int server_close(int sock){
     int ret;
     
     ret = close(sock);
+    if(ret < 0)
+        printf("server socket close failed\n");
 
     return ret;
 }
@@ -157,8 +166,9 @@ int wait_request(int sock, struct request *req){
     
     /* read buffer net socket io queue */
     read(c_sock, req, sizeof(struct request));
-    printf("received\n");
-    
+
+    printf("request : %c %c %c %ld %s\n", req->method, req->type, req->cmd, req->len, req->data);
+
     return c_sock;
 }
 
@@ -173,7 +183,12 @@ int response(int c_sock, char type, unsigned long len, char *data){
     memset(rsp.data, 0, BUFF_SIZE);
     strcpy(rsp.data, data);
     
+    printf("response : %c %ld %s\n", rsp.type, rsp.len, rsp.data);
+    
     write(c_sock, &rsp, sizeof(struct response));
+
+    printf("response success\n");
+    
     close(c_sock);
 
     return 0;
