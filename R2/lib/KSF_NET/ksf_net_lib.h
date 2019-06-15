@@ -27,6 +27,7 @@
 #define R3_REF_PORT 3020  /* Server */
 #define LOCAL_HOST "127.0.0.1"
 #define LOCAL_PORT 4000
+#define BACK_LOG_N 4      /* backlog : number of queue can listen to connection  */
 #endif
 
 #ifndef KSF_NET_METHOD
@@ -49,7 +50,7 @@ struct response{
 #ifndef KSF_CLIENT_FUNC
 #define KSF_CLIENT_FUNC
 /* Client Function */
-int client_open(char *dest_ip, int port);
+int client_open(char *dest_ip, int port, long timeout);
 struct response request(int sock, char method, char type, char cmd, unsigned long len, char *data);
 int client_close(int sock);
 #endif

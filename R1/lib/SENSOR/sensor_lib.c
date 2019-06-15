@@ -55,16 +55,19 @@ Parameter : int dht11_data[4]   (습도 : dht11_data[0].dht11_data[1] / 온도 :
 Return : void
 
 */
-void read_dht11_sensor(int dht11_data[])
+int read_dht11_sensor()
 {
 	int dev;
 	int ret;
+	int dht11_data;
 
 	dev = open("/dev/dht11_dev",O_RDWR);
 	
-	ret=read(dev,dht11_data,4*sizeof(int));
+	ret=read(dev,&dht11_data,sizeof(int));
 	
 	ret = close(dev);
+
+	return dht11_data;
 
 }
 
@@ -73,11 +76,11 @@ void read_dht11_sensor(int dht11_data[])
 	pir이나 ultrasonic 센서의 경우 시나리오상 한번씩 실행 되는 것이 아니라 계속 켜저서 값이 어느정도 이하 일 때, Interrupt가 	발생함.
 */
 
-/*	open_pir_senser()
+/* pir_wait()
 
-Description : 모션을 감지하는 센서를 켜는 함수
+Description : PIR Sensor에서 
 Parameter : void
-Return : int dev (file description)
+Return : 모션이 감지되었을 경우 0 return
 
 */
 int pir_wait()
@@ -85,36 +88,13 @@ int pir_wait()
 	int dev;
 	int ret;
 
-	dev = open("/dev/pir_sensor_dev",O_RDWR);
-	ret = ioctl(dev, _IOWR('z', (0x80+1), unsigned long *), NULL);
+	dev = open("/dev/pir",O_RDWR);
+	ret = ioctl(dev, DETECT_WAIT, NULL);    /* be wait in queue until detected */
 	
 	close(dev);
 
-	if(ret == 0){
-		return 0;	
-	}
-	else{
-		return -1;
-	}
+	return ret;
 }
-
-/*	close_pir_senser()
-
-Description : 모션을 감지하는 센서를 끄는 함
-Parameter : int dev  (file description)
-Return : void
-
-*/
-
-/*
-void close_pir_sensor(int dev)
-{
-	int ret;
-
-	ret = close(dev);
-}
-*/
-
 
 /*	open_ultrasonic_senser()
 

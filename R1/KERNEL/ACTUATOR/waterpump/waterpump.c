@@ -1,4 +1,4 @@
-#include "waterpump.h"
+#include "sprinkler.h"
 
 MODULE_LICENSE("GPL");
 
@@ -28,22 +28,59 @@ void pump_off(void){
 
 }
 
-static int waterpump_open(struct inode *inode, struct file *file){
+static int sprinkler_open(struct inode *inode, struct file *file){
 	pump_on();
 	return 0;
 }
 
-static int waterpump_release(struct inode *inode, struct file *file){
+static int sprinkler_release(struct inode *inode, struct file *file){
 	pump_off();
 	return 0;
 }
 
-struct file_operations waterpump_fops = {
-	.open = waterpump_open,
-	.release = waterpump_release
+static long sprinkler(struct file *file, unsigned int cmd, unsigned long arg){
+		
+	switch(cmd){
+		case BUZZER_ON:
+		    del_timer(&timer);
+	    	timer.function = buzzer_me;
+        	timer.expires = jiffies + (HZ);
+        	add_timer(&timer);
+			gpio_set_value(BUZZER, 1);
+			break;
+
+		case BUZZER_OFF:
+		    del_timer(&timer);
+			gpio_set_value(BUZZER, 0);
+			break;
+			
+		case BUZZER_TIME:
+		    del_timer(&timer);
+		    timer.function = buzzer_me;
+        	timer.expires = jiffies + (HZ);
+        	add_timer(&timer);
+			gpio_set_value(BUZZER, 1);
+			
+		    del_timer(&end_timer);
+			end_timer.function = timer_buzzer;
+			end_timer.expires = jiffies + (arg*HZ);
+		    add_timer(&end_timer);
+		    break;
+		    
+		default:
+			return -1;
+	}
+
+	return 0;
+}
+
+struct file_operations sprinkler_fops = {
+	.open = sprinkler_open,
+	.release = sprinkler_release,
+	.unlocked_ioctl = sprinkler
 };
 
-static int __init simple_waterpump_init(void){
+static int __init sprinkler_init(void){
 
 	gpio_request_one(WATERPUMP_A, GPIOF_OUT_INIT_LOW, "WATERPUMP_A");
 	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_LOW, "WATERPUMP_B");
@@ -52,7 +89,7 @@ static int __init simple_waterpump_init(void){
 
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_NAME);
 	cd_cdev = cdev_alloc();
-	cdev_init(cd_cdev, &waterpump_fops);
+	cdev_init(cd_cdev, &sprinkler_fops);
 	cdev_add(cd_cdev, dev_num, 1);
 
 	///*test 바로 지우셈
@@ -72,7 +109,7 @@ static int __init simple_waterpump_init(void){
 	return 0;
 }
 
-static void __exit simple_waterpump_exit(void){
+static void __exit sprinkler_exit(void){
 
 	cdev_del(cd_cdev);
 	unregister_chrdev_region(dev_num, 1);
@@ -84,5 +121,5 @@ static void __exit simple_waterpump_exit(void){
 	gpio_free(WATERPUMP_B);
 }
 
-module_init(simple_waterpump_init);
-module_exit(simple_waterpump_exit);
+module_init(sprinkler_init);
+module_exit(sprinkler_exit);
