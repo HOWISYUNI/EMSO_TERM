@@ -34,7 +34,7 @@ static void dht_read(void){
 		gpio_direction_input(DHT);
 	
 		for(i = 0;i < MAX_TIMING; i++){
-			counter++;
+			counter = 0;
 			while(gpio_get_value(DHT) == last_state){
 				counter++;
 				udelay(1);
