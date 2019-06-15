@@ -18,6 +18,7 @@
 #define MOTOR_C 19     /* motor */
 #define DHT 21         /* dht11 */
 #define MOTOR_D 26     /* motor */
+#define BUZZER 25      /* buzzer*/
 #define WATERPUMP_A 12   /*waterpump */
 #define WATERPUMP_B 24    /*waterpump*/
 ```
