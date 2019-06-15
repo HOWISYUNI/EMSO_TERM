@@ -10,6 +10,7 @@
 #define LED_ALERT 5    /* led_alert */
 #define MOTOR_A 6      /* motor */
 #define CE0 8          /* light */
+#define CE1 7          /* soil */
 #define MISO 9         /* light */
 #define MOSI 10        /* light */
 #define SCLK 11        /* light */
@@ -21,6 +22,8 @@
 #define BUZZER 25      /* buzzer*/
 #define WATERPUMP_A 12   /*waterpump */
 #define WATERPUMP_B 24    /*waterpump*/
+#define TRIG 23
+#define ECHO 27
 ```
 
 ## Device name
