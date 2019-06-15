@@ -8,7 +8,7 @@ default:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
 
 copy:
-	scp dht11.ko mknod.sh pi@10.10.10.13:~/emso/TP/dht11
+	scp dht11.ko dht11_mknod.sh pi@10.10.10.13:~/ku_smart_farm
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean

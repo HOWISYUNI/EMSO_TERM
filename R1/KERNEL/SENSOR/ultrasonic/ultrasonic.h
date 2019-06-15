@@ -7,12 +7,7 @@
 #include <linux/delay.h>
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
-
-#define DEV_NAME "ultrasonic_dev"
-
-#define TRIG 6
-#define ECHO 26	
-
+#include "../../devices.h"
 
 /* function : Start to measure distance
  * parameter : inode, file
