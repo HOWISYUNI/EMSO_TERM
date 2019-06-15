@@ -12,7 +12,8 @@ static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
         case DETECT_WAIT:
             enable_irq(irq_num);
             detect = FALSE;
-            wait_event(wq, detect == FALSE); /* wake up when detected from isr */
+            printk("wait!\n");
+            wait_event(wq, detect == TRUE); /* wake up when detected from isr */
             disable_irq(irq_num);
             return 0;
             
@@ -28,6 +29,7 @@ struct file_operations pir_fops =
 
 static irqreturn_t pir_isr(int irq, void* dev_id){
 	detect = TRUE;
+	printk("wake up!\n");
 	wake_up(&wq);
 
 	return IRQ_HANDLED;
