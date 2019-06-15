@@ -54,6 +54,8 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '0';
+		return_data[5] = '\0';
+		return_data[6] = '\0';
 		printf("return_data(fail0) : %s\n", return_data);
 
 		return return_data;
@@ -74,6 +76,8 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '1';
+		return_data[5] = '\0';
+		return_data[6] = '\0';
 		printf("return_Data(fail1) : %s\n", return_data);
 
 		return return_data;
@@ -115,6 +119,8 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[2] = 'i';
 		return_data[3] = 'l';
 		return_data[4] = '2';
+		return_data[5] = '\0';
+		return_data[6] = '\0';
 		printf("Failed because cmd is not 'a' or 'v'(fail2) : %s\n",return_data);
 	}
 
