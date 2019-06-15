@@ -19,21 +19,24 @@ int wait_for_pir(){
 
 
 /*거리 재는 함수*/
-int get_ultrasonic(){
+int get_ultrasonic(int dev){
 	int dist;
-	dist = open_ultrasonic_sensor();
+	dist = read_ultrasonic_sensor(dev);
 	
 	return dist;
 }
 
 
-
 int main(){
 	int time = 0;
+	int dev;
+	dev=open_ultrasonic_sensor();
 
+	printf("dev : %d\n",dev);
+	/*
 	while(1){
-			/*PIR 예훈이가 짜야 짠다*/
 			if(wait_for_pir()==0){
+			printf("detected.\n");
 				while(time<=10){
 					time=(clock()/CLOCKS_PER_SEC);
 					printf("distance : %d\n",get_ultrasonic());
@@ -42,8 +45,16 @@ int main(){
 						break;	
 					}
 				}
+			}else{
+				printf("distance : %d\n",get_ultrasonic());
 			}
 		}	
+	*/
+	time = get_ultrasonic(dev);
+	sleep(4);
+	printf("distance : %d\n", time);
+	
+	close_ultrasonic_sensor(dev);
 
 	return 0;	
 }

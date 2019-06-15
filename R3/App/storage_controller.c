@@ -11,7 +11,7 @@ int main(){
 	struct request *req;
 
 	req = (struct request*)malloc(sizeof(struct request));
-	sock = server_open(3010);
+	sock = server_open(R3_STG_PORT);
 	while(1){
 		printf("Wait!!\n");		
 		c_sock = wait_request(sock, req);		/* 데이터 수신 대기 */
@@ -20,15 +20,18 @@ int main(){
 		if(req->cmd == 's'){		//method??
 			ret = save_data(req->type, req->data);
 			if(ret < 0){
-				ret = response(c_sock, 'f', 0 , "Failed not save_data func");
+				ret = response(c_sock, 'f', 0, "Failed not save_data func");
 			}
-			ret = response(c_sock, 's', 0, suc);
+			else{
+				ret = response(c_sock, 's', 0, suc);
+			}
 		}
 		else{
-			ret = response(c_sock, 'f', 0 , "Failed not save");
+			ret = response(c_sock, 'f', 0 , "cmd data is strange");
 		}
-		sleep(5);
+		sleep(3);
 	}
+	free(req);
 	server_close(sock);
 	
 	return 0;
