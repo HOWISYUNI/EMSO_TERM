@@ -86,32 +86,6 @@ static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long a
 	int i = 0;		
 	int d = (int)arg;
 	switch(cmd){
-		/*case SPRINKLER_ON:
-		    del_timer(&timer);
-	    	timer.function = buzzer_me;
-        	timer.expires = jiffies + (HZ);
-        	add_timer(&timer);
-			gpio_set_value(BUZZER, 1);
-			break;
-
-		case sprinkler_OFF:
-		    del_timer(&timer);
-			gpio_set_value(BUZZER, 0);
-			break;
-			
-		case sprinkler_TIME:
-		    del_timer(&timer);
-		    timer.function = buzzer_me;
-        	timer.expires = jiffies + (HZ);
-        	add_timer(&timer);
-			gpio_set_value(BUZZER, 1);
-			
-		    del_timer(&end_timer);
-			end_timer.function = timer_buzzer;
-			end_timer.expires = jiffies + (arg*HZ);
-		    add_timer(&end_timer);
-		    break;*/
-
 		//jinhoski가 구현한부분
 		case SPRINKLER_ON:
 			gpio_set_value(WATERPUMP_A, 1);
@@ -123,7 +97,7 @@ static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long a
 		case SPRINKLER_OFF:
 		   	gpio_set_value(WATERPUMP_A, 0);
 			gpio_set_value(WATERPUMP_B, 0);
-			
+			break;	
 		case SPRINKLER_DELAY:
 			gpio_set_value(WATERPUMP_A, 1);
             		gpio_set_value(WATERPUMP_B, 0);
@@ -134,6 +108,7 @@ static long sprinkler_ioctl(struct file *file, unsigned int cmd, unsigned long a
 			}
 			gpio_set_value(WATERPUMP_A, 0);
 			gpio_set_value(WATERPUMP_B, 0);
+			break;
 		default:
 			return -1;
 	}

@@ -9,32 +9,38 @@ int main(void){
 	int c_sock;		/* client server sock */
 	int flag;
 
-	//struct response rsp;
 	struct request *req;
-
 	unsigned long data_len;
 	char *data;
 
 	req = (struct request*)malloc(sizeof(struct request));
-	//data = (char*)malloc(BUFF_SIZE);
 
 	srv = server_open(R3_REF_PORT);		//3020
+
 	while(1){
-		
 		printf("Wait!!\n");
 		c_sock = wait_request(srv, req);
-		printf("type : %c\n", req->type);
-		printf("cmd : %c\n", req->cmd);
-
+	
 		flag = 0;
 		if(req->method == 'G'){
 			printf("Come here!!\n");
-			//refine_data(req->type, req->cmd, data);
-			//refine_data('l', 'v', data);
+
 			data = refine_data(req->type, req->cmd, req->data);
-			if(data == "fail"){
+			if(strcmp(data, "fail0") == 0){
 				flag = 1;
 				response(c_sock, 'f', 0, "Failed wrong type");
+			}
+			if(strcmp(data, "fail1") == 0){
+				flag = 1;
+				response(c_sock, 'f', 0, "Your data is too many than my txt file");
+			}
+			if(strcmp(data, "fail2") == 0){
+				flag = 1;
+				response(c_sock, 'f', 0, "Failed wrong cmd");
+			}
+			if(strcmp(data, "fail3") == 0){
+				flag = 1;
+				response(c_sock, 'f', 0, "Your data is empty");
 			}
 			if(flag == 0){
 				printf("data : %s\n", data);
@@ -49,7 +55,7 @@ int main(void){
 			response(c_sock, 'f', 0, "Failed not refine");
 			printf("Fail to send!!\n");
 		}
-		sleep(2);
+		sleep(1);
 	}
 	free(req);
 	free(data);
