@@ -13,38 +13,40 @@ static int echo_flag = 0;
 //static ktime_t start;
 //static ktime_t stop;
 
-static int ultrasonic_open(struct inode *inode, struct file *file) {
-	
-	return 0;
-}
-
-static int ultrasonic_release(struct inode *inode, struct file* file){
-	disable_irq(irq_num);
-
-	return 0;
-}
-
-static int ultrasonic_read(struct file *file, char *buf, size_t len, loff_t *lof){
-	int ret;
-	enable_irq(irq_num);
- 
+int ultrasonic_go(void){
 	count = 0;
 	gpio_set_value(TRIG, 1);
 	udelay(10);
 	gpio_set_value(TRIG, 0);
 	echo_flag = 0;
-  
+  	
 	while(echo_flag == 0){
 		count++;
 		udelay(1);
 	}
- 
+ 	printk("count : %d\n",count);
 	dist = (34000 * count) / 2000000;
 
-	ret = copy_to_user(buf, &dist, sizeof(int));
+	return dist;
+}
+
+
+
+
+
+
+static int ultrasonic_read(struct file *file, char *buf, size_t len, loff_t *lof){
+	int ret;
+	int value;
+	//enable_irq(irq_num);
+ 	printk("read starto\n");
+	
+	value=ultrasonic_go();
+	ret = copy_to_user(buf, &value, sizeof(int));
 	if(ret < 0){
 		return -1;
 	}
+	
 
 	return 0;
 }
@@ -62,12 +64,13 @@ static irqreturn_t ultrasonic_isr(int irq, void* dev_id){
 			echo_flag = 1;
 		}
 	}
+
+	//printk("Important ! \n");
 	return IRQ_HANDLED;
 }
 
 struct file_operations ultrasonic_fops = {
-	.open = ultrasonic_open,
-	.release = ultrasonic_release,
+	
 	.read = ultrasonic_read,
 };
 

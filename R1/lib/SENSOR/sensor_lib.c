@@ -106,13 +106,25 @@ Return : int dev (file description)
 int open_ultrasonic_sensor()
 {
 	int dev;
+	int ulsn_value = 0;
+	dev = open("/dev/ultrasonic_dev",O_RDWR);
+	
+	
+	return dev;
+}	
+void close_ultrasonic_sensor(int dev)
+{
+	int ret;
+
+	ret=close(dev);	
+}
+int read_ultrasonic_sensor(int dev)
+{
 	int ret;
 	int ulsn_value = 0;
 
-	dev = open("/dev/ultrasonic_sensor_dev",O_RDWR);
 	ret = read(dev, &ulsn_value, sizeof(int));
 	
-	close(dev);
 	
 	return ulsn_value;
 }
@@ -125,9 +137,4 @@ Return : void
 
 */
 
-void close_ultrasonic_sensor(int dev)
-{
-	int ret;
 
-	ret = close(dev);
-}

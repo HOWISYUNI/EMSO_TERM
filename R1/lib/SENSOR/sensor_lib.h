@@ -21,6 +21,7 @@ int open_pir_sensor();
 void close_pir_sensor(int dev);
 
 int open_ultrasonic_sensor();
+int read_ultrasonic_sensor(int dev);
 void close_ultrasonic_sensor(int dev);
 
 int pir_wait();

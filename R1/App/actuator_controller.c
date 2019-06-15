@@ -19,6 +19,7 @@
 */
 void send_response(char type);
 static int socket_r2;
+static int c_socket;
 
 int main(void){
 	
@@ -30,7 +31,7 @@ int main(void){
 
 	/*요청 대기*/
 	while(1){
-		int ret = wait_request(socket_r2,&rcv);
+		c_socket = wait_request(socket_r2,&rcv);
 
 		if(rcv.type == 'l'){	/*광합성용 LED */
 			if(rcv.cmd == '1'){
@@ -183,7 +184,7 @@ void send_response(char type){
 	rsp.len = 0;
 	strcpy(rsp.data, "\n");
 
-	if(response(socket_r2, rsp.type, rsp.len, rsp.data)<0){
+	if(response(c_socket, rsp.type, rsp.len, rsp.data)<0){
 		/*Error*/
 	}
 	

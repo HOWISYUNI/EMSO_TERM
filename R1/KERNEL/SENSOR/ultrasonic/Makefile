@@ -8,7 +8,7 @@ default:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
 
 copy:
-	scp dht11.ko mknod.sh pi@10.10.10.13:~/emso/TP/led
+	scp ultrasonic.ko mknod.sh pi@10.10.10.13:~/TP/ultrasonic
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean
