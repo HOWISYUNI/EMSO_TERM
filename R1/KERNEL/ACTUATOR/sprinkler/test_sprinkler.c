@@ -27,7 +27,6 @@ int main(void)
 	int status;
 	pid_t pid;
 	pid=fork();
-	fd = open("/dev/sprinlker", O_RDWR);
 	while(1){
 		a=0;
 		b=0;
@@ -71,44 +70,43 @@ int main(void)
 			wait(&status);
 		}
 	}
-	close(fd);
 	return 0;
 }
 
 int turn_on_sprinkler(){
 //    int fd, ret;
-//    fd = open("/dev/sprinlker", O_RDWR);
+    fd = open("/dev/sprinlker", O_RDWR);
     ret = ioctl(fd, SPRINKLER_ON, NULL);
     if(ret < 0){
         printf("failed\n");
-//        close(fd);
+        close(fd);
         return -1;
     }
-//    close(fd);
+    close(fd);
     return 0;
 }
 int turn_off_sprinkler(){
 //    int fd, ret;
-//    fd = open("/dev/sprinlker", O_RDWR);
+    fd = open("/dev/sprinlker", O_RDWR);
     ret = ioctl(fd, SPRINKLER_OFF, NULL);
     if(ret < 0){
         printf("failed\n");
-//        close(fd);
+        close(fd);
         return -1;
     }
-//    close(fd);
+    close(fd);
     return 0;
 }
 
 int turn_on_sprinkler_timer(unsigned long sec){
 //    int fd, ret;
-//    fd = open("/dev/sprinkler", O_RDWR);
+    fd = open("/dev/sprinkler", O_RDWR);
     ret = ioctl(fd, SPRINKLER_DELAY, sec);
     if(ret < 0){
         printf("failed\n");
-//        close(fd);
+        close(fd);
         return -1;
     }
-//    close(fd);
+    close(fd);
     return 0;
 }

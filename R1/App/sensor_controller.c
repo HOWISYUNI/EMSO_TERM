@@ -22,7 +22,7 @@ int main(void){
 	int time=0;
 
 	/*소켓 초기화*/
-	socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
+
 	printf("시작\n");
 	pid=fork();
 	
@@ -34,16 +34,18 @@ int main(void){
 			printf("fork(1)\n");
 			while(1){
 				printf("보내는 거 시도!\n");
+				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);	
 				if(send_light_data_to_r2(socket_r2)<0){
 					/*send 실패*/
 					printf("light data send() failed.\n");
 				}
-				/*
+				client_close(socket_r2);
+				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 				if(send_soil_data_to_r2(socket_r2)<0){
-					/*send 실패/* /*
+					/*send 실패*/
 					printf("soil data send() failed.\n");					
 				}
-				*/
+				client_close(socket_r2);
 				printf("Sensor send() periodly.\n");
 				sleep(PERIOD);
 			}
@@ -62,9 +64,11 @@ int main(void){
 					while(time<=10){
 						time=(clock()/CLOCKS_PER_SEC);
 						if(get_ultrasonic()<ALERT_DISTANCE){
+							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 							if(send_alert_distance_data_to_r2(socket_r2, get_ultrasonic())<0){
 								/*send 실패*/
 							}
+							client_close(socket_r2);
 							break;	
 						}
 					}
@@ -74,10 +78,12 @@ int main(void){
 		else{
 			printf("fork(3)\n");			
 			while(1){
+				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 				if(send_alert_temperature_data_to_r2(socket_r2)<0){
 					/*send 실패*/
 					
 				}
+				client_close(socket_r2);
 				sleep(TEMPERATURE_PERIOD);
 			}			
 
@@ -86,7 +92,7 @@ int main(void){
 
 
 
-	client_close(socket_r2);
+	
 
 	return 0;
 }
