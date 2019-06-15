@@ -30,14 +30,20 @@
 #define BUZZER_OFF _IOWR(BUZZER_IOCTL_NUM, BUZZER_IOCTL_NUM2, unsigned long *)
 #define BUZZER_TIME _IOWR(BUZZER_IOCTL_NUM, BUZZER_IOCTL_NUM3, unsigned long *)
 /* Sprinkler */
-#define SPRINKLER_NUM 0x30
-#define SPRINKLER_IOCTL_NUM1 SPRINKLER_NUM+1
-#define SPRINKLER_IOCTL_NUM2 SPRINKLER_NUM+2
-#define SPRINKLER_IOCTL_NUM3 SPRINKLER_NUM+3
-#define SPRINKLER_IOCTL_NUM 'c'
-#define SPRINKLER_ON _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM1, unsigned long *)
-#define SPRINKLER_OFF _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM2, unsigned long *)
-#define SPRINKLER_TIME _IOWR(SPRINKLER_IOCTL_NUM, SPRINKLER_IOCTL_NUM3, unsigned long *)
+#define SPRNKLER 0x10
+#define SPRNKLER_NUM1 SPRNKLER+1
+#define SPRNKLER_NUM2 SPRNKLER+2
+#define SPRNKLER_NUM3 SPRNKLER+3
+#define SPRNKLER_NUM4 SPRNKLER+4
+#define SPRNKLER_NUM5 SPRNKLER+5
+#define SPRNKLER_NUM6 SPRNKLER+6
+#define SPRNKLER_NUM 'k'
+#define MOTOR_ON _IOWR(SPRNKLER_NUM, SPRNKLER_NUM1, unsigned long *)
+#define MOTOR_OFF _IOWR(SPRNKLER_NUM, SPRNKLER_NUM2, unsigned long *)
+#define MOTOR_TIMER _IOWR(SPRNKLER_NUM, SPRNKLER_NUM3, unsigned long *)
+#define PUMP_ON _IOWR(SPRNKLER_NUM, SPRNKLER_NUM4, unsigned long *)
+#define PUMP_OFF _IOWR(SPRNKLER_NUM, SPRNKLER_NUM5, unsigned long *)
+#define PUMP_TIMER _IOWR(SPRNKLER_NUM, SPRNKLER_NUM6, unsigned long *)
 /* LED & LED for ALERT */
 int turn_on_led();
 int turn_on_led_timer(unsigned long sec);
@@ -49,9 +55,10 @@ int turn_off_led_alert();
 int turn_on_buzzer();
 int turn_off_buzzer();
 int turn_on_buzzer_timer(unsigned long sec);
-
+/* Sprinkler */
+int turn_on_sprinkler();
+int turn_off_sprinkler();
+int timer_sprinkler(unsigned long sec);
 int read_light_sensor();
 
-int turn_on_motor();
-int turn_off_motor(int fd);
 int snapshot(void);
