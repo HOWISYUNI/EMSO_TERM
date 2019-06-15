@@ -32,27 +32,20 @@ int main(){
 	int dev;
 	dev=open_ultrasonic_sensor();
 
-	printf("dev : %d\n",dev);
-	/*
+	
 	while(1){
 			if(wait_for_pir()==0){
 			printf("detected.\n");
 				while(time<=10){
 					time=(clock()/CLOCKS_PER_SEC);
-					printf("distance : %d\n",get_ultrasonic());
-					if(get_ultrasonic()<ALERT_DISTANCE){
+					printf("distance : %d\n",get_ultrasonic(dev));
+					if(get_ultrasonic(dev)<ALERT_DISTANCE){
 						printf("%d\n",time);
 						break;	
 					}
 				}
-			}else{
-				printf("distance : %d\n",get_ultrasonic());
 			}
 		}	
-	*/
-	time = get_ultrasonic(dev);
-	sleep(4);
-	printf("distance : %d\n", time);
 	
 	close_ultrasonic_sensor(dev);
 
