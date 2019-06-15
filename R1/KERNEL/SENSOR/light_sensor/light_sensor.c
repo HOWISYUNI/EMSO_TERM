@@ -12,6 +12,7 @@
 MODULE_LICENSE("GPL");
 
 #define MAX_CLK 12
+#define CLOCK 10
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 static int light_data;
@@ -23,38 +24,38 @@ void start_mcp(void){
 	gpio_direction_output(CE0,0);
 	
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1); 
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 }
 
 void start_light_sensor(void){
@@ -64,21 +65,21 @@ void start_light_sensor(void){
 	gpio_direction_input(MISO);
 	start_mcp();
 	gpio_set_value(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 
 
 	for(i=0; i<MAX_CLK; i++){
 		gpio_direction_output(SCLK,0);
-		udelay(1);
+		udelay(CLOCK);
 		light_data <<= 1;
 		if(gpio_get_value(MISO)==1){
 			light_data |= 1;
 		}
 		gpio_direction_output(SCLK,1);
-		udelay(1);
+		udelay(CLOCK);
 	}
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(CE0,1);
 }
 /*

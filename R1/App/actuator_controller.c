@@ -26,13 +26,19 @@ int main(void){
 	struct request rcv;
 	int time;
 
-   	socket_r2 = server_open(R1_ACT_PORT);
+	socket_r2 = server_open(9999);
 
-
+	if(socket_r2 < 0){
+		printf("fail open server\n");
+		return 0;
+	}
 	/*요청 대기*/
 	while(1){
 		c_socket = wait_request(socket_r2,&rcv);
-
+		if(c_socket < 0){
+			printf("fail receive request\n");
+			return 0;
+		}
 		if(rcv.type == 'l'){	/*광합성용 LED */
 printf("[LED] type\n");
 			if(rcv.cmd == '1'){

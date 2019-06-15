@@ -7,19 +7,19 @@ static dev_t dev_num;
 static struct cdev *cd_cdev;
 
 static void timer_func(unsigned long data){
-    gpio_set_value(WATERPUMP_A, 1);
+    	gpio_set_value(WATERPUMP_A, 0);
 	gpio_set_value(WATERPUMP_B, 0);
 }
 
 void pump_on(void){
-	gpio_set_value(WATERPUMP_A, 1);
+	gpio_set_value(WATERPUMP_A, 0);
 	gpio_set_value(WATERPUMP_B, 0);
 
 }
 
 void pump_off(void){
 	gpio_set_value(WATERPUMP_A, 1);
-	gpio_set_value(WATERPUMP_B, 1);
+	gpio_set_value(WATERPUMP_B, 0);
 
 }
 
@@ -57,7 +57,7 @@ static int __init water_pump_init(void){
     init_timer(&timer_w);
     /* gpio init */
 	gpio_request_one(WATERPUMP_A, GPIOF_OUT_INIT_HIGH, "PUMP_A");
-	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_HIGH, "PUMP_B");
+	gpio_request_one(WATERPUMP_B, GPIOF_OUT_INIT_LOW, "PUMP_B");
 	pump_off();
     /* cdev init */
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_WTPMP);
