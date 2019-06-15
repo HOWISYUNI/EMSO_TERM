@@ -23,8 +23,6 @@ static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
 
 struct file_operations pir_fops =
 {
-	.open = pir_open,
-	.release = pir_release,
 	.unlocked_ioctl = pir_ioctl,
 };
 

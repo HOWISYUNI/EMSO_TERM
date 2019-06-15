@@ -9,7 +9,8 @@
 #include <linux/sched.h>
 
 #define SENSOR 17
-#define DEV_NAME "pir_sensor_dev"
+#define DEV_NAME "pir"
 
-static int pir_open(struct inode *inode, struct file* file);
-static int pir_release(struct inode *inode, struct file* file);
+static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+//static int pir_open(struct inode *inode, struct file* file);
+//static int pir_release(struct inode *inode, struct file* file);
