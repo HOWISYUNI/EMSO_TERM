@@ -5,7 +5,7 @@ int main(){
 	int input;
 
 	struct response rcv;
-
+	
 	char rcv_str[BUF];// = "aaaa\nbbbb\ncccc\ndddd\n\neeee";
 	int soil_a;
 	int light_a;
@@ -13,7 +13,7 @@ int main(){
 	int c;
 	
 	while(1){
-		system("clear");
+		//system("clear");
 		printf("-----------------------------------------\n");
 		printf("* 1. r1의 스프링클러 켜기               *\n");
 		printf("* 2. r1의 led 켜기                      *\n");
@@ -47,7 +47,7 @@ int main(){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			request_soil_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
-			printf("--최근 토양온습도 값들--\n");
+			//printf("--최근 토양온습도 값들--\n");
 			//parse(rcv_str);
 			//fflush(stdin);
 			//printf("넘어가려면 아무거나 누르세요.");
@@ -58,7 +58,7 @@ int main(){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			request_light_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
-			printf("--최근 조도 값들--\n");
+			//printf("--최근 조도 값들--\n");
 			//parse(rcv_str);
 			//fflush(stdin);
 			//printf("넘어가려면 아무거나 누르세요.");
@@ -69,7 +69,7 @@ int main(){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			soil_a = request_soil_average_to_r3(socket_r3);
 			client_close(socket_r3);
-			printf("토양온습도 평균값: %d", soil_a);
+			//printf("토양온습도 평균값: %d", soil_a);
 			//fflush(stdin);
 			//printf("넘어가려면 아무거나 누르세요.");
 			//getchar();
@@ -78,7 +78,7 @@ int main(){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			light_a = request_light_average_to_r3(socket_r3);
 			client_close(socket_r3);
-			printf("조도 평균값: %d\n", light_a);
+			//printf("조도 평균값: %d\n", light_a);
 			//fflush(stdin);
 			//printf("넘어가려면 아무거나 누르세요.");
 			//getchar();
@@ -119,8 +119,10 @@ void send_sprinkler_signal(int socket, int sig){
         rcv = request(socket, 'U', 's', '1', 0, "true");
         if(rcv.type == 'f'){
             printf("send_sprinkler_siganl - Fail\n");
+			sleep(3);
         }else if(rcv.type == 't'){
             printf("send_sprinkler_signal - Timeout\n");
+			sleep(3);
         }
 
     }else{
@@ -136,8 +138,10 @@ void send_led_signal(int socket, int sig){
         request(socket, 'U', 'l', '1', 0, "true");
         if(rcv.type == 'f'){
             printf("send_led_signal - Fail\n");
+			sleep(3);
         }else if(rcv.type == 't'){
             printf("send_len_signal - Timeout\n");
+			sleep(3);
         }
 
     }else{
