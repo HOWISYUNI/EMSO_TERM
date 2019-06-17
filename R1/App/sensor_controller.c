@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <time.h>
 
-#include "app.h"
+
+#include "sensor_controller.h"
 
 
 
