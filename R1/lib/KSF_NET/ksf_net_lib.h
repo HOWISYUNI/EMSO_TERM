@@ -16,8 +16,8 @@
 #ifndef KSF_NET_CONF
 #define KSF_NET_CONF
 #define R1_ADDR "10.10.10.13"
-#define R1_SNR_PORT 1010  /* Client */
-#define R1_ACT_PORT 1020  /* Server */
+#define R1_SNR_PORT 4010  /* Client */
+#define R1_ACT_PORT 4020  /* Server */
 #define R2_ADDR "10.10.10.14"
 #define R2_DATA_PORT 2010 /* Server */
 #define R2_DATB_PORT 2010 /* Client */

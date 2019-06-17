@@ -38,6 +38,7 @@ int main(void){
 					printf("1. light data send() failed.\n");
 				}
 				client_close(socket_r2);
+				sleep(1);				
 				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 				if(send_soil_data_to_r2(socket_r2)<0){
 					/*send 실패*/
@@ -102,7 +103,9 @@ int send_light_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
+	value =0;
 	value = read_light_sensor();
+	sleep(1);
 	sprintf(data, "%d", value);
 	len = sizeof(data);
 	rcv = request(socket, 'O', 'l', 's', len, data);
@@ -126,7 +129,9 @@ int send_soil_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
+	value=0;
 	value = read_soil_sensor();
+	sleep(1);
 	printf("1. soil : %d\n",value);	
 	sprintf(data, "%d", value);
 	len = sizeof(data);
@@ -150,6 +155,7 @@ int send_alert_temperature_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
+	value=0;
 	value = read_dht11_sensor();
 	sprintf(data, "%d", value);
 	len = sizeof(data);
