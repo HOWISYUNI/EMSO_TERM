@@ -14,24 +14,26 @@ int main(){
 	
 	while(1){
 		//system("clear");
-		printf("-----------------------------------------\n");
-		printf("* 1. r1의 스프링클러 켜기               *\n");
-		printf("* 2. r1의 led 켜기                      *\n");
-		printf("* 3. r3에 토양온습도 최근 n개 요청      *\n");
-		printf("* 4. r3에 조도 최근 n개 요청            *\n");
-		printf("* 5. r3에 토양온습도 평균값 요청        *\n");
-		printf("* 6. r3에 조도 평균값 요청              *\n");
-		printf("* 7. r3에 토양온습도 값 전달            *\n");
-		printf("* 8. r3에 조도 값 전달                  *\n");
-		printf("* 0. 종료                               *\n");
-		printf("-----------------------------------------\n");
-		printf("*****************************************\n");
-		printf("토양온습도 평균값:%d  조도 평균값:%d     \n", soil_a, light_a);
-		printf("*****************************************\n");
+		printf("------------------------------------------\n");
+		printf("* 1. r1의 스프링클러 켜기    11. 끄기    *\n");
+		printf("* 2. r1의    led     켜기    22. 끄기    *\n");
+		printf("* 3. r1의 카메라 촬영                    *\n");
+		printf("* 4. r1의    버저   울리기   44. 끄기    *\n");
+		printf("* 5. r3에 토양온습도 최근 n개 요청       *\n");
+		printf("* 6. r3에 조도 최근 n개 요청             *\n");
+		printf("* 7. r3에 토양온습도 평균값 요청         *\n");
+		printf("* 8. r3에 조도 평균값 요청               *\n");
+		printf("* 9. r3에 토양온습도 값 전달             *\n");
+		printf("* 10. r3에 조도 값 전달                   *\n");
+		printf("* 20. 종료                                *\n");
+		printf("------------------------------------------\n");
+		printf("******************************************\n");
+		printf("토양온습도 평균값:%d  조도 평균값:%d      \n", soil_a, light_a);
+		printf("******************************************\n");
 		printf("--토양온습도, 조도 최근값--\n");
 		printf("%s\n", rcv_str);
 		//parse(rcv_str);
-		printf("*****************************************\n");
+		printf("******************************************\n");
 		printf("선택해라.\n");
 		scanf("%d", &input);
 
@@ -43,7 +45,54 @@ int main(){
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
 			send_led_signal(socket_r1, true);
 			client_close(socket_r1);
-		}else if(input == 3){
+		}else if(input == 11){
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+            send_sprinkler_signal(socket_r1, false);
+            client_close(socket_r1);
+		}else if(input == 22){
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+            send_led_signal(socket_r1, false);
+            client_close(socket_r1);
+		}else if(input == 3){//카메라
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+            /*
+			rcv = request(socket, 'U', 's', '1', 0, "true");
+	        if(rcv.type == 'f'){
+	            printf("send_sprinkler_siganl - Fail\n");
+	            sleep(3);
+	        }else if(rcv.type == 't'){
+	            printf("send_sprinkler_signal - Timeout\n");
+	            sleep(3);
+	        }
+			*/
+			client_close(socket_r1);
+		}else if(input == 4){//버저 울기
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+	        /*    
+			rcv = request(socket, 'U', 's', '1', 0, "true");
+	        if(rcv.type == 'f'){
+	            printf("send_sprinkler_siganl - Fail\n");
+	            sleep(3);
+	        }else if(rcv.type == 't'){
+	            printf("send_sprinkler_signal - Timeout\n");
+	            sleep(3);
+	        }
+			*/
+			client_close(socket_r1);
+		}else if(input == 44){//버저 끄기
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+            /*
+			rcv = request(socket, 'U', 's', '1', 0, "true");
+        	if(rcv.type == 'f'){
+        	    printf("send_sprinkler_siganl - Fail\n");
+        	    sleep(3);
+        	}else if(rcv.type == 't'){
+        	    printf("send_sprinkler_signal - Timeout\n");
+        	    sleep(3);
+        	}
+			*/
+			client_close(socket_r1);
+		}else if(input == 5){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			request_soil_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
@@ -54,7 +103,7 @@ int main(){
 			//getchar();
 			//scanf("%d", &c);
 			//sleep(5);
-		}else if(input == 4){
+		}else if(input == 6){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			request_light_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
@@ -65,7 +114,7 @@ int main(){
 			//getchar();
 			//scanf("%d", &c);
 			//sleep(5);
-		}else if(input == 5){
+		}else if(input == 7){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			soil_a = request_soil_average_to_r3(socket_r3);
 			client_close(socket_r3);
@@ -74,7 +123,7 @@ int main(){
 			//printf("넘어가려면 아무거나 누르세요.");
 			//getchar();
 			//scanf("%d", &c);
-		}else if(input == 6){
+		}else if(input == 8){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
 			light_a = request_light_average_to_r3(socket_r3);
 			client_close(socket_r3);
@@ -83,14 +132,14 @@ int main(){
 			//printf("넘어가려면 아무거나 누르세요.");
 			//getchar();
 			//scanf("%d", &c);
-		}else if(input == 7){/*r3에 토양온습도 값 전달*/
+		}else if(input == 9){/*r3에 토양온습도 값 전달*/
 			char data[BUF];
 			//fflush(stdin);
 			scanf("%s", data);
 			int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
 			rcv = request(socket_r3, 'O', 's', 's', strlen(data), data);
 			client_close(socket_r3);
-		}else if(input == 8){/*r3에 조도 값 전달*/
+		}else if(input == 10){/*r3에 조도 값 전달*/
 			char data[BUF];
 			//fflush(stdin);
             scanf("%s", data);
@@ -112,7 +161,7 @@ int main(){
 	return 0;
 }
 
-/*1번*/
+/*1번, 11번*/
 void send_sprinkler_signal(int socket, int sig){
     struct response rcv;
     if(sig == true){
@@ -126,12 +175,20 @@ void send_sprinkler_signal(int socket, int sig){
         }
 
     }else{
-        /*보낼필요없음*/
+        rcv = request(socket, 'U', 's', '1', 0, "false");
+        if(rcv.type == 'f'){
+            printf("send_sprinkler_siganl - Fail\n");
+            sleep(3);
+        }else if(rcv.type == 't'){
+            printf("send_sprinkler_signal - Timeout\n");
+            sleep(3);
+        }
+
     }
 
 }
 
-/*2번*/
+/*2번, 22번*/
 void send_led_signal(int socket, int sig){
     struct response rcv;
     if(sig == true){
@@ -145,12 +202,20 @@ void send_led_signal(int socket, int sig){
         }
 
     }else{
-        /*보낼필요없음*/
+        request(socket, 'U', 'l', '1', 0, "false");
+        if(rcv.type == 'f'){
+            printf("send_led_signal - Fail\n");
+            sleep(3);
+        }else if(rcv.type == 't'){
+            printf("send_len_signal - Timeout\n");
+            sleep(3);
+        }
+
     }
 
 }
 
-/*3번*/
+/*5번*/
 void request_soil_recent_to_r3(int socket, char* str){
 	struct response rcv;
 	//char rcv_data[BUF];
@@ -159,7 +224,7 @@ void request_soil_recent_to_r3(int socket, char* str){
 	strcpy(str, rcv.data);
 }
 
-/*4번*/
+/*6번*/
 void request_light_recent_to_r3(int socket, char* str){
 	struct response rcv;
 	//char rcv_data[BUF];
@@ -168,7 +233,7 @@ void request_light_recent_to_r3(int socket, char* str){
 
 }
 
-/*5번*/
+/*7번*/
 int request_soil_average_to_r3(int socket){
 	struct response rcv;
 	int rcv_data;
@@ -178,7 +243,7 @@ int request_soil_average_to_r3(int socket){
 	return rcv_data;
 }
 
-/*6번*/
+/*8번*/
 int request_light_average_to_r3(int socket){
 	struct response rcv;
 	int rcv_data;
