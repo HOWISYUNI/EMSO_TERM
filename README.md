@@ -9,7 +9,7 @@ SCENARIO & GOAL & Internal Design & Excellence & Plan
 평가 요소
 Creativity & Technological Challenging & Completeness
 ```
-__최종 시연__ : 기말고사 기간(6/17예상 혹은 그 다음 주)
+__최종 시연__ : 6/25(TUE) 13:30PM
 ```
 Goal Achievement
 Stability of demonstration
