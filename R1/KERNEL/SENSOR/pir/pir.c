@@ -7,7 +7,6 @@ static int irq_num;
 wait_queue_head_t wq;
 
 static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
-
     switch(cmd){
         case DETECT_WAIT:
             enable_irq(irq_num);
@@ -15,10 +14,10 @@ static long pir_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
             printk("wait!\n");
             wait_event(wq, detect == TRUE); /* wake up when detected from isr */
             disable_irq(irq_num);
-	    printk("return!\n");
+	    	
+			printk("return!\n");
             return 0;
-	    break;
-            
+	            
         default :
             return -1;
     }
@@ -65,6 +64,7 @@ static int __init pir_init(void){
 	}
 	init_waitqueue_head(&wq);
 	printk("PIR Init\n");
+
 	return 0;
 }
 

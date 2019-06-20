@@ -104,7 +104,7 @@
 #define PIR_DEF
 
 #define SENSOR 17
-#define DEV_PIR "pir"
+#define DEV_PIR "pir_dev"
 
 #define PIR_IOCTL 0x60
 #define PIR_IOCTL_NUM1 PIR_IOCTL+1
