@@ -47,50 +47,50 @@ int main(){
 			client_close(socket_r1);
 		}else if(input == 11){
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
-            send_sprinkler_signal(socket_r1, false);
-            client_close(socket_r1);
+			send_sprinkler_signal(socket_r1, false);
+			client_close(socket_r1);
 		}else if(input == 22){
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
-            send_led_signal(socket_r1, false);
-            client_close(socket_r1);
+			send_led_signal(socket_r1, false);
+			client_close(socket_r1);
 		}else if(input == 3){//카메라
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
-            /*
-			rcv = request(socket, 'U', 's', '1', 0, "true");
-	        if(rcv.type == 'f'){
-	            printf("send_sprinkler_siganl - Fail\n");
-	            sleep(3);
-	        }else if(rcv.type == 't'){
-	            printf("send_sprinkler_signal - Timeout\n");
-	            sleep(3);
-	        }
-			*/
+			
+			rcv = request(socket_r1, 'U', 'c', '1', 0, "true");
+			if(rcv.type == 'f'){
+				printf("send_sprinkler_siganl - Fail\n");
+				sleep(3);
+			}else if(rcv.type == 't'){
+				printf("send_sprinkler_signal - Timeout\n");
+				sleep(3);
+			}
+			
 			client_close(socket_r1);
 		}else if(input == 4){//버저 울기
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
-	        /*    
-			rcv = request(socket, 'U', 's', '1', 0, "true");
-	        if(rcv.type == 'f'){
-	            printf("send_sprinkler_siganl - Fail\n");
-	            sleep(3);
-	        }else if(rcv.type == 't'){
-	            printf("send_sprinkler_signal - Timeout\n");
-	            sleep(3);
-	        }
-			*/
+			
+			rcv = request(socket_r1, 'U', 'b', '1', 0, "true");
+			if(rcv.type == 'f'){
+				printf("send_sprinkler_siganl - Fail\n");
+				sleep(3);
+			}else if(rcv.type == 't'){
+				printf("send_sprinkler_signal - Timeout\n");
+				sleep(3);
+			}
+			
 			client_close(socket_r1);
 		}else if(input == 44){//버저 끄기
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
-            /*
-			rcv = request(socket, 'U', 's', '1', 0, "true");
-        	if(rcv.type == 'f'){
-        	    printf("send_sprinkler_siganl - Fail\n");
-        	    sleep(3);
-        	}else if(rcv.type == 't'){
-        	    printf("send_sprinkler_signal - Timeout\n");
-        	    sleep(3);
-        	}
-			*/
+			
+			rcv = request(socket_r1, 'U', 'b', '0', 0, "false");
+			if(rcv.type == 'f'){
+				printf("send_sprinkler_siganl - Fail\n");
+				sleep(3);
+			}else if(rcv.type == 't'){
+				printf("send_sprinkler_signal - Timeout\n");
+				sleep(3);
+			}
+			
 			client_close(socket_r1);
 		}else if(input == 5){
 			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
@@ -175,7 +175,7 @@ void send_sprinkler_signal(int socket, int sig){
         }
 
     }else{
-        rcv = request(socket, 'U', 's', '1', 0, "false");
+        rcv = request(socket, 'U', 's', '0', 0, "false");
         if(rcv.type == 'f'){
             printf("send_sprinkler_siganl - Fail\n");
             sleep(3);
@@ -202,7 +202,7 @@ void send_led_signal(int socket, int sig){
         }
 
     }else{
-        request(socket, 'U', 'l', '1', 0, "false");
+        request(socket, 'U', 'l', '0', 0, "false");
         if(rcv.type == 'f'){
             printf("send_led_signal - Fail\n");
             sleep(3);
