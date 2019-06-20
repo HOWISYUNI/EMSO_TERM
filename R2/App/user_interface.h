@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 /*네트워크 라이버러리*/
-#include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../../KSF_NET/ksf_net_lib.h"
 
 #define BUF 1024
 #define true 1

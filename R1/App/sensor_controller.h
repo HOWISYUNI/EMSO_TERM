@@ -3,7 +3,7 @@
 #include <time.h>
 
 #include "../lib/SENSOR/sensor_lib.h"
-#include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../../KSF_NET/ksf_net_lib.h"
 
 #define PERIOD 10                   /*빛 센서/토양 온도 센서 주기를 10초로 설정*/
 #define TEMPERATURE_PERIOD 5        /*온도 체크 주기를 5초로 설정*/

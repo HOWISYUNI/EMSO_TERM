@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../../KSF_NET/ksf_net_lib.h"
 #include "../lib/controllers.h"
 
 int main(){

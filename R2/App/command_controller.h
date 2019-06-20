@@ -3,7 +3,7 @@
 /*네트워크 라이브러리*/
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
-#include "../lib/KSF_NET/ksf_net_lib.h"
+#include "../../KSF_NET/ksf_net_lib.h"
 #endif
 
 /*커맨드 라이브러리*/

@@ -28,7 +28,7 @@ int main(){
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r1에 소켓 OPEN\n");
-		socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 10);
+		socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 10);
 		if(rcv.type == 'f'){
 			printf("토양온습도 fail\n");
     	}else if(rcv.type == 't'){
@@ -57,7 +57,7 @@ int main(){
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r1에 소켓 OPEN\n");
-		socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 10);
+		socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 10);
 		if(rcv.type == 'f'){
 			printf("조도 fail\n");
    		}else if(rcv.type == 't'){
