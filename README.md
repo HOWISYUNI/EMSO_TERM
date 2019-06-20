@@ -41,17 +41,17 @@ OS : Rasbian
 ### Devices Specification
 1. Raspi
 2. Sensor
-	1. __토양 온습도 센서__
+	1. 토양 온습도 센서
 	2. 온습도 센서
 	3. 빛 감지 센서
-	4. LED
-	5. PIR 센서
-	6. 거리 감지 센서
+	4. PIR 센서
+	5. 거리 감지 센서
 3. Actuator
 	1. 모터
 	2. 부저
-    3. 카메라
+    	3. 카메라
 	4. 워터 펌프
+	5. LED / ALERT LED
 ### Coding Style
 가이드라인 : [kernel_code_style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html)
 
@@ -97,48 +97,47 @@ __매크로__ : ```DEFINE_SOMETHING```
 Smart Farm System
  ├──R1/
  │   ├──Kernel/
- │   │	   ├──SF_NET/
- │   │	   │    └──NETWORK.c 		/* Smart From Network */
  │   │	   ├──SENSOR/
  │   │	   │    ├──SENSOR_1.c
  │   │	   │    ├──SENSOR_2.c
  │   │	   │    ├──SENSOR_3.c
- │   │	   │    └──SENSOR_4.c
- │   │	   └──ACTUATOR/
- │   │            ├──ACTUATOR_1.c
- │   │            ├──ACTUATOR_2.c
- │   │            └──ACTUATOR_3.c
+ │   │	   │    ├──SENSOR_4.c
+ │   │	   │    └──SENSOR_5.c
  │   ├──lib/							
  │   │	  ├──SF_NET/
  │   │	  │    └──NETWORK_LIB.c 
- │   │	  ├──SENSOR/
- │   │	  │    └──SENSOR_LIB.c
- │   │	  └──ACTUATOR/
- │   │	       └──ACTUATOR_LIB.c
+ │   │	  └──SENSOR/
+ │   │	       └──SENSOR_LIB.c
  │   └──App/
- │       ├──daemon.c 			/* Background */
- │       └──SF_SUBCTR.c 		/* sub Controller */
+ │       └──SNSR_CTRL.c 		/* Sensor Controller */
  │
  ├──R2/
- │   ├──Kernel/
- │   │   └──SF_NET/
- │   │        └──NETWORK.c
  │   ├──lib/
  │   │	 └──SF_NET/
  │   │	      └──NETWORK_LIB.c 
  │   └──App/
- │	 ├──daemon.c	 		/* Background */
- │       ├──SF_CTR.c 			/* Controller */
- │       └──SF_UIF.c 			/* User Interface */
+ │       ├──DATA_CTRL.c 		/* Data Controller */
+ │       ├──CMD_CTRL.c 			/* Refine Controller */
+ │       └──UI_CTRL.c 			/* User Interface */
  │
- └──R3/
+ ├──R3/
+ │   ├──lib/
+ │   │   └──SF_NET/
+ │   │	      └──NETWORK_LIB.c 
+ │   └──App/
+ │   	 ├──STG_CTRL.c 			/* Storage Controller */
+ │       └──RFN_CTRL.c 			/* Refine Controller */
+ └──R4/
      ├──Kernel/
-     │   └──SF_NET/
-     │        └──NETWORK.c
-     ├──lib/
-     │   └──SF_NET/
-     │	      └──NETWORK_LIB.c 
+     │	   └──ACTUATOR/
+     │            ├──ACTUATOR_1.c
+     │            ├──ACTUATOR_2.c
+     │            └──ACTUATOR_3.c
+     ├──lib/							
+     │	  ├──SF_NET/
+     │	  │    └──NETWORK_LIB.c 
+     │	  └──ACTUATOR/
+     │	       └──ACTUATOR_LIB.c
      └──App/
-     	 ├──daemon.c 			/* Background */
-         └──SF_STORAGE.c 		/* Storage */
+         └──ACT_CTRL.c 			/* Actuator Controller */
 ```
