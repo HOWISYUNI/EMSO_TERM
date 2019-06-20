@@ -3,7 +3,7 @@ rm -r bin
 mkdir bin
 
 #lib compile
-arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_net_lib.c
+arm-linux-gnueabi-gcc -c ./../KSF_NET/ksf_net_lib.c
 arm-linux-gnueabi-gcc -c ./lib/command_controller_lib/led_lib.c
 arm-linux-gnueabi-gcc -c ./lib/command_controller_lib/sprinkler_lib.c
 
