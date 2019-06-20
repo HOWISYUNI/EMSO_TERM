@@ -4,7 +4,7 @@ mkdir bin
 
 #lib compile
 ##network lib compile
-arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_net_lib.c
+arm-linux-gnueabi-gcc -c ./../KSF_NET/ksf_net_lib.c
 ##controller lib compile
 arm-linux-gnueabi-gcc -c ./lib/SENSOR/sensor_lib.c
 
