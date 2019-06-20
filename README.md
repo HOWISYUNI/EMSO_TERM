@@ -104,17 +104,14 @@ Smart Farm System
  │   │	   │    ├──SENSOR_4.c
  │   │	   │    └──SENSOR_5.c
  │   ├──lib/							
- │   │	  ├──SF_NET/
- │   │	  │    └──NETWORK_LIB.c 
- │   │	  └──SENSOR/
+ │   │	   └──SENSOR/
  │   │	       └──SENSOR_LIB.c
  │   └──App/
  │       └──SNSR_CTRL.c 		/* Sensor Controller */
  │
  ├──R2/
  │   ├──lib/
- │   │	 └──SF_NET/
- │   │	      └──NETWORK_LIB.c 
+ │   │   └──CTRL_LIB.c 			/* Controller library */
  │   └──App/
  │       ├──DATA_CTRL.c 		/* Data Controller */
  │       ├──CMD_CTRL.c 			/* Refine Controller */
@@ -122,22 +119,21 @@ Smart Farm System
  │
  ├──R3/
  │   ├──lib/
- │   │   └──SF_NET/
- │   │	      └──NETWORK_LIB.c 
+ │   │   └──CTRL_LIB.c 			/* Controller library */
  │   └──App/
  │   	 ├──STG_CTRL.c 			/* Storage Controller */
  │       └──RFN_CTRL.c 			/* Refine Controller */
- └──R4/
-     ├──Kernel/
-     │	   └──ACTUATOR/
-     │            ├──ACTUATOR_1.c
-     │            ├──ACTUATOR_2.c
-     │            └──ACTUATOR_3.c
-     ├──lib/							
-     │	  ├──SF_NET/
-     │	  │    └──NETWORK_LIB.c 
-     │	  └──ACTUATOR/
-     │	       └──ACTUATOR_LIB.c
-     └──App/
-         └──ACT_CTRL.c 			/* Actuator Controller */
+ ├──R4/
+ │   ├──Kernel/
+ │   │	   └──ACTUATOR/
+ │   │            ├──ACTUATOR_1.c
+ │   │            ├──ACTUATOR_2.c
+ │   │            └──ACTUATOR_3.c
+ │   ├──lib/							
+ │   │	  └──ACTUATOR/
+ │   │	       └──ACTUATOR_LIB.c
+ │   └──App/
+ │        └──ACT_CTRL.c 			/* Actuator Controller */
+ └──KSF_NET/
+     └──NETWORK_LIB.c 
 ```
