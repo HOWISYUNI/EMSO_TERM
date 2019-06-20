@@ -4,7 +4,7 @@ mkdir bin/
 
 #lib compile
 ##Net compile
-arm-linux-gnueabi-gcc -c ./lib/KSF_NET/ksf_net_lib.c
+arm-linux-gnueabi-gcc -c ./../KSF_NET/ksf_net_lib.c
 ##ctl compile
 arm-linux-gnueabi-gcc -c ./lib/controllers.c
 

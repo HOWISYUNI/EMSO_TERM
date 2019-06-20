@@ -1,21 +1,5 @@
 #!bin/bash
-cd ./ACTUATOR/buzzer/
-make
-make copy
-make clean
-cd ../led
-make
-make copy
-make clean
-cd ../led_alert
-make
-make copy
-make clean
-cd ../sprinkler
-make
-make copy
-make clean
-cd ../../SENSOR/dht11
+cd ./SENSOR/dht11
 make
 make copy
 make clean
@@ -36,5 +20,5 @@ make
 make copy
 make clean
 
-scp ./ACTUATOR/actuator_mknod.sh ./SENSOR/sensor_mknod.sh module_insert.sh module_remove.sh pi@10.10.10.13:~/ku_smart_farm/modules
+scp ./SENSOR/sensor_mknod.sh module_insert.sh module_remove.sh pi@10.10.10.13:~/ku_smart_farm/modules
 

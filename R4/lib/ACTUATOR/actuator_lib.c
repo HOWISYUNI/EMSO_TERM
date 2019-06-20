@@ -1,5 +1,5 @@
 #include "actuator_lib.h"
-#include <stdio.h>
+
 /* LED device path : /dev/LED
    BUZZER device path : /dev/buzzer */
 

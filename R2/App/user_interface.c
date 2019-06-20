@@ -36,11 +36,11 @@ int main(){
 		scanf("%d", &input);
 
 		if(input == 1){
-			int socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 5);		
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);		
 			send_sprinkler_signal(socket_r1, true);
 			client_close(socket_r1);			
 		}else if(input == 2){
-			int socket_r1 = client_open(R1_ADDR, R1_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
 			send_led_signal(socket_r1, true);
 			client_close(socket_r1);
 		}else if(input == 3){
