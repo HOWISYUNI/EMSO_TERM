@@ -8,7 +8,7 @@ default:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) modules
 
 copy:
-	scp led_alert.ko led_alert_mknod.sh pi@10.10.10.13:~/ku_smart_farm/modules
+	scp led_alert.ko led_alert_mknod.sh pi@10.10.10.16:~/ku_smart_farm/modules
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) $(ARM) clean

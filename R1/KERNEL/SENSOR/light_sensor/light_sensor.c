@@ -12,7 +12,7 @@
 MODULE_LICENSE("GPL");
 
 #define MAX_CLK 12
-#define CLOCK 10
+#define CLOCK 1
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 static int light_data;
@@ -21,8 +21,9 @@ static int light_data;
 * light_sensor로 부터 값을 받기 위해 start 신호 등등을 보내는 함수.
 */
 void start_mcp(void){
+	gpio_direction_output(CE1,1);
 	gpio_direction_output(CE0,0);
-	
+	udelay(CLOCK);	
 	gpio_direction_output(SCLK,1);
 	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
@@ -81,6 +82,10 @@ void start_light_sensor(void){
 	gpio_direction_output(SCLK,0);
 	udelay(CLOCK);
 	gpio_direction_output(CE0,1);
+	gpio_direction_output(SCLK,1);
+	udelay(CLOCK);
+	gpio_direction_output(SCLK,0);
+	udelay(CLOCK);
 }
 /*
 * Parameter : File Description, Buffer(int), lenght(sizeof(int))
@@ -89,7 +94,8 @@ void start_light_sensor(void){
 
 static int light_sensor_read(struct file *file, char *buf, size_t len, loff_t *lof){
 	int ret;
-	printk("!!!!!!!!!\n");
+	start_light_sensor();
+	start_light_sensor();
 	start_light_sensor();
 	printk("light value: %u\n",light_data);
 	ret = copy_to_user(buf,&light_data,sizeof(int));
@@ -129,8 +135,7 @@ static int __init light_sensor_init(void) {
 	gpio_request_one(MISO, GPIOF_OUT_INIT_LOW,"Master In/Slave Out");
 	gpio_request_one(SCLK, GPIOF_OUT_INIT_LOW,"SCLK");
 	gpio_request_one(CE0, GPIOF_OUT_INIT_LOW,"CE0");
-	start_light_sensor();
-	printk("[init]light value: %u\n",light_data);
+	gpio_request_one(CE1, GPIOF_OUT_INIT_LOW,"CE1");
 	
 
 
@@ -141,6 +146,7 @@ static void __exit light_sensor_exit(void){
 	gpio_free(MISO);
 	gpio_free(SCLK);
 	gpio_free(CE0);
+	gpio_free(CE1);
 	cdev_del(cd_cdev);
 	unregister_chrdev_region(dev_num, 1);
 }

@@ -15,4 +15,6 @@
  * @TURN_OFF_LED : Turn off led
  * @TIME_LED : while "arg" second, turn on led
  * */
+ 
 static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+void led_down(void);
