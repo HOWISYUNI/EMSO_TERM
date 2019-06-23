@@ -137,4 +137,19 @@ Return : void
 
 */
 
+int emergency_line_up(){
+    int fd, ret;
+    fd = open("/dev/emg_dev", O_RDWR);
+    ret = ioctl(fd, EMG_ON, NULL);
+    close(fd);
+    return ret;
+}
+
+int emergency_line_down(){
+    int fd, ret;
+    fd = open("/dev/emg_dev", O_RDWR);
+    ret = ioctl(fd, EMG_OFF, NULL);
+    close(fd);
+    return ret;
+}
 

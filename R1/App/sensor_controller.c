@@ -1,8 +1,4 @@
-
-
 #include "sensor_controller.h"
-
-
 
 int send_light_data_to_r2(int socket);
 int send_soil_data_to_r2(int socket);
@@ -61,6 +57,7 @@ int main(void){
 					while(time<=10){
 						time=(clock()/CLOCKS_PER_SEC);
 						if(get_ultrasonic()<ALERT_DISTANCE){
+						    emergency_line_up();
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
 							printf("2. 침입 알람 R2에게 전송\n");	
 							if(send_alert_distance_data_to_r2(socket_r2, get_ultrasonic())<0){
@@ -160,6 +157,7 @@ int send_alert_temperature_data_to_r2(int socket){
 
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
 	if(value>ALERT_TEMPERATURE){
+    	emergency_line_up();
 		rcv = request(socket, 'O', 't', 's', len, data);
 		printf("3. 온도 이상 현재 온도 : %d 도 \n",value);
 		if(rcv.type=='f'){
@@ -217,3 +215,4 @@ int send_alert_distance_data_to_r2(int socket, int value){
 
 	return 0;
 }
+

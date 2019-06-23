@@ -51,3 +51,19 @@
 
 #define DEV_ULTRA "ultrasonic_dev"
 #endif
+
+
+/* EMERGENCY */
+#ifndef EMG_DEF
+#define EMG_DEF
+
+#define EMG_PIN 12
+#define DEV_EMG "emg_dev"
+
+#define EMG_IOCTL 0x70
+#define EMG_IOCTL_NUM1 EMG_IOCTL+1
+#define EMG_IOCTL_NUM2 EMG_IOCTL+2
+#define EMG_IOCTL_NUM 'p'
+#define EMG_ON _IOWR(EMG_IOCTL_NUM, EMG_IOCTL_NUM1, unsigned long *)
+#define EMG_OFF _IOWR(EMG_IOCTL_NUM, EMG_IOCTL_NUM2, unsigned long *)
+#endif

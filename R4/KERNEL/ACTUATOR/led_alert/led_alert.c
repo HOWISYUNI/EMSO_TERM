@@ -1,12 +1,11 @@
 /*
  * 20190524 aeomhs
  * led_alert.c
- * open : LED_ALERT on
- * close : LED_ALERt off
  * */
 
 #include "led_alert.h"
-
+#include <linux/interrupt.h>
+#define EMG_PIN 17
 
 MODULE_LICENSE("GPL");
 
@@ -14,6 +13,7 @@ static struct timer_list timer;
 static struct timer_list alert;
 static dev_t dev_num;
 static struct cdev *cd_cdev;
+static int irq_num;
 
 static void timer_func(unsigned long data){
     printk("led alert down\n");
@@ -32,23 +32,19 @@ static void alert_led(unsigned long data){
 	alert.data = data + 1;
 	alert.expires = jiffies + (HZ);
 	
-	if(alert.data%3 == 0){
-		gpio_set_value(LED_R, 0);
+	if(alert.data%2 == 0){
+		gpio_set_value(LED_R, 1);
 		gpio_set_value(LED_G, 0);
 		gpio_set_value(LED_B, 1);
 	}
-	else if(alert.data%3 == 1){
-		gpio_set_value(LED_R, 1);
-        gpio_set_value(LED_G, 0);
-        gpio_set_value(LED_B, 0);
-	}
 	else{
 		gpio_set_value(LED_R, 0);
-		gpio_set_value(LED_G, 1);
-		gpio_set_value(LED_B, 0);
+        gpio_set_value(LED_G, 1);
+        gpio_set_value(LED_B, 0);
 	}
 	add_timer(&alert);
 }
+
 
 
 static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
@@ -57,7 +53,7 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
                 printk("turn on led alert\n");
                 led_down();
                 
-                gpio_set_value(LED_R, 1);
+                gpio_set_value(LED_G, 1);
                 
                 alert.function = alert_led;
                 alert.data = 1L;
@@ -80,7 +76,8 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
 	            timer.expires = jiffies + (arg*HZ);
 
                 /* alert led on */
-	            gpio_set_value(LED_R, 1);
+	            gpio_set_value(LED_G, 1);
+
 	            alert.function = alert_led;
                 alert.data = 1L;
                 alert.expires = jiffies + (HZ);
@@ -95,12 +92,36 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
         return 0;
 }
 
+static irqreturn_t emergency_isr(int irq, void* dev_id){
+
+	printk("emergency alert!\n");
+	/* RISING */
+	if(gpio_get_value(EMG_PIN) == 1){
+        printk("turn on led alert\n");
+        led_down();
+        
+        gpio_set_value(LED_G, 1);
+        
+        alert.function = alert_led;
+        alert.data = 1L;
+        alert.expires = jiffies + (HZ);
+        add_timer(&alert);
+    }
+    else{
+        printk("turn off led alert\n");
+        led_down();
+    }
+	
+
+	return IRQ_HANDLED;
+}
 
 struct file_operations led_alert_fops = {
 	.unlocked_ioctl = led_alert_ioctl,
 };
 
 static int __init led_alert_init(void){
+    int ret;
     /* timer init */
     init_timer(&timer);
     init_timer(&alert);
@@ -109,7 +130,17 @@ static int __init led_alert_init(void){
     gpio_request_one(LED_R, GPIOF_OUT_INIT_LOW, "LED_R");
     gpio_request_one(LED_G, GPIOF_OUT_INIT_LOW, "LED_G");
     gpio_request_one(LED_B, GPIOF_OUT_INIT_LOW, "LED_B");
-    
+
+    /* emergency gpio & interrupt init */
+    gpio_request_one(EMG_PIN, GPIOF_IN, "emergency");
+	irq_num = gpio_to_irq(EMG_PIN);
+	ret = request_irq(irq_num, emergency_isr, IRQF_TRIGGER_RISING|IRQF_TRIGGER_FALLING, "emergency", NULL);
+	/* irq fail */
+	if(ret){
+		printk(KERN_ERR "Unable to request IRQ: %d\n", ret);
+		free_irq(irq_num, NULL);
+	}
+	
     /* cdev init */
     alloc_chrdev_region(&dev_num, 0, 1, DEV_LED_ALERT);
     cd_cdev = cdev_alloc();
@@ -133,6 +164,11 @@ static void __exit led_alert_exit(void){
     gpio_free(LED_R);
     gpio_free(LED_G);
     gpio_free(LED_B);
+    
+    disable_irq(irq_num);
+    
+    free_irq(irq_num, NULL);
+	gpio_free(EMG_PIN);
 }
 
 module_init(led_alert_init);
