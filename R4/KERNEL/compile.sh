@@ -16,5 +16,6 @@ make
 make copy
 make clean
 
+cd ../..
 scp ./ACTUATOR/actuator_mknod.sh module_insert.sh module_remove.sh pi@10.10.10.16:~/ku_smart_farm/modules
 

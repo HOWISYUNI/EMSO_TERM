@@ -11,4 +11,5 @@ int main(void){
 
     close(fd_m);    
     close(fd_w);
+    return 0;
 }

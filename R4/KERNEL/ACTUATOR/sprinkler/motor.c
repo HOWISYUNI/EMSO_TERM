@@ -9,7 +9,11 @@ static struct cdev *cd_cdev;
 struct task_struct *cycling_motor;
 
 static void timer_func(unsigned long data){
-    kthread_stop(cycling_motor);
+    /* Exception Handle */
+    if(cycling_motor != NULL){
+        kthread_stop(cycling_motor);
+        printk("MOTOR_OFF_TIMER\n");
+    }
 }
 
 int steps[STEPS][4] = {
@@ -63,11 +67,9 @@ void moveDegree(int degree, int delay, int direction){
         long int cycle = (degree * 1000000 / 703125);
 
         if(direction == 0){
-		printk("cycle : %ld\n", cycle);
                 forward(cycle, delay);
         }
         else{
-		printk("cycle : %ld\n", cycle);
                 backward(cycle, delay);
         }
 }
@@ -101,11 +103,19 @@ static long motor(struct file *file, unsigned int cmd, unsigned long arg){
 	switch(cmd){
 		case MOTOR_ON:
 		    /* kthread create & wake up */
-		    cycling_motor = kthread_run(kthread_cycling, NULL, "cycling");
+		    /* Exception Handle */
+		    if(cycling_motor == NULL){
+    		    cycling_motor = kthread_run(kthread_cycling, NULL, "cycling");
+    		    printk("MOTOR_ON\n");
+		    }
 		    break;
 		case MOTOR_OFF:
 		    /* kthread stop */
-		    kthread_stop(cycling_motor);
+		    /* Exception Handle */
+		    if(cycling_motor != NULL){
+    		    kthread_stop(cycling_motor);
+    		    printk("MOTOR_OFF\n");   
+		    }
 		    cycling_motor = NULL;
 		    break;
 		case MOTOR_TIMER:
@@ -113,8 +123,13 @@ static long motor(struct file *file, unsigned int cmd, unsigned long arg){
             timer_m.function = timer_func;
             timer_m.data = 1L;
             timer_m.expires = jiffies + (arg*HZ);
+            if(cycling_motor != NULL){
+                kthread_stop(cycling_motor);
+    		    printk("MOTOR_OFF\n");
+            }
 		    cycling_motor = kthread_run(kthread_cycling, NULL, "cycling");
             add_timer(&timer_m);
+            printk("MOTOR_ON_TIMER\n");
 		    break;
 		default:
 			return -1;
@@ -132,6 +147,7 @@ static int __init motor_init(void){
 
     /* timer init */
     init_timer(&timer_m);
+    cycling_motor = NULL;
     /* gpio init */
 	gpio_request_one(MOTOR_A, GPIOF_OUT_INIT_LOW, "MOTOR_A");
 	gpio_request_one(MOTOR_B, GPIOF_OUT_INIT_LOW, "MOTOR_B");
@@ -152,6 +168,7 @@ static void __exit motor_exit(void){
     /* kthread stop */
     if(cycling_motor != NULL){
         kthread_stop(cycling_motor);
+        printk("MOTOR_OFF_EXIT\n");
     }
     
     /* gpio free */
