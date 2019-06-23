@@ -19,6 +19,6 @@ cd ../ultrasonic
 make
 make copy
 make clean
-
+cd ../../
 scp ./SENSOR/sensor_mknod.sh module_insert.sh module_remove.sh pi@10.10.10.13:~/ku_smart_farm/modules
 

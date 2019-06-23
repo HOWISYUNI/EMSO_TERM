@@ -43,6 +43,9 @@ static struct cdev *cd_cdev;
 static int __init pir_init(void){
 	int ret;
 
+    /* wait queue init */
+    init_waitqueue_head(&wq);
+
     /* cdev init */
 	alloc_chrdev_region(&dev_num, 0, 1, DEV_PIR);
 	cd_cdev = cdev_alloc();
@@ -63,7 +66,7 @@ static int __init pir_init(void){
 	else{
 	   	disable_irq(irq_num);
 	}
-	init_waitqueue_head(&wq);
+	
 	printk("PIR Init\n");
 	return 0;
 }
@@ -71,6 +74,8 @@ static int __init pir_init(void){
 static void __exit pir_exit(void){
 	cdev_del(cd_cdev);
 	unregister_chrdev_region(dev_num, 1);
+
+    disable_irq(irq_num);
 
 	free_irq(irq_num, NULL);
 	gpio_free(SENSOR);
