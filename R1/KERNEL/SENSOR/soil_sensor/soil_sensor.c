@@ -12,6 +12,7 @@
 MODULE_LICENSE("GPL");
 
 #define MAX_CLK 12
+#define CLOCK 1
 static dev_t dev_num;
 static struct cdev *cd_cdev;
 static int soil_data;
@@ -20,41 +21,42 @@ static int soil_data;
 * light_sensor로 부터 값을 받기 위해 start 신호 등등을 보내는 함수.
 */
 void start_mcp(void){
+	gpio_direction_output(CE0,1);
 	gpio_direction_output(CE1,0);
-	
+	udelay(CLOCK);	
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1); 
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
 	gpio_direction_output(MOSI,0);	//D0
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 }
 
 void start_soil_sensor(void){
@@ -64,30 +66,36 @@ void start_soil_sensor(void){
 	gpio_direction_input(MISO);
 	start_mcp();
 	gpio_set_value(SCLK,1);
-	udelay(1);
+	udelay(CLOCK);
 
 
 	for(i=0; i<MAX_CLK; i++){
 		gpio_direction_output(SCLK,0);
-		udelay(1);
+		udelay(CLOCK);
 		soil_data <<= 1;
 		if(gpio_get_value(MISO)==1){
 			soil_data |= 1;
 		}
 		gpio_direction_output(SCLK,1);
-		udelay(1);
+		udelay(CLOCK);
 	}
 	gpio_direction_output(SCLK,0);
-	udelay(1);
+	udelay(CLOCK);
 	gpio_direction_output(CE1,1);
+	gpio_direction_output(SCLK,1);
+	udelay(CLOCK);
+	gpio_direction_output(SCLK,0);
+	udelay(CLOCK);
 }
 /*
 * Parameter : File Description, Buffer(int), lenght(sizeof(int))
-* Return : light_data
+* Return : light_datain
 */
 
 static int soil_sensor_read(struct file *file, char *buf, size_t len, loff_t *lof){
 	int ret;
+	start_soil_sensor();
+	start_soil_sensor();
 	start_soil_sensor();
 	printk("soil value: %u\n",soil_data);
 	ret = copy_to_user(buf,&soil_data,sizeof(int));
@@ -126,8 +134,9 @@ static int __init soil_sensor_init(void) {
 	gpio_request_one(MOSI, GPIOF_OUT_INIT_LOW,"Master Out/ Slave In");
 	gpio_request_one(MISO, GPIOF_OUT_INIT_LOW,"Master In/Slave Out");
 	gpio_request_one(SCLK, GPIOF_OUT_INIT_LOW,"SCLK");
+	gpio_request_one(CE0, GPIOF_OUT_INIT_LOW,"CE0");
 	gpio_request_one(CE1, GPIOF_OUT_INIT_LOW,"CE1");
-	start_soil_sensor();
+
 	
 
 
@@ -137,6 +146,7 @@ static void __exit soil_sensor_exit(void){
 	gpio_free(MOSI);
 	gpio_free(MISO);
 	gpio_free(SCLK);
+	gpio_free(CE0);
 	gpio_free(CE1);
 	cdev_del(cd_cdev);
 	unregister_chrdev_region(dev_num, 1);
