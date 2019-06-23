@@ -11,15 +11,20 @@ int wait_for_pir();
 int get_ultrasonic();
 int send_alert_distance_data_to_r2(int socket, int value);
 
+static int ultra_fd;
+
 
 int main(void){
 
 	struct request rcv;
 	pid_t pid;
 	int socket_r2;
+	int distance=0;
 	int time=0;
 
 	/*소켓 초기화*/
+	ultra_fd = open_ultrasonic_sensor();
+
 
 	pid=fork();
 	
@@ -30,7 +35,7 @@ int main(void){
 	else if(pid==0){
 			while(1){
 				printf("1. 조도 값, 습도 값 보내는 거 시도!\n");
-				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);	
+				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);	
 				if(send_light_data_to_r2(socket_r2)<0){
 					/*send 실패*/
 					printf("1. light data send() failed.\n");
@@ -42,6 +47,7 @@ int main(void){
 					/*send 실패*/
 					printf("1. soil data send() failed.\n");					
 				}
+
 				client_close(socket_r2);
 				printf("1. 주기적 값 보내는 것 성공.\n");
 				sleep(PERIOD);
@@ -58,25 +64,33 @@ int main(void){
 				/*PIR 예훈이가 짜야 짠다*/
 				if(wait_for_pir()==0){
 					printf("2. PIR 발견.\n");
+					time = 0;
+					distance = -1;
 					while(time<=10){
-						time=(clock()/CLOCKS_PER_SEC);
-						if(get_ultrasonic()<ALERT_DISTANCE){
-							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
+						fprintf(stderr, "time : %d\n", time);
+						/*time=(clock()/CLOCKS_PER_SEC);*/
+						distance = get_ultrasonic();
+						if(distance<ALERT_DISTANCE&&distance>0){
+							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
 							printf("2. 침입 알람 R2에게 전송\n");	
-							if(send_alert_distance_data_to_r2(socket_r2, get_ultrasonic())<0){
+							if(send_alert_distance_data_to_r2(socket_r2, distance)<0){
 								/*send 실패*/
 							}
 							client_close(socket_r2);
 							break;	
 						}
+						time++;
+						sleep(1);
 					}
+					/* find err */
+					fprintf(stderr, "time : distance = %d : %d\n", time, distance);
 				}
 			}					
 		}
 		else{
 			while(1){
 				printf("3. 온도 측정!\n");
-				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,5);
+				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
 				if(send_alert_temperature_data_to_r2(socket_r2)<0){
 					/*send 실패*/
 					
@@ -88,7 +102,7 @@ int main(void){
 		}
 	}
 
-
+	close_ultrasonic_sensor(ultra_fd);
 
 	
 
@@ -191,7 +205,8 @@ int wait_for_pir(){
 /*거리 재는 함수*/
 int get_ultrasonic(){
 	int dist;
-	dist = open_ultrasonic_sensor();
+	int fd;
+	dist = read_ultrasonic_sensor(ultra_fd);
 	
 	return dist;
 }
