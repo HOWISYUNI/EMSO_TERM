@@ -53,11 +53,11 @@
 #endif
 
 
-/* EMERGENCY */
+/* EMERGENCY 
 #ifndef EMG_DEF
 #define EMG_DEF
 
-#define EMG_PIN 12
+#define EMG_PIN 22
 #define DEV_EMG "emg_dev"
 
 #define EMG_IOCTL 0x70
@@ -67,3 +67,4 @@
 #define EMG_ON _IOWR(EMG_IOCTL_NUM, EMG_IOCTL_NUM1, unsigned long *)
 #define EMG_OFF _IOWR(EMG_IOCTL_NUM, EMG_IOCTL_NUM2, unsigned long *)
 #endif
+*/

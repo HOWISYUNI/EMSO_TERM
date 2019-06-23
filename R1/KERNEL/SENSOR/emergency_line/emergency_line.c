@@ -14,6 +14,7 @@ static long emg_line_ioctl(struct file *file, unsigned int cmd, unsigned long ar
         case EMG_ON:
                 printk("emergency line up\n");
                 gpio_set_value(EMG_PIN, 1);
+                gpio_set_value(EMG_PIN, 0);
                 break;
         case EMG_OFF:
                 printk("emergency line down\n");
