@@ -1,36 +1,38 @@
 #include "./user_interface.h"
 
+char rcv_str[BUF];
+
 int main(){
 	
 	int input;
 
 	struct response rcv;
 	
-	char rcv_str[BUF];// = "aaaa\nbbbb\ncccc\ndddd\n\neeee";
 	int soil_a;
 	int light_a;
 	
 	int c;
 	
 	while(1){
-		//system("clear");
+		system("clear");
 		printf("------------------------------------------\n");
-		printf("* 1. r1의 스프링클러 켜기    11. 끄기    *\n");
-		printf("* 2. r1의    led     켜기    22. 끄기    *\n");
-		printf("* 3. r1의 카메라 촬영                    *\n");
-		printf("* 4. r1의    버저   울리기   44. 끄기    *\n");
-		printf("* 5. r3에 토양온습도 최근 n개 요청       *\n");
-		printf("* 6. r3에 조도 최근 n개 요청             *\n");
-		printf("* 7. r3에 토양온습도 평균값 요청         *\n");
-		printf("* 8. r3에 조도 평균값 요청               *\n");
-		printf("* 9. r3에 토양온습도 값 전달             *\n");
+		printf("* 1. r1의 스프링클러 켜기    11. 끄기      *\n");
+		printf("* 2. r1의    led     켜기    22. 끄기     *\n");
+		printf("* 3. r1의 카메라 촬영                     *\n");
+		printf("* 4. r1의    버저   울리기   44. 끄기      *\n");
+		printf("* 5. r3에 토양온습도 최근 n개 요청          *\n");
+		printf("* 6. r3에 조도 최근 n개 요청               *\n");
+		printf("* 7. r3에 토양온습도 평균값 요청            *\n");
+		printf("* 8. r3에 조도 평균값 요청                 *\n");
+		printf("* 9. r3에 토양온습도 값 전달               *\n");
 		printf("* 10. r3에 조도 값 전달                   *\n");
+		printf("* 11. r1에 alert 신호 보내기              *\n");
 		printf("* 0. 종료                                *\n");
 		printf("------------------------------------------\n");
 		printf("******************************************\n");
 		printf("토양온습도 평균값:%d  조도 평균값:%d      \n", soil_a, light_a);
 		printf("******************************************\n");
-		printf("--토양온습도, 조도 최근값--\n");
+		//printf("--토양온습도, 조도 최근값--\n");
 		printf("%s\n", rcv_str);
 		//parse(rcv_str);
 		printf("******************************************\n");
@@ -58,10 +60,12 @@ int main(){
 			
 			rcv = request(socket_r1, 'U', 'c', '1', 0, "true");
 			if(rcv.type == 'f'){
-				printf("send_sprinkler_siganl - Fail\n");
+				printf("send_camera_siganl - Fail\n");
+				strcpy(rcv_str, "send_camera_signal - Fail\n");
 				sleep(3);
 			}else if(rcv.type == 't'){
-				printf("send_sprinkler_signal - Timeout\n");
+				printf("send_camera_signal - Timeout\n");
+				strcpy(rcv_str, "send_camera_signal - Timeout\n");
 				sleep(3);
 			}
 			
@@ -71,10 +75,12 @@ int main(){
 			
 			rcv = request(socket_r1, 'U', 'b', '1', 0, "true");
 			if(rcv.type == 'f'){
-				printf("send_sprinkler_siganl - Fail\n");
+				printf("send_buzzer_siganl - Fail\n");
+				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
 				sleep(3);
 			}else if(rcv.type == 't'){
-				printf("send_sprinkler_signal - Timeout\n");
+				printf("send_buzzer_signal - Timeout\n");
+				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
 				sleep(3);
 			}
 			
@@ -84,10 +90,12 @@ int main(){
 			
 			rcv = request(socket_r1, 'U', 'b', '0', 0, "false");
 			if(rcv.type == 'f'){
-				printf("send_sprinkler_siganl - Fail\n");
+				printf("send_buzzer_siganl - Fail\n");
+				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
 				sleep(3);
 			}else if(rcv.type == 't'){
-				printf("send_sprinkler_signal - Timeout\n");
+				printf("send_buzzer_signal - Timeout\n");
+				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
 				sleep(3);
 			}
 			
@@ -146,10 +154,25 @@ int main(){
             int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
             rcv = request(socket_r3, 'O', 'l', 's', strlen(data), data);
             client_close(socket_r3);
+		}else if(input == 11){
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			
+			rcv = request(socket_r1, 'U', 'a', '1', 0, "true");
+			if(rcv.type == 'f'){
+				printf("send_alert_siganl - Fail\n");
+				strcpy(rcv_str, "sned_alert_signal - Fail\n");
+				sleep(3);
+			}else if(rcv.type == 't'){
+				printf("send_buzzer_signal - Timeout\n");
+				strcpy(rcv_str, "sned_alert_signal - Timeout\n");
+				sleep(3);
+			}
+			
+			client_close(socket_r1);
 		}else if(input == 0){
 			printf("종료합니다.\n");
 			//fflush(stdin);
-			scanf("%d", &c);
+			//scanf("%d", &c);
 			break;
 		}else{
 
@@ -167,20 +190,24 @@ void send_sprinkler_signal(int socket, int sig){
     if(sig == true){
         rcv = request(socket, 'U', 's', '1', 0, "true");
         if(rcv.type == 'f'){
-            printf("send_sprinkler_siganl - Fail\n");
-			sleep(3);
+		printf("send_sprinkler_siganl - Fail\n");
+		strcpy(rcv_str, "sned_sprinkler_signal - Fail\n");
+		sleep(3);
         }else if(rcv.type == 't'){
-            printf("send_sprinkler_signal - Timeout\n");
-			sleep(3);
+		printf("send_sprinkler_signal - Timeout\n");
+		strcpy(rcv_str, "sned_sprinkler_signal - Timeout\n");
+		sleep(3);
         }
 
     }else{
         rcv = request(socket, 'U', 's', '0', 0, "false");
         if(rcv.type == 'f'){
             printf("send_sprinkler_siganl - Fail\n");
+		strcpy(rcv_str, "sned_sprinkler_signal - Fail\n");
             sleep(3);
         }else if(rcv.type == 't'){
             printf("send_sprinkler_signal - Timeout\n");
+		strcpy(rcv_str, "sned_sprinkler_signal - Timeout\n");
             sleep(3);
         }
 
@@ -195,9 +222,11 @@ void send_led_signal(int socket, int sig){
         request(socket, 'U', 'l', '1', 0, "true");
         if(rcv.type == 'f'){
             printf("send_led_signal - Fail\n");
+		strcpy(rcv_str, "sned_led_signal - Fail\n");
 			sleep(3);
         }else if(rcv.type == 't'){
             printf("send_len_signal - Timeout\n");
+		strcpy(rcv_str, "sned_led_signal - Timeout\n");
 			sleep(3);
         }
 
@@ -205,9 +234,11 @@ void send_led_signal(int socket, int sig){
         request(socket, 'U', 'l', '0', 0, "false");
         if(rcv.type == 'f'){
             printf("send_led_signal - Fail\n");
+		strcpy(rcv_str, "sned_led_signal - Fail\n");
             sleep(3);
         }else if(rcv.type == 't'){
             printf("send_len_signal - Timeout\n");
+		strcpy(rcv_str, "sned_led_signal - Timeout\n");
             sleep(3);
         }
 
