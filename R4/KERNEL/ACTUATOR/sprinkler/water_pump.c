@@ -7,20 +7,21 @@ static dev_t dev_num;
 static struct cdev *cd_cdev;
 
 static void timer_func(unsigned long data){
-	gpio_set_value(WATERPUMP_A, 0);
-	gpio_set_value(WATERPUMP_B, 0);
+	gpio_set_value(WATERPUMP_A, 1);
+	gpio_set_value(WATERPUMP_B, 1);
+    printk("PUMP_OFF_TIMER\n");
 }
 
 void pump_on(void){
 	gpio_set_value(WATERPUMP_A, 1);
 	gpio_set_value(WATERPUMP_B, 0);
-
+    printk("PUMP_ON\n");
 }
 
 void pump_off(void){
-	gpio_set_value(WATERPUMP_A, 0);
-	gpio_set_value(WATERPUMP_B, 0);
-
+	gpio_set_value(WATERPUMP_A, 1);
+	gpio_set_value(WATERPUMP_B, 1);
+    printk("PUMP_OFF\n");
 }
 
 static long water_pump(struct file *file, unsigned int cmd, unsigned long arg){
@@ -40,6 +41,26 @@ static long water_pump(struct file *file, unsigned int cmd, unsigned long arg){
 		    pump_on();
 		    add_timer(&timer_w);
 		    break;
+	    case PIN_TEST_A:
+            if(gpio_get_value(WATERPUMP_A) == 0){
+                gpio_set_value(WATERPUMP_A, 1);
+                printk("PIN_A : 1\n");
+            }
+            else{
+	            gpio_set_value(WATERPUMP_A, 0);
+                printk("PIN_A : 0\n");
+            }
+            break;
+        case PIN_TEST_B:
+            if(gpio_get_value(WATERPUMP_B) == 0){
+                gpio_set_value(WATERPUMP_B, 1);
+                printk("PIN_B : 1\n");
+            }
+            else{
+	            gpio_set_value(WATERPUMP_B, 0);
+                printk("PIN_B : 0\n");
+            }
+            break;
 		default:
 			return -1;
 	}
