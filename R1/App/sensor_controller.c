@@ -1,8 +1,4 @@
-
-
 #include "sensor_controller.h"
-
-
 
 int send_light_data_to_r2(int socket);
 int send_soil_data_to_r2(int socket);
@@ -232,3 +228,4 @@ int send_alert_distance_data_to_r2(int socket, int value){
 
 	return 0;
 }
+

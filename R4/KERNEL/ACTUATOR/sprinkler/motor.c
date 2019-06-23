@@ -80,14 +80,14 @@ int kthread_cycling(void *args){
 	
     /* cycling infinite */
     while(!kthread_should_stop()){
-        for(i=0;i<24;i++){
+        for(i=0;i<6;i++){
             if(kthread_should_stop()){ 
                 return 0;
             }
             moveDegree(15, MOTOR_SPEED, 0);
             msleep_interruptible(500);
         }
-        for(i=0;i<24;i++){
+        for(i=0;i<6;i++){
             if(kthread_should_stop()){ 
                 return 0;
             }
