@@ -66,4 +66,4 @@ int turn_on_sprinkler(void);
 int turn_off_sprinkler(void);
 int timer_sprinkler(unsigned long sec);
 /* Camera */
-int snapshot(void);
+int snapshot(char *file_name);
