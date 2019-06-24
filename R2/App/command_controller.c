@@ -17,7 +17,7 @@ int main(){
 		
 		/*r3에 토양 온습도 데이터를 요청함.*/
 		printf("r3에 request\n");
-		rcv = request(socket_r3, GET, SOIL, AVERAGE, 2, "10");
+		rcv = request(socket_r3, GET, SOIL, AVERAGE, 1, "5");
 
 		printf("r3에 연결된 소켓 CLOSE\n");
 		client_close(socket_r3);
@@ -47,7 +47,7 @@ int main(){
 
 		/*r3에 조도 데이터를 요청함*/
 		printf("r3에 request\n");
-		rcv = request(socket_r3, GET, LIGHT, AVERAGE, 2, "10");
+		rcv = request(socket_r3, GET, LIGHT, AVERAGE, 1, "5");
 
 		printf("r3에 연결된 소켓 CLOSE\n");
 		client_close(socket_r3);
