@@ -5,7 +5,7 @@
 #include "../lib/controllers.h"
 
 int main(){
-	int sock, c_sock, ret;
+	int sock, c_sock, ret, data;
 	
 	struct request *req;
 
@@ -17,6 +17,13 @@ int main(){
 		printf("wait request from R2.data_controller\n");		
 		c_sock = wait_request(sock, req);
 		
+		data = atoi(req->data);
+		if(data == 0){
+			printf("Data is 0!! No save!!\n");
+			sleep(1);
+			continue;
+		}
+
 		/* cmd is save('s') */
 		if(req->cmd == STORE){
 			ret = save_data(req->type, req->data);
