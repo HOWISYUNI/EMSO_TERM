@@ -36,6 +36,12 @@ int main(void){
 		    ret = camera_controller(req);
 		else if(req.type == 's')
 		    ret = sprinkler_controller(req);
+		else if(req.type == 'e')
+		    ret = emergency_controller();
+	    else if(req.type == 'f')
+	        ret = fin_emgcy_controller();
+		else
+		    ret = -1;
 		
 		if(ret < 0){
 		    printf("fail act Control\n");
@@ -192,8 +198,8 @@ int sprinkler_controller(struct request req){
     
 	/* cmd == 0 : OFF */
     else if(req.cmd == '0')
-
         ret = turn_off_sprinkler();
+        
     /* cmd != 0 && cmd != 1 : ERROR */
     else
         ret = -1;
@@ -205,3 +211,47 @@ int sprinkler_controller(struct request req){
 	return 0;
 }
 
+int emergency_controller(){
+    int ret;
+    int failed;
+    
+    /* LED AELRT ON */
+    ret = turn_on_led_alert_timer(0);
+    if(ret < 0)
+        failed = -1;
+        
+    /* BUZZER ON */
+    ret = turn_on_buzzer_timer(0);
+    if(ret < 0)
+        failed = -1;
+        
+    /* camera on */
+    ret = snapshot("timelog");
+    if(ret < 0)
+        failed = -1;
+        
+    if(failed == -1)
+        return -1;
+    
+    return 0;
+}
+
+int fin_emgcy_controller(){
+    int ret;
+    int failed;
+    
+    /* LED AELRT OFF */
+    ret = turn_off_led_alert_timer(0);
+    if(ret < 0)
+        failed = -1;
+        
+    /* BUZZER OFF */
+    ret = turn_off_buzzer_timer(0);
+    if(ret < 0)
+        failed = -1;
+
+    if(failed == -1)
+        return -1;
+    
+    return 0;
+}

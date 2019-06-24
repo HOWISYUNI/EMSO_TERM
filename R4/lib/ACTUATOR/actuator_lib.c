@@ -1,7 +1,8 @@
 #include "actuator_lib.h"
 
-/* LED device path : /dev/LED
-   BUZZER device path : /dev/buzzer */
+/* LED device path       : /dev/LED
+   LED_ALERT device path : /dev/LED_ALERT
+   BUZZER device path    : /dev/buzzer    */
 
 /* turn on led */
 int turn_on_led(){
@@ -161,7 +162,7 @@ int turn_off_sprinkler(){
 
     return 0;
 }
-/* kernel panic */
+
 int timer_sprinkler(unsigned long sec){
 	int fd_m, fd_w;
     fd_m = open("/dev/motor", O_RDWR);
@@ -197,6 +198,8 @@ int snapshot(char *file_name){
     else{
         /* parents process */
         printf("return pid(%d)\n", pid);
+
+        /* No wait Camera Snapshot
         printf("wait...\n");
         ret = wait(&status);    
         if(ret < 0){
@@ -204,6 +207,7 @@ int snapshot(char *file_name){
             return -1;
         }
         printf("snapshot success\n");
+        */
         return pid;
     }
 }

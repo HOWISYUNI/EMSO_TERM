@@ -11,12 +11,14 @@ int main(){
 
 	req = (struct request*)malloc(sizeof(struct request));
 	sock = server_open(R3_STG_PORT);
+	printf("R3.storage_controller init\n");
+	
 	while(1){
-		printf("Wait for saving data!!\n");		
-		c_sock = wait_request(sock, req);		/* 데이터 수신 대기 */
+		printf("wait request from R2.data_controller\n");		
+		c_sock = wait_request(sock, req);
 		
 		/* cmd is save('s') */
-		if(req->cmd == 's'){		//method??
+		if(req->cmd == 's'){
 			ret = save_data(req->type, req->data);
 			if(ret < 0){
 				printf("Failed save_data function!!\n");
@@ -28,8 +30,13 @@ int main(){
 			}
 		}
 		else{
-			printf("Cmd data is strange!!\n");
-			ret = response(c_sock, 'f', 0 , "cmd data is strange");
+    		/* not support request cmd */
+			printf("not support request command\n");
+			ret = response(c_sock, 'f', 0, "not support request");
+		}
+		/* response failed */
+		if(ret < 0){
+		    printf("failed send response\n");
 		}
 		sleep(1);
 	}
