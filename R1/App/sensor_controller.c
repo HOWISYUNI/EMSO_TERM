@@ -236,15 +236,24 @@ int send_alert_distance_data_to_r2(int socket, int value){
 
 /* Emergency situation, send signal to R4 */
 int emergency_actuator_signal(void){
+    char file_name[20];
     int sock, ret;
+    time_t ts;
+    struct tm *t;
     struct response rsp;
+
+    /* time stamp */
+    ts = time(NULL);
+    t = localtime(&ts);
+    sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+    
     sock = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
     
     /* Fail Connect */
     if(sock < 0)
         return -1;
     
-    rsp = request(sock, PUT, EMERGENCY, TURN_ON, sizeof("EMERGENCY"), "EMERGENCY");
+    rsp = request(sock, PUT, EMERGENCY, TURN_ON, sizeof(file_name), file_name);
     
     /* Fail request */
     if(rsp.type != SUCCESS)

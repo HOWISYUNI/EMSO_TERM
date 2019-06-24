@@ -16,3 +16,5 @@ void send_light_data_to_r3(int socket, struct request data_r1);
 void send_unidentified_object_to_r3(int socket, struct request data_r1);
 
 int alert_situation();
+
+int scp_snapshot(char *filename);
