@@ -47,7 +47,6 @@ int main(void){
 				}
 
 				client_close(socket_r2);
-				printf("1. 주기적 값 보내는 것 성공.\n");
 				sleep(PERIOD);
 			}
 	}
@@ -69,8 +68,9 @@ int main(void){
 						/*time=(clock()/CLOCKS_PER_SEC);*/
 						distance = get_ultrasonic();
 						if(distance<ALERT_DISTANCE&&distance>0){
-    						while(emergency_actuator_signal() < 0)
-    						    printf("notify emergency to r4\n");
+                            emergency_actuator_signal();
+						    printf("notify emergency to r4\n");
+						    
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,WAIT_RSP);
 							printf("2. 침입 알람 R2에게 전송\n");	
 							if(send_alert_distance_data_to_r2(socket_r2, distance)<0){
@@ -92,8 +92,8 @@ int main(void){
 				printf("3. 온도 측정!\n");
 				tmpo = read_dht11_sensor();
 				if(tmpo > ALERT_TEMPERATURE){
-			        while(emergency_actuator_signal() < 0)
-                	    printf("notify emergency to r4\n");
+			        emergency_actuator_signal()
+            	    printf("notify emergency to r4\n");
                 	    
 				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
 				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo)<0){
@@ -128,7 +128,6 @@ int send_light_data_to_r2(int socket){
 	len = sizeof(data);
 	rcv = request(socket, POST, LIGHT, STORE, len, data);
 	printf("1. light : %d\n",value);
-	printf("1. data : %s\n",data);
 	if(rcv.type==FAILURE){
 		printf("1. light receive failed.\n");
 		return -1;
