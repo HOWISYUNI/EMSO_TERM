@@ -45,7 +45,7 @@ int main(void){
 		
 		if(ret < 0){
 		    printf("fail act Control\n");
-		    rsp.type = FAIL;
+		    rsp.type = FAILURE;
 		    rsp.len = 0;
         	strcpy(rsp.data, "\0");
 		}
