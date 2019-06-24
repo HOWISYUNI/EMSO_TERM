@@ -27,21 +27,21 @@ int main(void){
 		}
 		
 		if(req.type == LED)
-		    ret = led_controller(req);
+            ret = led_controller(req);
 		else if(req.type == LED_ALERT)
             ret = led_alert_controller(req);
 		else if(req.type == BUZZER)
-			ret = buzzer_controller(req);
+            ret = buzzer_controller(req);
 		else if(req.type == CAMERA)
-		    ret = camera_controller(req);
+            ret = camera_controller(req);
 		else if(req.type == SPRINKLER)
-		    ret = sprinkler_controller(req);
+            ret = sprinkler_controller(req);
 		else if(req.type == EMERGENCY)
-		    ret = emergency_controller();
+            ret = emergency_controller();
 	    else if(req.type == FIN_EMRCY)
-	        ret = fin_emgcy_controller();
+            ret = fin_emgcy_controller();
 		else
-		    ret = -1;
+            ret = -1;
 		
 		if(ret < 0){
 		    printf("fail act Control\n");

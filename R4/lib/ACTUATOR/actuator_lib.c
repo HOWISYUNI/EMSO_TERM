@@ -182,7 +182,7 @@ int timer_sprinkler(unsigned long sec){
 
 
 /* camera snapshot */
-int snapshot(){
+int snapshot(void){
     char *file_name;
     int status, ret;
     time_t ts;
@@ -199,7 +199,7 @@ int snapshot(){
         /* time stamp min */
         ts = time(NULL) / 60;
         sprintf(file_name, "%ld", ts);
-        
+        printf("snapshot!!: %s\n", file_name);
         /* child process */
         execl("/bin/sh", "sh", "./snapshot.sh", file_name, NULL);
     }
