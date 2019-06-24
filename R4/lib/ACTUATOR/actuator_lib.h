@@ -51,19 +51,19 @@
 #define PIN_TEST_A _IOWR(SPRNKLER_NUM, SPRNKLER_NUM7, unsigned long *)
 #define PIN_TEST_B _IOWR(SPRNKLER_NUM, SPRNKLER_NUM8, unsigned long *)
 /* LED & LED for ALERT */
-int turn_on_led();
+int turn_on_led(void);
 int turn_on_led_timer(unsigned long sec);
-int turn_off_led();
-int turn_on_led_alert();
+int turn_off_led(void);
+int turn_on_led_alert(void);
 int turn_on_led_alert_timer(unsigned long sec);
-int turn_off_led_alert();
+int turn_off_led_alert(void);
 /* Buzzer */
-int turn_on_buzzer();
-int turn_off_buzzer();
+int turn_on_buzzer(void);
+int turn_off_buzzer(void);
 int turn_on_buzzer_timer(unsigned long sec);
 /* Sprinkler */
-int turn_on_sprinkler();
-int turn_off_sprinkler();
+int turn_on_sprinkler(void);
+int turn_off_sprinkler(void);
 int timer_sprinkler(unsigned long sec);
 /* Camera */
-int snapshot(char *file_name);
+int snapshot();

@@ -136,5 +136,3 @@ Parameter : int dev  (file description)
 Return : void
 
 */
-
-

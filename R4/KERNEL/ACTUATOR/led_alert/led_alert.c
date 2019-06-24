@@ -1,8 +1,6 @@
 /*
  * 20190524 aeomhs
  * led_alert.c
- * open : LED_ALERT on
- * close : LED_ALERt off
  * */
 
 #include "led_alert.h"
@@ -14,6 +12,7 @@ static struct timer_list timer;
 static struct timer_list alert;
 static dev_t dev_num;
 static struct cdev *cd_cdev;
+
 
 static void timer_func(unsigned long data){
     printk("led alert down\n");
@@ -32,23 +31,19 @@ static void alert_led(unsigned long data){
 	alert.data = data + 1;
 	alert.expires = jiffies + (HZ);
 	
-	if(alert.data%3 == 0){
-		gpio_set_value(LED_R, 0);
+	if(alert.data%2 == 0){
+		gpio_set_value(LED_R, 1);
 		gpio_set_value(LED_G, 0);
 		gpio_set_value(LED_B, 1);
 	}
-	else if(alert.data%3 == 1){
-		gpio_set_value(LED_R, 1);
-        gpio_set_value(LED_G, 0);
-        gpio_set_value(LED_B, 0);
-	}
 	else{
 		gpio_set_value(LED_R, 0);
-		gpio_set_value(LED_G, 1);
-		gpio_set_value(LED_B, 0);
+        gpio_set_value(LED_G, 1);
+        gpio_set_value(LED_B, 0);
 	}
 	add_timer(&alert);
 }
+
 
 
 static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long arg){
@@ -57,7 +52,7 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
                 printk("turn on led alert\n");
                 led_down();
                 
-                gpio_set_value(LED_R, 1);
+                gpio_set_value(LED_G, 1);
                 
                 alert.function = alert_led;
                 alert.data = 1L;
@@ -80,7 +75,8 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
 	            timer.expires = jiffies + (arg*HZ);
 
                 /* alert led on */
-	            gpio_set_value(LED_R, 1);
+	            gpio_set_value(LED_G, 1);
+
 	            alert.function = alert_led;
                 alert.data = 1L;
                 alert.expires = jiffies + (HZ);
@@ -95,7 +91,6 @@ static long led_alert_ioctl(struct file *file, unsigned int cmd, unsigned long a
         return 0;
 }
 
-
 struct file_operations led_alert_fops = {
 	.unlocked_ioctl = led_alert_ioctl,
 };
@@ -109,7 +104,7 @@ static int __init led_alert_init(void){
     gpio_request_one(LED_R, GPIOF_OUT_INIT_LOW, "LED_R");
     gpio_request_one(LED_G, GPIOF_OUT_INIT_LOW, "LED_G");
     gpio_request_one(LED_B, GPIOF_OUT_INIT_LOW, "LED_B");
-    
+
     /* cdev init */
     alloc_chrdev_region(&dev_num, 0, 1, DEV_LED_ALERT);
     cd_cdev = cdev_alloc();

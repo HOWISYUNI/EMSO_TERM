@@ -25,3 +25,6 @@ void close_ultrasonic_sensor(int dev);
 
 int pir_wait();
 
+int emergency_line_up();
+int emergency_line_down();
+
