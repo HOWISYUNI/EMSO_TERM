@@ -92,7 +92,7 @@ int main(void){
 				printf("3. 온도 측정!\n");
 				tmpo = read_dht11_sensor();
 				if(tmpo > ALERT_TEMPERATURE){
-			        emergency_actuator_signal()
+			        emergency_actuator_signal();
             	    printf("notify emergency to r4\n");
                 	    
 				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);

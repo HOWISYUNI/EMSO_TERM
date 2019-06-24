@@ -169,7 +169,7 @@ int camera_controller(struct request req){
     /* cmd == 1 : SNAPSHOT */
     if(req.cmd == TURN_ON){
         /* request.data ==> FILE_NAME */
-        ret = snapshot(req.data);
+        ret = snapshot();
         if(ret < 0)
             return -1;
     }
@@ -226,7 +226,7 @@ int emergency_controller(void){
         failed = -1;
         
     /* camera on */
-    ret = snapshot("timelog");
+    ret = snapshot();
     if(ret < 0)
         failed = -1;
         
