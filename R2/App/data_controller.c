@@ -25,7 +25,7 @@ int main(void){
 			/*ERROR*/
 			printf("response error");
 		}
-		printf("r3에게 보내기위한 소켓 OPEN\n");
+		//printf("r3에게 보내기위한 소켓 OPEN\n");
 		socket_r3 = client_open(R3_ADDR, R3_STG_PORT,WAIT_RSP);
 		
 		if(rcv.type == SOIL){	/*온습도 데이터*/
@@ -47,7 +47,7 @@ int main(void){
 		}else{	/**/
 
 		}
-		printf("r3에게 보내기위한 소켓 CLOSE\n");
+		//printf("r3에게 보내기위한 소켓 CLOSE\n");
 		client_close(socket_r3);
 	}
 

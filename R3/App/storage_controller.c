@@ -5,18 +5,25 @@
 #include "../lib/controllers.h"
 
 int main(){
-	int sock, c_sock, ret;
+	int sock, c_sock, ret, data;
 	
 	struct request *req;
 
 	req = (struct request*)malloc(sizeof(struct request));
 	sock = server_open(R3_STG_PORT);
-	printf("R3.storage_controller init\n");
+	//printf("R3.storage_controller init\n");
 	
 	while(1){
 		printf("wait request from R2.data_controller\n");		
 		c_sock = wait_request(sock, req);
 		
+		data = atoi(req->data);
+		if(data == 0){
+			printf("Data is 0!! No save!!\n");
+			sleep(1);
+			continue;
+		}
+
 		/* cmd is save('s') */
 		if(req->cmd == STORE){
 			ret = save_data(req->type, req->data);

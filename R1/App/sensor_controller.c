@@ -70,12 +70,12 @@ int main(void){
 						distance = get_ultrasonic();
 						if(distance<ALERT_DISTANCE&&distance>0){
 					        /* time stamp */
-                            ts = time(NULL);
-                            t = localtime(&ts);
-                            sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
-						    
-                            emergency_actuator_signal(file_name);
-						    printf("notify emergency to r4\n");
+                  ts = time(NULL);
+                  t = localtime(&ts);
+                  sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+                  emergency_actuator_signal(file_name);
+						      /*printf("notify emergency to r4\n");*/
+
 						    
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,WAIT_RSP);
 							printf("2. 침입 알람 R2에게 전송\n");	
@@ -89,7 +89,8 @@ int main(void){
 						sleep(1);
 					}
 					/* find err */
-					fprintf(stderr, "time : distance = %d : %d\n", p_time, distance);
+
+					//fprintf(stderr, "time : distance = %d : %d\n", time, distance);
 				}
 			}					
 		}
@@ -103,7 +104,7 @@ int main(void){
                     t = localtime(&ts);
                     sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
 			        emergency_actuator_signal(file_name);
-            	    printf("notify emergency to r4\n");
+            	    /*printf("notify emergency to r4\n");*/
                 	    
 				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
 				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo, file_name)<0){
