@@ -24,7 +24,7 @@ int main(){
 
 		/*rcv값에 따라서 스프링클러 작동여부 구하는 함수*/
 		printf("작동여부 구함.\n");
-		sig = check_sprinkler((int)rcv.data);
+		sig = check_sprinkler(atoi(rcv.data));
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r1에 소켓 OPEN\n");
@@ -53,7 +53,7 @@ int main(){
 	
 		/*rcv값에 따라서 led 작동여부 구하는 함수*/
 		printf("작동여부 구함.\n");
-		sig = check_led((int)rcv.data);
+		sig = check_led(atoi(rcv.data));
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
 		printf("r1에 소켓 OPEN\n");
@@ -85,11 +85,11 @@ void send_sprinkler_signal(int socket, int sig){
 
 	}else{/*스프링클러 끄는 신호 전송*/
 		rcv = request(socket, 'U', 's', '0', 0, "false");
-        if(rcv.type == 'f'){
-            printf("send_sprinkler_siganl - Fail\n");
-        }else if(rcv.type == 't'){
-                printf("send_sprinkler_signal - Timeout\n");
-        }
+        	if(rcv.type == 'f'){
+        	    printf("send_sprinkler_siganl - Fail\n");
+        	}else if(rcv.type == 't'){
+        	        printf("send_sprinkler_signal - Timeout\n");
+        	}
 
 	}
 
@@ -107,11 +107,11 @@ void send_led_signal(int socket, int sig){
 
 	}else{
 		request(socket, 'U', 'l', '0', 0, "false");
-        if(rcv.type == 'f'){
+        	if(rcv.type == 'f'){
 			printf("send_led_signal - Fail\n");
-        }else if(rcv.type == 't'){
-            printf("send_len_signal - Timeout\n");
-        }
+        	}else if(rcv.type == 't'){
+        	    printf("send_len_signal - Timeout\n");
+        	}
 
 
 	}
