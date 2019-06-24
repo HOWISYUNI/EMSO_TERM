@@ -2,24 +2,25 @@
 
 int send_light_data_to_r2(int socket);
 int send_soil_data_to_r2(int socket);
-int send_alert_temperature_data_to_r2(int socket, int value);
+int send_alert_temperature_data_to_r2(int socket, int value, char *file_name);
 int wait_for_pir();
 int get_ultrasonic();
-int send_alert_distance_data_to_r2(int socket, int value);
-int emergency_actuator_signal(void);
+int send_alert_distance_data_to_r2(int socket, int value, char *file_name);
+int emergency_actuator_signal(char *file_name);
 
 static int ultra_fd;
 
 
 int main(void){
-
+    char file_name[20];
+    time_t ts;
+    struct tm *t;
 	struct request rcv;
 	pid_t pid;
 	int socket_r2;
 	int distance=0;
-	int time=0;
+	int p_time=0;
 	int tmpo;
-
 	/*소켓 초기화*/
 	ultra_fd = open_ultrasonic_sensor();
 
@@ -61,28 +62,34 @@ int main(void){
 				/*PIR 예훈이가 짜야 짠다*/
 				if(wait_for_pir()==0){
 					printf("2. PIR 발견.\n");
-					time = 0;
+					p_time = 0;
 					distance = -1;
-					while(time<=10){
-						fprintf(stderr, "time : %d\n", time);
-						/*time=(clock()/CLOCKS_PER_SEC);*/
+					while(p_time<=10){
+						fprintf(stderr, "p_time : %d\n", p_time);
+						/*p_time=(clock()/CLOCKS_PER_SEC);*/
 						distance = get_ultrasonic();
 						if(distance<ALERT_DISTANCE&&distance>0){
-                            emergency_actuator_signal();
-						    //printf("notify emergency to r4\n");
+					        /* time stamp */
+                  ts = time(NULL);
+                  t = localtime(&ts);
+                  sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+                  emergency_actuator_signal(file_name);
+						      /*printf("notify emergency to r4\n");*/
+
 						    
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,WAIT_RSP);
 							printf("2. 침입 알람 R2에게 전송\n");	
-							if(send_alert_distance_data_to_r2(socket_r2, distance)<0){
+							if(send_alert_distance_data_to_r2(socket_r2, distance, file_name)<0){
 								/*send 실패*/
 							}
 							client_close(socket_r2);
 							break;	
 						}
-						time++;
+						p_time++;
 						sleep(1);
 					}
 					/* find err */
+
 					//fprintf(stderr, "time : distance = %d : %d\n", time, distance);
 				}
 			}					
@@ -92,11 +99,15 @@ int main(void){
 				printf("3. 온도 측정!\n");
 				tmpo = read_dht11_sensor();
 				if(tmpo > ALERT_TEMPERATURE){
-			        emergency_actuator_signal();
-            	    //printf("notify emergency to r4\n");
+			        /* time stamp */
+                    ts = time(NULL);
+                    t = localtime(&ts);
+                    sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+			        emergency_actuator_signal(file_name);
+            	    /*printf("notify emergency to r4\n");*/
                 	    
 				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
-				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo)<0){
+				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo, file_name)<0){
 					    /*send 실패*/
 					    
 				    }
@@ -167,12 +178,12 @@ int send_soil_data_to_r2(int socket){
 }
 
 /*r2에게 온도 값이 일정이상이면 Alert를 보내는 함수*/
-int send_alert_temperature_data_to_r2(int socket, int value){
+int send_alert_temperature_data_to_r2(int socket, int value, char *file_name){
 	struct response rcv;
 	char data[1024];
 	int len;
 		
-	sprintf(data, "%d", value);
+	sprintf(data, "%s : %d", file_name, value);
 	len = sizeof(data);
 
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
@@ -213,13 +224,13 @@ int get_ultrasonic(){
 
 
 /*r2에게 Alert 신호 보내고 거리 보내는 함수*/
-int send_alert_distance_data_to_r2(int socket, int value){
+int send_alert_distance_data_to_r2(int socket, int value, char *file_name){
 	struct response rcv;
 	char data[1024];
 	int len;
 	
 	printf("2. 거리 : %d\n",value);
-	sprintf(data, "%d", value);
+	sprintf(data, "%s : %d", file_name, value);
 	len = sizeof(data);
 	rcv = request(socket, POST, EMG_P, STORE, len, data);
 
@@ -235,17 +246,9 @@ int send_alert_distance_data_to_r2(int socket, int value){
 }
 
 /* Emergency situation, send signal to R4 */
-int emergency_actuator_signal(void){
-    char file_name[20];
+int emergency_actuator_signal(char *file_name){
     int sock, ret;
-    time_t ts;
-    struct tm *t;
     struct response rsp;
-
-    /* time stamp */
-    ts = time(NULL);
-    t = localtime(&ts);
-    sprintf(file_name, "%04d%02d%02d_%02d%02d%02d", t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
     
     sock = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
     
