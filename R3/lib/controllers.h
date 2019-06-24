@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../../KSF_NET/ksf_net_lib.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 #define DATA_LEN 10
