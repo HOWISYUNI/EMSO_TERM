@@ -6,6 +6,7 @@ int send_alert_temperature_data_to_r2(int socket);
 int wait_for_pir();
 int get_ultrasonic();
 int send_alert_distance_data_to_r2(int socket, int value);
+int emergency_actuator_signal(void);
 
 static int ultra_fd;
 
@@ -116,14 +117,14 @@ int send_light_data_to_r2(int socket){
 	sleep(1);
 	sprintf(data, "%d", value);
 	len = sizeof(data);
-	rcv = request(socket, 'O', 'l', 's', len, data);
+	rcv = request(socket, POST, LIGHT, STORE, len, data);
 	printf("1. light : %d\n",value);
 	printf("1. data : %s\n",data);
-	if(rcv.type=='f'){
+	if(rcv.type==FAILURE){
 		printf("1. light receive failed.\n");
 		return -1;
 	}
-	else if(rcv.type=='t'){
+	else if(rcv.type==TIME_OUT){
 		printf("1. light receive timeout.\n");
 		return -2;
 	}
@@ -143,13 +144,13 @@ int send_soil_data_to_r2(int socket){
 	printf("1. soil : %d\n",value);	
 	sprintf(data, "%d", value);
 	len = sizeof(data);
-	rcv = request(socket, 'O', 's', 's', len, data);
+	rcv = request(socket, POST, SOIL, STORE, len, data);
 
-	if(rcv.type=='f'){
+	if(rcv.type==FAILURE){
 		printf("1. soil receive failed.\n");
 		return -1;
 	}
-	else if(rcv.type=='t'){
+	else if(rcv.type==TIME_OUT){
 		printf("1. soil receive timeout.\n");
 		return -2;
 	}
@@ -163,6 +164,16 @@ int send_alert_temperature_data_to_r2(int socket){
 	char data[1024];
 	int value;
 	int len;
+	int pid, ret, status;
+	
+	/* fork, child running for notify R4.ActController */
+	pid = fork();
+	if(pid == 0){
+	    printf("[ALERT]request... R4... Acting...\n");
+	    emergency_actuator_signal();
+	}
+	
+	
 	value=0;
 	value = read_dht11_sensor();
 	sprintf(data, "%d", value);
@@ -170,18 +181,22 @@ int send_alert_temperature_data_to_r2(int socket){
 
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
 	if(value>ALERT_TEMPERATURE){
-		rcv = request(socket, 'O', 't', 's', len, data);
+		rcv = request(socket, POST, EMG_T, STORE, len, data);
 		printf("3. 온도 이상 현재 온도 : %d 도 \n",value);
-		if(rcv.type=='f'){
+		if(rcv.type==FAILURE){
 			return -1;
 		}
-		else if(rcv.type=='t'){
+		else if(rcv.type==TIME_OUT){
 			return -2;
 		}
 
 	}
 	
-
+    ret = wait(&status);
+    if(ret < 0){
+        printf("Fail request!!! to R4\n");
+    }
+    
 	return 0;
 }
 
@@ -213,19 +228,63 @@ int send_alert_distance_data_to_r2(int socket, int value){
 	struct response rcv;
 	char data[1024];
 	int len;
+	int pid, ret, status;
+	
+	/* fork, child running for notify R4.ActController */
+	pid = fork();
+	if(pid == 0){
+	    printf("[ALERT]request... R4... Acting...\n");
+	    emergency_actuator_signal();
+	}
+	
 	printf("2. 거리 : %d\n",value);
 	sprintf(data, "%d", value);
 	len = sizeof(data);
-	rcv = request(socket, 'O', 'a', 's', len, data);
+	rcv = request(socket, POST, EMG_P, STORE, len, data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.type=='f'){
+	if(rcv.type==FAILURE){
 		return -1;
 	}
-	else if(rcv.type=='t'){
+	else if(rcv.type==TIME_OUT){
 		return -2;
 	}
-
+	
+    ret = wait(&status);
+    if(ret < 0){
+        printf("Fail request!!! to R4\n");
+    }
+    
 	return 0;
+}
+
+/* Emergency situation, send signal to R4 */
+int emergency_actuator_signal(void){
+    int sock, ret;
+    struct response rsp;
+    sock = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
+    
+    
+    /* Fail connect */
+    while(sock < 0){
+        /* Try Connect infinite : NOTIFIER EMERGENCY */
+        sock = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
+        sleep(2);
+    }
+    rsp = request(sock, PUT, EMERGENCY, TURN_ON, sizeof("EMERGENCY"), "EMERGENCY");
+    printf("request to r4...\n");
+    
+    /* Fail Request */
+    while(rsp.type != SUCCESS){
+        rsp = request(sock, PUT, EMERGENCY, TURN_ON, sizeof("EMERGENCY"), "EMERGENCY");
+        printf("request to r4...\n");
+        sleep(2);
+    }
+    
+    printf("request successful\n");
+    
+    client_close(sock);
+    
+    return 0;
 }
 

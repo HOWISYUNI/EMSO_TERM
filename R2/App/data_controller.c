@@ -21,26 +21,26 @@ int main(void){
 		printf("받은 값 : %d\n", atoi(rcv.data));
 		//printf("0\n");
 		strcpy(res.data,"\n");
-		if(response(c_socket, 's', 0, res.data) < 0 ){
+		if(response(c_socket, SUCCESS, 0, res.data) < 0 ){
 			/*ERROR*/
 			printf("response error");
 		}
 		printf("r3에게 보내기위한 소켓 OPEN\n");
-		socket_r3 = client_open(R3_ADDR, R3_STG_PORT,10);
+		socket_r3 = client_open(R3_ADDR, R3_STG_PORT,WAIT_RSP);
 		
-		if(rcv.type == 's'){	/*온습도 데이터*/
+		if(rcv.type == SOIL){	/*온습도 데이터*/
 			/*r3에게 데이터 전송*/
 			printf("온습도데이터 전송\n");
 			send_humidity_data_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'l'){	/*조도 데이터*/
+		}else if(rcv.type == LIGHT){	/*조도 데이터*/
 			/*r3에게 데이터 전송*/
 			printf("조도데이터 전송\n");
 			send_light_data_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'a'){	/*비정상 상황 신호*/
+		}else if(rcv.type == EMG_T){	/*비정상 상황 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
 			printf("비정상 상황 신호 전송\n");
 			send_abnormal_situation_to_r3(socket_r3, rcv);
-		}else if(rcv.type == 'a'){	/*미확인 물체 신호*/
+		}else if(rcv.type == EMG_P){	/*미확인 물체 신호*/
 			/*r3에게 데이터 전송 및 알람 메시지*/
 			printf("미확인 물체 신호 전송\n");
 			send_unidentified_object_to_r3(socket_r3, rcv);
@@ -63,12 +63,12 @@ void send_abnormal_situation_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
 	int len = strlen(data_r1.data);
-	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
+	rcv = request(socket, POST, EMG_T, STORE, len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.type == 'f'){
+	if(rcv.type == FAILURE){
         printf("send_abnormal_situation_to_r3 - Fail\n");
-    }else if(rcv.type == 't'){
+    }else if(rcv.type == TIME_OUT){
         printf("send_abnormal_situation_to_r3 - Timeout\n");
     }
 
@@ -80,12 +80,12 @@ void send_humidity_data_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
 	int len = strlen(data_r1.data);
-	rcv = request(socket, 'O', 's', 's', len, data_r1.data);
+	rcv = request(socket, POST, SOIL, STORE, len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.type == 'f'){
+	if(rcv.type == FAILURE){
         printf("send_humidity_data_to_r3 - Fail\n");
-    }else if(rcv.type == 't'){
+    }else if(rcv.type == TIME_OUT){
         printf("send_humidity_data_to_r3 - Timeout\n");
     }
 
@@ -96,12 +96,12 @@ void send_light_data_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
     int len = strlen(data_r1.data);
-	rcv = request(socket, 'O', 'l', 's', len, data_r1.data);
+	rcv = request(socket, POST, LIGHT, STORE, len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.type == 'f'){
+	if(rcv.type == FAILURE){
         printf("send_light_data_to_r3 - Fail\n");
-    }else if(rcv.type == 't'){
+    }else if(rcv.type == TIME_OUT){
         printf("send_light_data_to_r3 - Timeout\n");
     }
 
@@ -112,12 +112,12 @@ void send_unidentified_object_to_r3(int socket, struct request data_r1){
 	struct response rcv;
 
 	int len = strlen(data_r1.data);
-	rcv = request(socket, 'O', 'a', 's', len, data_r1.data);
+	rcv = request(socket, POST, EMG_P, STORE, len, data_r1.data);
 
 	/*추후 예외처리를 할지도 모르니 만들어는 놨는데 비어둠*/
-	if(rcv.type == 'f'){
+	if(rcv.type == FAILURE){
 		printf("send_unidentified_object_to_r3 - Fail\n");
-	}else if(rcv.type == 't'){
+	}else if(rcv.type == TIME_OUT){
 		printf("send_unidentified_object_to_r3 - Timeout\n");
 	}
 

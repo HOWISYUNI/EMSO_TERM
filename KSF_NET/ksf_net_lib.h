@@ -26,6 +26,7 @@
 #define LOCAL_HOST "127.0.0.1"
 #define LOCAL_PORT 4000
 #define BACK_LOG_N 4      /* backlog : number of queue can listen to connection  */
+#define WAIT_RSP 10
 #endif
 
 #ifndef KSF_NET_DEFINE
@@ -39,9 +40,8 @@
 /* SENSOR */
 #define LIGHT     'L'
 #define SOIL      'S'
-#define DHT       'D'
-#define PIR       'P'
-#define ULT_SONIC 'U'
+#define EMG_T     'T'
+#define EMG_P     'P'
 /* ACTUATOR */ 
 #define LED       'l'
 #define LED_ALERT 'a'
@@ -53,8 +53,8 @@
 
 /* Command */
 /* GET */
-#define RCNT        'R'
-#define AVRG        'A'
+#define RCNT_VAL    'v'
+#define AVERAGE     'a'
 /* POST */
 #define STORE       'S'
 /* PUT */
@@ -62,7 +62,8 @@
 #define TURN_OFF    0
 
 /* RESPONSE TYPE */
-#define FAIL        'F'
+#define FAILURE     'F'
+#define TIME_OUT    'T'
 #define SUCCESS     'S'
 
 #endif

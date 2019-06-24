@@ -40,30 +40,30 @@ int main(){
 		scanf("%d", &input);
 
 		if(input == 1){
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);		
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);		
 			send_sprinkler_signal(socket_r1, true);
 			client_close(socket_r1);			
 		}else if(input == 2){
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			send_led_signal(socket_r1, true);
 			client_close(socket_r1);
 		}else if(input == 11){
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			send_sprinkler_signal(socket_r1, false);
 			client_close(socket_r1);
 		}else if(input == 22){
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			send_led_signal(socket_r1, false);
 			client_close(socket_r1);
 		}else if(input == 3){//카메라
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			
-			rcv = request(socket_r1, 'U', 'c', '1', 0, "true");
-			if(rcv.type == 'f'){
+			rcv = request(socket_r1, PUT, CAMERA, TURN_ON, sizeof("snapshot!"), "snapshot!");
+			if(rcv.type == FAILURE){
 				printf("send_camera_siganl - Fail\n");
 				strcpy(rcv_str, "send_camera_signal - Fail\n");
 				sleep(3);
-			}else if(rcv.type == 't'){
+			}else if(rcv.type == TIME_OUT){
 				printf("send_camera_signal - Timeout\n");
 				strcpy(rcv_str, "send_camera_signal - Timeout\n");
 				sleep(3);
@@ -71,14 +71,14 @@ int main(){
 			
 			client_close(socket_r1);
 		}else if(input == 4){//버저 울기
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			
-			rcv = request(socket_r1, 'U', 'b', '1', 0, "true");
-			if(rcv.type == 'f'){
+			rcv = request(socket_r1, PUT, BUZZER, TURN_ON, sizeof("turn on buzzer"), "turn on buzzer");
+			if(rcv.type == FAILURE){
 				printf("send_buzzer_siganl - Fail\n");
 				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
 				sleep(3);
-			}else if(rcv.type == 't'){
+			}else if(rcv.type == TIME_OUT){
 				printf("send_buzzer_signal - Timeout\n");
 				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
 				sleep(3);
@@ -86,14 +86,14 @@ int main(){
 			
 			client_close(socket_r1);
 		}else if(input == 44){//버저 끄기
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			
-			rcv = request(socket_r1, 'U', 'b', '0', 0, "false");
-			if(rcv.type == 'f'){
+			rcv = request(socket_r1, PUT, BUZZER, TURN_OFF, sizeof("turn off buzzer"), "turn off buzzer");
+			if(rcv.type == FAILURE){
 				printf("send_buzzer_siganl - Fail\n");
 				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
 				sleep(3);
-			}else if(rcv.type == 't'){
+			}else if(rcv.type == TIME_OUT){
 				printf("send_buzzer_signal - Timeout\n");
 				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
 				sleep(3);
@@ -101,7 +101,7 @@ int main(){
 			
 			client_close(socket_r1);
 		}else if(input == 5){
-			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
+			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, WAIT_RSP);
 			request_soil_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
 			//printf("--최근 토양온습도 값들--\n");
@@ -112,7 +112,7 @@ int main(){
 			//scanf("%d", &c);
 			//sleep(5);
 		}else if(input == 6){
-			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, 5);
+			int socket_r3 = client_open(R3_ADDR, R3_REF_PORT, WAIT_RSP);
 			request_light_recent_to_r3(socket_r3, rcv_str);
 			client_close(socket_r3);
 			//printf("--최근 조도 값들--\n");
@@ -145,24 +145,24 @@ int main(){
 			//fflush(stdin);
 			scanf("%s", data);
 			int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
-			rcv = request(socket_r3, 'O', 's', 's', strlen(data), data);
+			rcv = request(socket_r3, POST, SOIL, STORE, strlen(data), data);
 			client_close(socket_r3);
 		}else if(input == 10){/*r3에 조도 값 전달*/
 			char data[BUF];
 			//fflush(stdin);
             scanf("%s", data);
             int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
-            rcv = request(socket_r3, 'O', 'l', 's', strlen(data), data);
+            rcv = request(socket_r3, POST, LIGHT, STORE, strlen(data), data);
             client_close(socket_r3);
 		}else if(input == 11){
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
 			
-			rcv = request(socket_r1, 'U', 'a', '1', 0, "true");
-			if(rcv.type == 'f'){
+			rcv = request(socket_r1, PUT, LED_ALERT, TURN_ON, sizeof("turn on led alert"), "turn on led alert");
+			if(rcv.type == FAILURE){
 				printf("send_alert_siganl - Fail\n");
 				strcpy(rcv_str, "sned_alert_signal - Fail\n");
 				sleep(3);
-			}else if(rcv.type == 't'){
+			}else if(rcv.type == TIME_OUT){
 				printf("send_buzzer_signal - Timeout\n");
 				strcpy(rcv_str, "sned_alert_signal - Timeout\n");
 				sleep(3);
@@ -188,7 +188,7 @@ int main(){
 void send_sprinkler_signal(int socket, int sig){
     struct response rcv;
     if(sig == true){
-        rcv = request(socket, 'U', 's', '1', 0, "true");
+        rcv = request(socket, PUT, SPRINKLER, TURN_ON, sizeof("turn on sprinkler"), "turn on sprinkler");
         if(rcv.type == 'f'){
 		printf("send_sprinkler_siganl - Fail\n");
 		strcpy(rcv_str, "sned_sprinkler_signal - Fail\n");
@@ -200,12 +200,12 @@ void send_sprinkler_signal(int socket, int sig){
         }
 
     }else{
-        rcv = request(socket, 'U', 's', '0', 0, "false");
-        if(rcv.type == 'f'){
+        rcv = request(socket, PUT, SPRINKLER, TURN_OFF, sizeof("turn off sprinkler"), "turn off sprinkler");
+        if(rcv.type == FAILURE){
             printf("send_sprinkler_siganl - Fail\n");
 		strcpy(rcv_str, "sned_sprinkler_signal - Fail\n");
             sleep(3);
-        }else if(rcv.type == 't'){
+        }else if(rcv.type == TIME_OUT){
             printf("send_sprinkler_signal - Timeout\n");
 		strcpy(rcv_str, "sned_sprinkler_signal - Timeout\n");
             sleep(3);
@@ -219,24 +219,24 @@ void send_sprinkler_signal(int socket, int sig){
 void send_led_signal(int socket, int sig){
     struct response rcv;
     if(sig == true){
-        request(socket, 'U', 'l', '1', 0, "true");
-        if(rcv.type == 'f'){
+        request(socket, PUT, LED, TURN_ON, sizeof("turn on led"), "turn on led");
+        if(rcv.type == FAILURE){
             printf("send_led_signal - Fail\n");
 		strcpy(rcv_str, "sned_led_signal - Fail\n");
 			sleep(3);
-        }else if(rcv.type == 't'){
+        }else if(rcv.type == TIME_OUT){
             printf("send_len_signal - Timeout\n");
 		strcpy(rcv_str, "sned_led_signal - Timeout\n");
 			sleep(3);
         }
 
     }else{
-        request(socket, 'U', 'l', '0', 0, "false");
-        if(rcv.type == 'f'){
+        request(socket, PUT, LED, TURN_OFF, sizeof("turn off led"), "turn off led");
+        if(rcv.type == FAILURE){
             printf("send_led_signal - Fail\n");
 		strcpy(rcv_str, "sned_led_signal - Fail\n");
             sleep(3);
-        }else if(rcv.type == 't'){
+        }else if(rcv.type == TIME_OUT){
             printf("send_len_signal - Timeout\n");
 		strcpy(rcv_str, "sned_led_signal - Timeout\n");
             sleep(3);
@@ -250,7 +250,7 @@ void send_led_signal(int socket, int sig){
 void request_soil_recent_to_r3(int socket, char* str){
 	struct response rcv;
 	//char rcv_data[BUF];
-	rcv = request(socket, 'G', 's', 'v', 1, "5");
+	rcv = request(socket, GET, SOIL, RCNT_VAL, 1, "5");
 	//rcv_data = rcv.data;
 	strcpy(str, rcv.data);
 }
@@ -259,7 +259,7 @@ void request_soil_recent_to_r3(int socket, char* str){
 void request_light_recent_to_r3(int socket, char* str){
 	struct response rcv;
 	//char rcv_data[BUF];
-	rcv = request(socket, 'G', 'l', 'v', 1, "5");
+	rcv = request(socket, GET, LIGHT, RCNT_VAL, 1, "5");
 	strcpy(str, rcv.data);
 
 }
@@ -268,7 +268,7 @@ void request_light_recent_to_r3(int socket, char* str){
 int request_soil_average_to_r3(int socket){
 	struct response rcv;
 	int rcv_data;
-	rcv = request(socket, 'G', 's', 'a', 2, "10");
+	rcv = request(socket, GET, SOIL, AVERAGE, 2, "10");
 	rcv_data = atoi(rcv.data);
 	
 	return rcv_data;
@@ -278,7 +278,7 @@ int request_soil_average_to_r3(int socket){
 int request_light_average_to_r3(int socket){
 	struct response rcv;
 	int rcv_data;
-	rcv = request(socket, 'G', 'l', 'a', 2, "10");
+	rcv = request(socket, GET, LIGHT, AVERAGE, 2, "10");
 	rcv_data = atoi(rcv.data);
 
 	return rcv_data;
