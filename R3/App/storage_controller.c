@@ -11,7 +11,7 @@ int main(){
 
 	req = (struct request*)malloc(sizeof(struct request));
 	sock = server_open(R3_STG_PORT);
-	printf("R3.storage_controller init\n");
+	//printf("R3.storage_controller init\n");
 	
 	while(1){
 		printf("wait request from R2.data_controller\n");		

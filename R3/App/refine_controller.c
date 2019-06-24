@@ -15,7 +15,7 @@ int main(void){
 
 	req = (struct request*)malloc(sizeof(struct request));
 	srv = server_open(R3_REF_PORT);		//3020
-	printf("R3.refine_controller init\n");
+	//printf("R3.refine_controller init\n");
 
 	while(1){
 	    printf("wait request from R2.command_controller\n");
