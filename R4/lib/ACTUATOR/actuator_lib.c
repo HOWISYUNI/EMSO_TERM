@@ -1,5 +1,6 @@
 #include "actuator_lib.h"
 
+#include <time.h>
 /* LED device path       : /dev/LED
    LED_ALERT device path : /dev/LED_ALERT
    BUZZER device path    : /dev/buzzer    */
@@ -49,7 +50,7 @@ int turn_on_led_timer(unsigned long sec){
 int turn_on_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TURN_ON_LED, NULL);
+    ret = ioctl(fd, TURN_ON_LEDA, NULL);
     if(ret < 0){
         printf("failed\n");
         close(fd);
@@ -63,7 +64,7 @@ int turn_on_led_alert(void){
 int turn_off_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TURN_OFF_LED, NULL);
+    ret = ioctl(fd, TURN_OFF_LEDA, NULL);
     if(ret < 0){
         printf("failed\n");
         close(fd);
@@ -77,7 +78,7 @@ int turn_off_led_alert(void){
 int turn_on_led_alert_timer(unsigned long sec){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TIME_LED, sec);
+    ret = ioctl(fd, TIME_LEDA, sec);
     if(ret < 0){
         printf("failed\n");
         close(fd);
@@ -181,9 +182,12 @@ int timer_sprinkler(unsigned long sec){
 
 
 /* camera snapshot */
-int snapshot(char *file_name){
+int snapshot(){
+    char *file_name;
     int status, ret;
+    time_t ts;
     pid_t pid;
+    
     pid = fork();
     
     if(pid < 0){
@@ -192,6 +196,10 @@ int snapshot(char *file_name){
         return -1;
     }
     else if(pid == 0){
+        /* time stamp min */
+        ts = time(NULL) / 60;
+        sprintf(file_name, "%ld", ts);
+        
         /* child process */
         execl("/bin/sh", "sh", "./snapshot.sh", file_name, NULL);
     }
