@@ -26,32 +26,32 @@ int main(void){
 			break;
 		}
 		
-		if(req.type == 'l')
+		if(req.type == LED)
 		    ret = led_controller(req);
-		else if(req.type == 'a')
+		else if(req.type == LED_ALERT)
             ret = led_alert_controller(req);
-		else if(req.type == 'b')
+		else if(req.type == BUZZER)
 			ret = buzzer_controller(req);
-		else if(req.type == 'c')
+		else if(req.type == CAMERA)
 		    ret = camera_controller(req);
-		else if(req.type == 's')
+		else if(req.type == SPRINKLER)
 		    ret = sprinkler_controller(req);
-		else if(req.type == 'e')
+		else if(req.type == EMERGENCY)
 		    ret = emergency_controller();
-	    else if(req.type == 'f')
+	    else if(req.type == FIN_EMRCY)
 	        ret = fin_emgcy_controller();
 		else
 		    ret = -1;
 		
 		if(ret < 0){
 		    printf("fail act Control\n");
-		    rsp.type = 'f';
+		    rsp.type = FAIL;
 		    rsp.len = 0;
         	strcpy(rsp.data, "\0");
 		}
 		else{
 		    printf("success act Control\n");
-		    rsp.type = 's';
+		    rsp.type = SUCCESS;
 		    rsp.len = 0;
 		    strcpy(rsp.data, "\0");
 		}
@@ -72,7 +72,7 @@ int led_controller(struct request req){
     int ret;
     
     /* cmd == 1 : ON */
-	if(req.cmd == '1'){
+	if(req.cmd == TURN_ON){
 		time = atoi(req.data);
 		/* data > 0 : TIMER */
 		if(time > 0)
@@ -85,7 +85,7 @@ int led_controller(struct request req){
 			ret = -1;
 	}
 	/* cmd == 0 : OFF */
-	else if(req.cmd == '0')
+	else if(req.cmd == TURN_OFF)
 	    ret = turn_off_led();
 
 	/* cmd != 0 && cmd != 1 : ERROR */
@@ -105,7 +105,7 @@ int led_alert_controller(struct request req){
     int ret;
     
     /* cmd == 1 : ON */
-    if(req.cmd == '1'){
+    if(req.cmd == TURN_ON){
 	    time = atoi(req.data);
 	    if(time > 0)
 	        ret = turn_on_led_alert_timer(time);
@@ -116,7 +116,7 @@ int led_alert_controller(struct request req){
     }
     
 	/* cmd == 0 : OFF */
-    else if(req.cmd == '0')
+    else if(req.cmd == TURN_OFF)
         ret = turn_off_led_alert();
         
     /* cmd != 0 && cmd != 1 : ERROR */
@@ -136,7 +136,7 @@ int buzzer_controller(struct request req){
     int ret;
     
     /* cmd == 1 : ON */
-    if(req.cmd == '1'){
+    if(req.cmd == TURN_ON){
 	    time = atoi(req.data);
 	    if(time > 0)
 	        ret = turn_on_buzzer_timer(time);
@@ -147,7 +147,7 @@ int buzzer_controller(struct request req){
     }
     
 	/* cmd == 0 : OFF */
-    else if(req.cmd == '0'){
+    else if(req.cmd == TURN_OFF){
         ret = turn_off_buzzer();
     }
     
@@ -167,7 +167,7 @@ int camera_controller(struct request req){
     int ret;
     
     /* cmd == 1 : SNAPSHOT */
-    if(req.cmd == '1'){
+    if(req.cmd == TURN_ON){
         /* request.data ==> FILE_NAME */
         ret = snapshot(req.data);
         if(ret < 0)
@@ -186,7 +186,7 @@ int sprinkler_controller(struct request req){
     int ret;
     
     /* cmd == 1 : ON */
-    if(req.cmd == '1'){
+    if(req.cmd == TURN_ON){
 	    time = atoi(req.data);
 	    if(time > 0)
 	        ret = timer_sprinkler(time);
@@ -197,7 +197,7 @@ int sprinkler_controller(struct request req){
     }
     
 	/* cmd == 0 : OFF */
-    else if(req.cmd == '0')
+    else if(req.cmd == TURN_OFF)
         ret = turn_off_sprinkler();
         
     /* cmd != 0 && cmd != 1 : ERROR */
@@ -211,17 +211,17 @@ int sprinkler_controller(struct request req){
 	return 0;
 }
 
-int emergency_controller(){
+int emergency_controller(void){
     int ret;
     int failed;
     
     /* LED AELRT ON */
-    ret = turn_on_led_alert_timer(0);
+    ret = turn_on_led_alert();
     if(ret < 0)
         failed = -1;
         
     /* BUZZER ON */
-    ret = turn_on_buzzer_timer(0);
+    ret = turn_on_buzzer();
     if(ret < 0)
         failed = -1;
         
@@ -236,17 +236,17 @@ int emergency_controller(){
     return 0;
 }
 
-int fin_emgcy_controller(){
+int fin_emgcy_controller(void){
     int ret;
     int failed;
     
     /* LED AELRT OFF */
-    ret = turn_off_led_alert_timer(0);
+    ret = turn_off_led_alert();
     if(ret < 0)
         failed = -1;
         
     /* BUZZER OFF */
-    ret = turn_off_buzzer_timer(0);
+    ret = turn_off_buzzer();
     if(ret < 0)
         failed = -1;
 

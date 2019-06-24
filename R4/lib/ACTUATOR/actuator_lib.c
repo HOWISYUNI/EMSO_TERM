@@ -5,7 +5,7 @@
    BUZZER device path    : /dev/buzzer    */
 
 /* turn on led */
-int turn_on_led(){
+int turn_on_led(void){
     int fd, ret;
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
@@ -19,7 +19,7 @@ int turn_on_led(){
 }
 
 /* turn off led */
-int turn_off_led(){
+int turn_off_led(void){
     int fd, ret;
     fd = open("/dev/led", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
@@ -46,7 +46,7 @@ int turn_on_led_timer(unsigned long sec){
     return 0;
 }
 /* turn on led alert */
-int turn_on_led_alert(){
+int turn_on_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_ON_LED, NULL);
@@ -60,7 +60,7 @@ int turn_on_led_alert(){
 }
 
 /* turn off led */
-int turn_off_led_alert(){
+int turn_off_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
     ret = ioctl(fd, TURN_OFF_LED, NULL);
@@ -88,7 +88,7 @@ int turn_on_led_alert_timer(unsigned long sec){
 }
 
 /* turn on buzzer */
-int turn_on_buzzer(){
+int turn_on_buzzer(void){
     int fd, ret;
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_ON, NULL);
@@ -101,7 +101,7 @@ int turn_on_buzzer(){
     return 0;
 }
 /* turn off buzzer */
-int turn_off_buzzer(){
+int turn_off_buzzer(void){
     int fd, ret;
     fd = open("/dev/buzzer", O_RDWR);
     ret = ioctl(fd, BUZZER_OFF, NULL);
@@ -133,7 +133,7 @@ int turn_on_buzzer_timer(unsigned long sec){
     off 
     timer - can but after finish kernel panic (bad pc value)
 */
-int turn_on_sprinkler(){
+int turn_on_sprinkler(void){
 	int fd_m, fd_w;
     fd_m = open("/dev/motor", O_RDWR);
     fd_w = open("/dev/water_pump", O_RDWR);
@@ -148,7 +148,7 @@ int turn_on_sprinkler(){
     return 0;
 }
 
-int turn_off_sprinkler(){
+int turn_off_sprinkler(void){
 	int fd_m, fd_w;
     fd_m = open("/dev/motor", O_RDWR);
     fd_w = open("/dev/water_pump", O_RDWR);

@@ -6,3 +6,5 @@ int led_alert_controller(struct request req);
 int buzzer_controller(struct request req);
 int camera_controller(struct request req);
 int sprinkler_controller(struct request req);
+int emergency_controller();
+int fin_emgcy_controller();
