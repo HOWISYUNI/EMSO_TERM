@@ -88,7 +88,7 @@ int pir_wait()
 	int dev;
 	int ret;
 
-	dev = open("/dev/pir",O_RDWR);
+	dev = open("/dev/pir_dev",O_RDWR);
 	ret = ioctl(dev, DETECT_WAIT, NULL);    /* be wait in queue until detected */
 	
 	close(dev);
