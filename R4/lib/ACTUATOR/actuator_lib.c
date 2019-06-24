@@ -50,7 +50,7 @@ int turn_on_led_timer(unsigned long sec){
 int turn_on_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TURN_ON_LED, NULL);
+    ret = ioctl(fd, TURN_ON_LEDA, NULL);
     if(ret < 0){
         printf("failed\n");
         close(fd);
@@ -64,7 +64,7 @@ int turn_on_led_alert(void){
 int turn_off_led_alert(void){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TURN_OFF_LED, NULL);
+    ret = ioctl(fd, TURN_OFF_LEDA, NULL);
     if(ret < 0){
         printf("failed\n");
         close(fd);
@@ -78,7 +78,7 @@ int turn_off_led_alert(void){
 int turn_on_led_alert_timer(unsigned long sec){
     int fd, ret;
     fd = open("/dev/led_alert", O_RDWR);
-    ret = ioctl(fd, TIME_LED, sec);
+    ret = ioctl(fd, TIME_LEDA, sec);
     if(ret < 0){
         printf("failed\n");
         close(fd);
