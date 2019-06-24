@@ -11,7 +11,7 @@ int save_data(char type, char *data){
 	else if(type == EMG_T)
 		fp = fopen("emg_t.txt", "a+");
 	else if(type == EMG_P)
-		fp = fopen("emt_p.txt", "a+");
+		fp = fopen("emg_p.txt", "a+");
 	else
 		return -1;
 	
@@ -156,7 +156,7 @@ char* refine_data(char type, char cmd, char* data){
 		return_data[4] = '2';
 		return_data[5] = '\0';
 		return_data[6] = '\0';
-		printf("Failed because cmd is not 'a' or 'v'(fail2) : %s\n",return_data);
+		printf("Failed because cmd is not 'a' or 'v'(fail2) : %s\n", return_data);
 	}
 
 	return return_data;
