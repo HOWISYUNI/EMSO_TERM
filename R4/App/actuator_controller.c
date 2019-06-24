@@ -37,7 +37,7 @@ int main(void){
 		else if(req.type == SPRINKLER)
             ret = sprinkler_controller(req);
 		else if(req.type == EMERGENCY)
-            ret = emergency_controller();
+            ret = emergency_controller(req.data);
 	    else if(req.type == FIN_EMRCY)
             ret = fin_emgcy_controller();
 		else
@@ -169,7 +169,7 @@ int camera_controller(struct request req){
     /* cmd == 1 : SNAPSHOT */
     if(req.cmd == TURN_ON){
         /* request.data ==> FILE_NAME */
-        ret = snapshot();
+        ret = snapshot(req.data);
         if(ret < 0)
             return -1;
     }
@@ -211,7 +211,7 @@ int sprinkler_controller(struct request req){
 	return 0;
 }
 
-int emergency_controller(void){
+int emergency_controller(char *file_name){
     int ret;
     int failed;
     
@@ -226,7 +226,7 @@ int emergency_controller(void){
         failed = -1;
         
     /* camera on */
-    ret = snapshot();
+    ret = snapshot(file_name);
     if(ret < 0)
         failed = -1;
         
@@ -236,7 +236,7 @@ int emergency_controller(void){
     return 0;
 }
 
-int fin_emgcy_controller(void){
+int fin_emgcy_controller(){
     int ret;
     int failed;
     
