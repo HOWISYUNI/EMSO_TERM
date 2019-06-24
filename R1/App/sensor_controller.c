@@ -69,7 +69,7 @@ int main(void){
 						distance = get_ultrasonic();
 						if(distance<ALERT_DISTANCE&&distance>0){
                             emergency_actuator_signal();
-						    printf("notify emergency to r4\n");
+						    //printf("notify emergency to r4\n");
 						    
 							socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,WAIT_RSP);
 							printf("2. 침입 알람 R2에게 전송\n");	
@@ -83,7 +83,7 @@ int main(void){
 						sleep(1);
 					}
 					/* find err */
-					fprintf(stderr, "time : distance = %d : %d\n", time, distance);
+					//fprintf(stderr, "time : distance = %d : %d\n", time, distance);
 				}
 			}					
 		}
@@ -93,7 +93,7 @@ int main(void){
 				tmpo = read_dht11_sensor();
 				if(tmpo > ALERT_TEMPERATURE){
 			        emergency_actuator_signal();
-            	    printf("notify emergency to r4\n");
+            	    //printf("notify emergency to r4\n");
                 	    
 				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
 				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo)<0){

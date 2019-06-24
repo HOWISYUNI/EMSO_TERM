@@ -12,22 +12,22 @@ int main(){
 		sleep(2);
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
-		printf("r3에 소켓 OPEN\n");
+		//printf("r3에 소켓 OPEN\n");
 	    socket_r3 = client_open(R3_ADDR, R3_REF_PORT, WAIT_RSP);
 		
 		/*r3에 토양 온습도 데이터를 요청함.*/
-		printf("r3에 request\n");
+		//printf("r3에 request\n");
 		rcv = request(socket_r3, GET, SOIL, AVERAGE, 1, "5");
 
-		printf("r3에 연결된 소켓 CLOSE\n");
+		//printf("r3에 연결된 소켓 CLOSE\n");
 		client_close(socket_r3);
 
 		/*rcv값에 따라서 스프링클러 작동여부 구하는 함수*/
-		printf("작동여부 구함.\n");
+		//printf("작동여부 구함.\n");
 		sig = check_sprinkler(atoi(rcv.data));
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
-		printf("r1에 소켓 OPEN\n");
+		//printf("r1에 소켓 OPEN\n");
 		socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 		if(rcv.type == FAILURE){
 			printf("토양온습도 fail\n");
@@ -37,27 +37,27 @@ int main(){
 	    
 		send_sprinkler_signal(socket_r1, sig);	/*작동하기로 했으면 시그널을 보냄*/
         
-		printf("r1에 연결된 소켓 CLOSE\n");
+		//printf("r1에 연결된 소켓 CLOSE\n");
 		client_close(socket_r1);
 
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
-		printf("r3에 소켓 OPEN\n");
+		//printf("r3에 소켓 OPEN\n");
 	    socket_r3 = client_open(R3_ADDR, R3_REF_PORT, WAIT_RSP);
 
 		/*r3에 조도 데이터를 요청함*/
-		printf("r3에 request\n");
+		//printf("r3에 request\n");
 		rcv = request(socket_r3, GET, LIGHT, AVERAGE, 1, "5");
 
-		printf("r3에 연결된 소켓 CLOSE\n");
+		//printf("r3에 연결된 소켓 CLOSE\n");
 		client_close(socket_r3);
 	
 		/*rcv값에 따라서 led 작동여부 구하는 함수*/
-		printf("작동여부 구함.\n");
+		//printf("작동여부 구함.\n");
 		sig = check_led(atoi(rcv.data));
 
 		/*클라이언트 초기화 및 시그널 전송---------------------------------------*/
-		printf("r1에 소켓 OPEN\n");
+		//printf("r1에 소켓 OPEN\n");
 		socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 		if(rcv.type == FAILURE){
 			printf("조도 fail\n");
@@ -66,7 +66,7 @@ int main(){
     	}
 		send_led_signal(socket_r1, sig);	/*작동하기로 했으면 시그널을 보냄*/
 		
-		printf("r1에 연결된 소켓 CLOSE\n");
+		//printf("r1에 연결된 소켓 CLOSE\n");
 		client_close(socket_r1);	
 
 	}
