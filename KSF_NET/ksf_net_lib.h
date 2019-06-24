@@ -28,6 +28,45 @@
 #define BACK_LOG_N 4      /* backlog : number of queue can listen to connection  */
 #endif
 
+#ifndef KSF_NET_DEFINE
+#define KSF_NET_DEFINE
+
+/* Method */
+#define GET  'G'
+#define POST 'O'
+#define PUT  'U'
+/* Device type */
+/* SENSOR */
+#define LIGHT     'L'
+#define SOIL      'S'
+#define DHT       'D'
+#define PIR       'P'
+#define ULT_SONIC 'U'
+/* ACTUATOR */ 
+#define LED       'l'
+#define LED_ALERT 'a'
+#define BUZZER    'b'
+#define CAMERA    'c'
+#define SPRINKLER 's'
+#define EMERGENCY 'e'
+#define FIN_EMRCY 'f'
+
+/* Command */
+/* GET */
+#define RCNT        'R'
+#define AVRG        'A'
+/* POST */
+#define STORE       'S'
+/* PUT */
+#define TURN_ON     1
+#define TURN_OFF    0
+
+/* RESPONSE TYPE */
+#define FAIL        'F'
+#define SUCCESS     'S'
+
+#endif
+
 #ifndef KSF_NET_METHOD
 #define KSF_NET_METHOD
 struct request{
