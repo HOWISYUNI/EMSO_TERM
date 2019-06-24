@@ -75,7 +75,7 @@ int main(){
 
 void send_sprinkler_signal(int socket, int sig){
 	struct response rcv;
-	if(sig == true){
+	if(sig == true){/*스프링클러 켜는 신호 전송*/
 		rcv = request(socket, 'U', 's', '1', 0, "true");
 		if(rcv.type == 'f'){
 			printf("send_sprinkler_siganl - Fail\n");
@@ -83,8 +83,14 @@ void send_sprinkler_signal(int socket, int sig){
 	        	printf("send_sprinkler_signal - Timeout\n");
 		}
 
-	}else{
-		/*보낼필요없음*/
+	}else{/*스프링클러 끄는 신호 전송*/
+		rcv = request(socket, 'U', 's', '0', 0, "false");
+        if(rcv.type == 'f'){
+            printf("send_sprinkler_siganl - Fail\n");
+        }else if(rcv.type == 't'){
+                printf("send_sprinkler_signal - Timeout\n");
+        }
+
 	}
 
 }
@@ -92,7 +98,6 @@ void send_sprinkler_signal(int socket, int sig){
 void send_led_signal(int socket, int sig){
 	struct response rcv;
 	if(sig == true){
-		printf("r1");
 		request(socket, 'U', 'l', '1', 0, "true");
 		if(rcv.type == 'f'){
 	        	printf("send_led_signal - Fail\n");
@@ -101,7 +106,14 @@ void send_led_signal(int socket, int sig){
 		}
 
 	}else{
-		/*보낼필요없음*/
+		request(socket, 'U', 'l', '0', 0, "false");
+        if(rcv.type == 'f'){
+			printf("send_led_signal - Fail\n");
+        }else if(rcv.type == 't'){
+            printf("send_len_signal - Timeout\n");
+        }
+
+
 	}
 
 }
