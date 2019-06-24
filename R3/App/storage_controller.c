@@ -18,21 +18,21 @@ int main(){
 		c_sock = wait_request(sock, req);
 		
 		/* cmd is save('s') */
-		if(req->cmd == 's'){
+		if(req->cmd == STORE){
 			ret = save_data(req->type, req->data);
 			if(ret < 0){
 				printf("Failed save_data function!!\n");
-				ret = response(c_sock, 'f', 0, "Failed not save_data func");
+				ret = response(c_sock, FAILURE, sizeof("Failed not save_data func"), "Failed not save_data func");
 			}
 			else{
 				printf("Successed saving data!!\n");
-				ret = response(c_sock, 's', 0, "Successed saving data");
+				ret = response(c_sock, SUCCESS, sizeof("Successed saving data"), "Successed saving data");
 			}
 		}
 		else{
     		/* not support request cmd */
 			printf("not support request command\n");
-			ret = response(c_sock, 'f', 0, "not support request");
+			ret = response(c_sock, FAILURE, sizeof("not support request"), "not support request");
 		}
 		/* response failed */
 		if(ret < 0){

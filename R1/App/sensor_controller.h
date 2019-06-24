@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <wait.h>
 
 #include "../lib/SENSOR/sensor_lib.h"
 #include "../../KSF_NET/ksf_net_lib.h"
