@@ -231,6 +231,7 @@ int send_alert_distance_data_to_r2(int socket, int value, char *file_name){
 	
 	printf("2. 거리 : %d\n",value);
 	sprintf(data, "%s : %d", file_name, value);
+	printf("data : %s\n", data);
 	len = sizeof(data);
 	rcv = request(socket, POST, EMG_P, STORE, len, data);
 
