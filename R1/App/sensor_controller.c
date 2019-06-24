@@ -2,7 +2,7 @@
 
 int send_light_data_to_r2(int socket);
 int send_soil_data_to_r2(int socket);
-int send_alert_temperature_data_to_r2(int socket);
+int send_alert_temperature_data_to_r2(int socket, int value);
 int wait_for_pir();
 int get_ultrasonic();
 int send_alert_distance_data_to_r2(int socket, int value);
@@ -18,6 +18,7 @@ int main(void){
 	int socket_r2;
 	int distance=0;
 	int time=0;
+	int tmpo;
 
 	/*소켓 초기화*/
 	ultra_fd = open_ultrasonic_sensor();
@@ -89,12 +90,18 @@ int main(void){
 		else{
 			while(1){
 				printf("3. 온도 측정!\n");
-				socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
-				if(send_alert_temperature_data_to_r2(socket_r2)<0){
-					/*send 실패*/
-					
+				tmpo = read_dht11_sensor();
+				if(tmpo > ALERT_TEMPERATURE){
+			        while(emergency_actuator_signal() < 0)
+                	    printf("notify emergency to r4\n");
+                	    
+				    socket_r2 = client_open(R2_ADDR, R2_DATA_PORT,10);
+				    if(send_alert_temperature_data_to_r2(socket_r2, tmpo)<0){
+					    /*send 실패*/
+					    
+				    }
+				    client_close(socket_r2);
 				}
-				client_close(socket_r2);
 				sleep(TEMPERATURE_PERIOD);
 			}			
 
@@ -161,29 +168,23 @@ int send_soil_data_to_r2(int socket){
 }
 
 /*r2에게 온도 값이 일정이상이면 Alert를 보내는 함수*/
-int send_alert_temperature_data_to_r2(int socket){
+int send_alert_temperature_data_to_r2(int socket, int value){
 	struct response rcv;
 	char data[1024];
-	int value;
 	int len;
 		
-	value=0;
-	value = read_dht11_sensor();
 	sprintf(data, "%d", value);
 	len = sizeof(data);
 
 	/*온도 값이 ALERT_TEMPERATURE 이상일 때 R2에게 데이터 보냄*/
-	if(value>ALERT_TEMPERATURE){
-	    while(emergency_actuator_signal() < 0)
-    	    printf("notify emergency to r4\n");
-		rcv = request(socket, POST, EMG_T, STORE, len, data);
-		printf("3. 온도 이상 현재 온도 : %d 도 \n",value);
-		if(rcv.type==FAILURE){
-			return -1;
-		}
-		else if(rcv.type==TIME_OUT){
-			return -2;
-		}
+
+	rcv = request(socket, POST, EMG_T, STORE, len, data);
+	printf("3. 온도 이상 현재 온도 : %d 도 \n",value);
+	if(rcv.type==FAILURE){
+		return -1;
+	}
+	else if(rcv.type==TIME_OUT){
+		return -2;
 	}
     
 	return 0;
