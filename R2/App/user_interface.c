@@ -19,14 +19,14 @@ int main(){
 		printf("* 1. r1의 스프링클러 켜기    11. 끄기      *\n");
 		printf("* 2. r1의    led     켜기    22. 끄기     *\n");
 		printf("* 3. r1의 카메라 촬영                     *\n");
-		printf("* 4. r1의    버저   울리기   44. 끄기      *\n");
+		printf("* 4. r1의   Alert   울리기   44. 끄기     *\n");
 		printf("* 5. r3에 토양온습도 최근 n개 요청          *\n");
 		printf("* 6. r3에 조도 최근 n개 요청               *\n");
 		printf("* 7. r3에 토양온습도 평균값 요청            *\n");
 		printf("* 8. r3에 조도 평균값 요청                 *\n");
 		printf("* 9. r3에 토양온습도 값 전달               *\n");
 		printf("* 10. r3에 조도 값 전달                   *\n");
-		printf("* 11. r1에 alert 신호 보내기              *\n");
+		printf("* 101. r1에 alert 신호 보내기              *\n");
 		printf("* 0. 종료                                *\n");
 		printf("------------------------------------------\n");
 		printf("******************************************\n");
@@ -70,32 +70,32 @@ int main(){
 			}
 			
 			client_close(socket_r1);
-		}else if(input == 4){//버저 울기
+		}else if(input == 4){//alert 울리기
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			
-			rcv = request(socket_r1, PUT, BUZZER, TURN_ON, sizeof("turn on buzzer"), "turn on buzzer");
+			rcv = request(socket_r1, PUT, EMERGENCY, TURN_ON, sizeof("turn on emergency"), "turn on emergency");
 			if(rcv.type == FAILURE){
-				printf("send_buzzer_siganl - Fail\n");
-				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
+				printf("send_emergency_siganl - Fail\n");
+				strcpy(rcv_str, "sned_emergency_signal - Fail\n");
 				sleep(3);
 			}else if(rcv.type == TIME_OUT){
-				printf("send_buzzer_signal - Timeout\n");
-				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
+				printf("send_emergency_signal - Timeout\n");
+				strcpy(rcv_str, "sned_emergency_signal - Timeout\n");
 				sleep(3);
 			}
 			
 			client_close(socket_r1);
-		}else if(input == 44){//버저 끄기
+		}else if(input == 44){//alert 끄기
 			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, WAIT_RSP);
 			
-			rcv = request(socket_r1, PUT, BUZZER, TURN_OFF, sizeof("turn off buzzer"), "turn off buzzer");
+			rcv = request(socket_r1, PUT, FIN_EMRCY, TURN_OFF, sizeof("turn off emergency"), "turn off emergency");
 			if(rcv.type == FAILURE){
-				printf("send_buzzer_siganl - Fail\n");
-				strcpy(rcv_str, "sned_buzzer_signal - Fail\n");
+				printf("send_emergency_siganl - Fail\n");
+				strcpy(rcv_str, "sned_emergency_signal - Fail\n");
 				sleep(3);
 			}else if(rcv.type == TIME_OUT){
-				printf("send_buzzer_signal - Timeout\n");
-				strcpy(rcv_str, "sned_buzzer_signal - Timeout\n");
+				printf("send_emergency_signal - Timeout\n");
+				strcpy(rcv_str, "sned_emergency_signal - Timeout\n");
 				sleep(3);
 			}
 			
@@ -150,14 +150,14 @@ int main(){
 		}else if(input == 10){/*r3에 조도 값 전달*/
 			char data[BUF];
 			//fflush(stdin);
-            scanf("%s", data);
-            int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
-            rcv = request(socket_r3, POST, LIGHT, STORE, strlen(data), data);
-            client_close(socket_r3);
-		}else if(input == 11){
-			int socket_r1 = client_open(R4_ADDR, R4_ACT_PORT, 5);
+            		scanf("%s", data);
+            		int socket_r3 = client_open(R3_ADDR, R3_STG_PORT, 5);
+            		rcv = request(socket_r3, POST, LIGHT, STORE, strlen(data), data);
+            		client_close(socket_r3);
+		}else if(input == 101){
+			int socket_r4 = client_open(R4_ADDR, R4_ACT_PORT, 5);
 			
-			rcv = request(socket_r1, PUT, LED_ALERT, TURN_ON, sizeof("turn on led alert"), "turn on led alert");
+			rcv = request(socket_r4, PUT, LED_ALERT, TURN_ON, sizeof("turn on led alert"), "turn on led alert");
 			if(rcv.type == FAILURE){
 				printf("send_alert_siganl - Fail\n");
 				strcpy(rcv_str, "sned_alert_signal - Fail\n");
@@ -168,7 +168,7 @@ int main(){
 				sleep(3);
 			}
 			
-			client_close(socket_r1);
+			client_close(socket_r4);
 		}else if(input == 0){
 			printf("종료합니다.\n");
 			//fflush(stdin);
