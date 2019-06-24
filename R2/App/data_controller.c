@@ -132,8 +132,8 @@ int alert_situation(){
 
 /* camera snapshot */
 int scp_snapshot(char *file_name){
+    char *ptr;
     pid_t pid;
-    
     pid = fork();
     
     if(pid < 0){
@@ -142,8 +142,9 @@ int scp_snapshot(char *file_name){
         return -1;
     }
     else if(pid == 0){
+        ptr = strtok(file_name, " ");
         /* child process */
-        execl("/bin/sh", "sh", "./copy_from_r4.sh", file_name, NULL);
+        execl("/bin/sh", "sh", "./copy_from_r4.sh", ptr, NULL);
     }
     else{
     
