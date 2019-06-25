@@ -22,7 +22,7 @@ Peer review ( 리더십, 토론 능력, 책임감, 전공능력 )
 ## Overview
 * 임베디드 시스템 소프트웨어 팀 프로젝트
 * Smart Farm System (스마트 팜 시스템)
-* 
+
 ---
 ## Member
 > 201311276 박형민   
@@ -41,17 +41,17 @@ OS : Rasbian
 ### Devices Specification
 1. Raspi
 2. Sensor
-	1. 토양 온습도 센서
-	2. 온습도 센서
-	3. 빛 감지 센서
-	4. PIR 센서
-	5. 거리 감지 센서
+	1. 토양 온습도 센서  
+	2. 온습도 센서  
+	3. 빛 감지 센서  
+	4. PIR 센서  
+	5. 거리 감지 센서  
 3. Actuator
-	1. 모터
-	2. 부저
-    	3. 카메라
-	4. 워터 펌프
-	5. LED / ALERT LED
+	1. 모터  
+	2. 부저  
+	3. 카메라  
+	4. 워터 펌프  
+	5. LED / ALERT LED  
 ### Coding Style
 가이드라인 : [kernel_code_style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html)
 
