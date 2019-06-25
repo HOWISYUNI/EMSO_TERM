@@ -30,6 +30,28 @@ Peer review ( 리더십, 토론 능력, 책임감, 전공능력 )
 > 201311306 이진호   
 > 201311320 한예훈   
 ---
+## KU Smart Farm
+> [Demonstrate Link](https://youtu.be/uXOjjKhMu4A)
+### Scenario 1
+> 빛 조도 분석  
+> 광합성에 도움을 주는 파장의 LED 작동 여부 결정  
+> 지속적인 광합성 환경 지원  
+### Scenario 2
+> 토양 온습도 분석  
+> SPRINKLER 작동 여부 결정  
+> 지속적인 수분 공급  
+### Scenario 3
+> 물체 감지  
+> 물체 접근 감지  
+> 일정 임계치 이상으로 다가올 경우 비상 알림 시스템 작동  
+### Scenario 4
+> 대기 중 온도 감지  
+> 비정상 수치 감지시 비상 알림 시스템 작동  
+### User interface 
+> .중앙 제어 모듈(R2)에서 사용  
+> R3(Storage & Refine Controller)로부터 환경 데이터 정보 요청  
+> R4(Actuator Controller)로부터 Actuator 작동 제어 요청  
+---
 ## Environments
 ### Development Environment
 OS : Linux  
