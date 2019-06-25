@@ -1,5 +1,5 @@
 
-# Smart Farm System
+# KU Smart Farm System
 ### DeadLine
 __중간 발표 자료 제출__ : 6/2(SUN)
 __중간 발표__ : 6/5 - 6/7(WED, FRI)
